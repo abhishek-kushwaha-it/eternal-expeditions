@@ -1,0 +1,88 @@
+/* ============================================
+   ERROR BOUNDARY COMPONENT
+   Error fallback UI display
+   ============================================ */
+
+.error-boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-boundary__icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.error-boundary__title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #333;
+  margin-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.error-boundary__message {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-top: 0;
+  margin-left: 0;
+  margin-right: 0;
+  line-height: 1.5;
+}
+
+/* Button spacing */
+.error-boundary .btn {
+  margin-top: 1rem;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .error-boundary {
+    min-height: 50vh;
+    padding: 1.5rem;
+  }
+
+  .error-boundary__icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-boundary__title {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .error-boundary__message {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .error-boundary {
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .error-boundary__icon {
+    font-size: 2.5rem;
+  }
+
+  .error-boundary__title {
+    font-size: 1.25rem;
+  }
+
+  .error-boundary__message {
+    font-size: 0.9rem;
+  }
+}

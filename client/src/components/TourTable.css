@@ -1,0 +1,418 @@
+/* ============================================
+   TOUR TABLE COMPONENT
+   Data table for tours
+   ============================================ */
+
+.tour-table {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all var(--transition-base);
+}
+
+.tour-table:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-white);
+}
+
+.table__head {
+  background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.table__header {
+  padding: var(--spacing-lg) var(--spacing-md);
+  text-align: left;
+  font-weight: var(--font-weight-bold);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-gray);
+  background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%);
+  border-bottom: 2px solid #e8e8e8;
+  white-space: nowrap;
+}
+
+.table__header--center {
+  text-align: center;
+}
+
+.table__header--image {
+  width: 60px;
+  text-align: center;
+}
+
+.table__row {
+  border-bottom: 1px solid #f0f0f0;
+  transition: all var(--transition-fast);
+}
+
+.table__row:hover {
+  background-color: #fafafa;
+}
+
+.table__row:last-child {
+  border-bottom: none;
+}
+
+.table__cell {
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: #333;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.table__cell--image {
+  text-align: center;
+  padding: var(--spacing-md);
+  width: 60px;
+}
+
+.table__cell--name {
+  font-weight: 600;
+  min-width: 180px;
+}
+
+.table__cell--center {
+  text-align: center;
+}
+
+.table__cell--actions {
+  white-space: nowrap;
+}
+
+/* ============================================
+   TOUR TABLE SPECIFIC COMPONENTS
+   ============================================ */
+
+/* Tour Thumbnail Image */
+.tour-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid #e8e8e8;
+  transition: all var(--transition-fast);
+}
+
+.tour-thumbnail:hover {
+  transform: scale(1.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(85, 197, 122, 0.15);
+}
+
+.tour-thumbnail--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: #f5f5f5;
+  border-radius: var(--radius-md);
+}
+
+/* Tour Name Cell */
+.tour-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.tour-name-cell__name {
+  font-weight: 600;
+  color: #333;
+}
+
+.tour-name-cell__badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  background: #ffe5cc;
+  color: #d97706;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* Tour Info Cell */
+.tour-info-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: #333;
+  font-size: 0.9rem;
+}
+
+/* Price Cell */
+.price-cell__price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.status-badge__icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-badge__text {
+  letter-spacing: 0.3px;
+}
+
+/* Easy - Green */
+.status-badge--success {
+  background-color: #d5f4e6;
+  color: #22a84a;
+  border-color: #a8e6d5;
+}
+
+.status-badge--success .status-badge__icon {
+  background-color: #22a84a;
+}
+
+/* Medium - Yellow */
+.status-badge--warning {
+  background-color: #fef5e7;
+  color: #d68910;
+  border-color: #f8d7a1;
+}
+
+.status-badge--warning .status-badge__icon {
+  background-color: #d68910;
+}
+
+/* Difficult - Red */
+.status-badge--danger {
+  background-color: #fadbd8;
+  color: #b72717;
+  border-color: #f5b7b1;
+}
+
+.status-badge--danger .status-badge__icon {
+  background-color: #b72717;
+}
+
+/* Rating Cell */
+.rating-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.9rem;
+}
+
+.rating-cell__stars {
+  font-size: 1rem;
+}
+
+.rating-cell__value {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.rating-cell__count {
+  color: var(--text-gray);
+  font-size: 0.8rem;
+}
+
+/* Guides Cell - Avatars */
+.guides-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.guides-cell__empty {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.guides-avatars {
+  display: flex;
+  align-items: center;
+  gap: -8px;
+}
+
+.guides-avatars__item {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-fast);
+}
+
+.guides-avatars__item:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+
+.guides-avatars__more {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e8e8e8;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Actions Group */
+.actions-group {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.actions-group button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.actions-group button:hover {
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .table__cell {
+    padding: var(--spacing-md);
+    font-size: 0.9rem;
+  }
+
+  .table__header {
+    padding: var(--spacing-md);
+    font-size: 0.75rem;
+  }
+
+  .tour-thumbnail {
+    width: 45px;
+    height: 45px;
+  }
+
+  .guides-avatars__item {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 700px;
+    font-size: 0.85rem;
+  }
+
+  .table__cell {
+    padding: var(--spacing-md) var(--spacing-sm);
+    font-size: 0.85rem;
+  }
+
+  .table__header {
+    padding: var(--spacing-md) var(--spacing-sm);
+    font-size: 0.7rem;
+  }
+
+  .tour-thumbnail {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tour-name-cell__name {
+    font-size: 0.9rem;
+  }
+
+  .actions-group button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table {
+    min-width: 600px;
+  }
+
+  .table__cell {
+    padding: var(--spacing-sm);
+    font-size: 0.8rem;
+  }
+
+  .table__header {
+    padding: var(--spacing-sm);
+    font-size: 0.65rem;
+  }
+
+  .tour-thumbnail {
+    width: 35px;
+    height: 35px;
+  }
+
+  .guides-avatars__item {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+
+  .guides-avatars__more {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+
+  .status-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}

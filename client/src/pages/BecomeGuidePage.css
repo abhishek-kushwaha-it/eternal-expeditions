@@ -1,0 +1,89 @@
+/* Become Guide Page - Minimal & Clean */
+
+main[data-page='become-guide'] {
+  min-height: calc(100vh - 25rem);
+}
+
+.become-guide-page {
+  background: linear-gradient(135deg, #f8fafc 0%, #e8f5f0 100%);
+  padding: 3rem 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.guide-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.guide-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.2;
+}
+
+.guide-intro {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 2rem 0;
+}
+
+.guide-requirements {
+  text-align: left;
+  margin: 0 auto 2rem;
+  max-width: 400px;
+}
+
+.guide-requirements h2 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+}
+
+.guide-requirements ul {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-requirements li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+  color: #666;
+}
+
+.guide-requirements li:before {
+  content: '✓ ';
+  color: #55c57a;
+  font-weight: bold;
+}
+
+.guide-contact {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.guide-contact strong {
+  color: #55c57a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .become-guide-page {
+    padding: 2rem 1rem;
+  }
+
+  .guide-title {
+    font-size: 2rem;
+  }
+
+  .guide-requirements {
+    max-width: 100%;
+  }
+}

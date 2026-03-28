@@ -1,0 +1,525 @@
+/* ============================================
+   GUIDE MONTHLY PLAN PAGE - INDUSTRY LEVEL
+   Beautiful monthly tour planning dashboard
+   ============================================ */
+
+.main {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
+}
+
+.monthly-plan-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem;
+}
+
+.monthly-plan-container h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  letter-spacing: -0.5px;
+  animation: slideDown 0.6s ease-out;
+}
+
+/* ====== YEAR SELECTOR ====== */
+.year-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  animation: slideUp 0.6s ease-out 0.1s both;
+}
+
+.year-selector label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+}
+
+.year-select {
+  padding: 0.75rem 1.25rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  color: #1a202c;
+  min-width: 180px;
+}
+
+.year-select:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(85, 197, 122, 0.15);
+  background: linear-gradient(135deg, #f8fafc, #ffffff);
+}
+
+.year-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(85, 197, 122, 0.1);
+}
+
+/* ====== MONTHLY PLAN GRID ====== */
+.monthly-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+}
+
+/* ====== MONTH CARD ====== */
+.month-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.month-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
+  z-index: 1;
+}
+
+.month-card:hover::before {
+  transform: scaleX(1);
+}
+
+.month-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.month-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.75rem;
+  border-bottom: 2px solid #f1f5f9;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transition: all 0.3s ease;
+}
+
+.month-card:hover .month-card__header {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-bottom-color: var(--color-primary);
+}
+
+.month-card__month {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+  transition: color 0.3s ease;
+  flex: 1;
+}
+
+.month-card:hover .month-card__month {
+  color: var(--color-primary);
+}
+
+.month-card__count {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 3.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(85, 197, 122, 0.3);
+  transition: all 0.3s ease;
+}
+
+.month-card:hover .month-card__count {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(85, 197, 122, 0.4);
+}
+
+/* ====== MONTH CARD BODY ====== */
+.month-card__body {
+  padding: 1.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.month-card__tours-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.month-card__tours-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.month-card__tour-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.month-card__tour-item:hover {
+  background: #f8fafc;
+  padding-left: 1rem;
+}
+
+.month-card__tour-item--empty {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.tour-bullet {
+  color: var(--color-primary);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 1.2rem;
+}
+
+/* ====== EMPTY STATE ====== */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: white;
+  border-radius: 12px;
+  border: 2px dashed #e2e8f0;
+  color: #94a3b8;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ====== PLAN SUMMARY ====== */
+.plan-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: center;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.summary-stat:hover {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  transform: translateY(-4px);
+}
+
+.summary-stat span:first-child {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+/* ====== ANIMATIONS ====== */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 1200px) {
+  .monthly-plan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.75rem;
+  }
+
+  .monthly-plan-container {
+    padding: 2.75rem 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .monthly-plan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .monthly-plan-container h1 {
+    font-size: 2.2rem;
+  }
+
+  .month-card__header {
+    padding: 1.5rem;
+  }
+
+  .month-card__body {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-plan-container {
+    padding: 2rem 1rem;
+  }
+
+  .monthly-plan-container h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .year-selector {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .year-selector label {
+    width: 100%;
+    text-align: center;
+    font-size: 0.95rem;
+  }
+
+  .year-select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .monthly-plan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .month-card {
+    border-radius: 10px;
+  }
+
+  .month-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .month-card__header {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .month-card__month {
+    font-size: 1.25rem;
+  }
+
+  .month-card__count {
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+    min-width: 3rem;
+  }
+
+  .month-card__body {
+    padding: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .month-card__tours-label {
+    font-size: 0.8rem;
+  }
+
+  .month-card__tour-item {
+    font-size: 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .plan-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .summary-stat {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+  }
+
+  .empty-state {
+    padding: 2rem 1.5rem;
+  }
+
+  .empty-state p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .monthly-plan-container {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .monthly-plan-container h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .year-selector {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .year-selector label {
+    font-size: 0.9rem;
+  }
+
+  .year-select {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .monthly-plan-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .month-card {
+    border-radius: 8px;
+  }
+
+  .month-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .month-card__header {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .month-card__month {
+    font-size: 1.1rem;
+  }
+
+  .month-card__count {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.9rem;
+    min-width: 2.5rem;
+  }
+
+  .month-card__body {
+    padding: 1rem;
+  }
+
+  .month-card__tours-label {
+    font-size: 0.75rem;
+  }
+
+  .month-card__tour-item {
+    font-size: 0.85rem;
+  }
+
+  .tour-bullet {
+    font-size: 1rem;
+    margin-top: 1px;
+  }
+
+  .plan-summary {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .summary-stat {
+    padding: 0.75rem;
+  }
+
+  .summary-stat span:first-child {
+    font-size: 0.85rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 1rem;
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+  }
+}

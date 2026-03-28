@@ -1,0 +1,264 @@
+/* ============================================
+   MANAGE REVIEWS PAGE
+   Admin review management with modern design
+   ============================================ */
+
+.main {
+  background: linear-gradient(135deg, #f8fafb 0%, #f0f4f8 100%);
+  min-height: 100vh;
+  padding: var(--spacing-xl) 0;
+}
+
+.page__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+
+.manage-reviews__header {
+  margin-bottom: var(--spacing-2xl);
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page__title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #333;
+  margin: 0;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #55c57a 0%, #28b487 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   FILTER SECTION
+   ============================================ */
+
+.manage-reviews__filters {
+  margin-bottom: var(--spacing-2xl);
+  animation: slideDown 0.6s ease-out 0.1s backwards;
+}
+
+/* ============================================
+   REVIEWS LIST LAYOUT
+   ============================================ */
+
+.reviews-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: var(--spacing-lg);
+  animation: fadeIn 0.5s ease-out 0.2s backwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-4xl) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(85, 197, 122, 0.05) 0%, rgba(85, 197, 122, 0.02) 100%);
+  border-radius: 16px;
+  border: 2px dashed rgba(85, 197, 122, 0.2);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.empty-state__text {
+  font-size: 1.3rem;
+  color: var(--color-text-secondary, #999);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.empty-state::before {
+  content: '📭';
+  display: block;
+  font-size: 4rem;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.3;
+}
+
+/* ============================================
+   LOADING & ERROR STATES
+   ============================================ */
+
+.loading-state,
+.error-state {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .page__container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .manage-reviews__header {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .page__title {
+    font-size: 1.9rem;
+  }
+
+  .review-edit-modal__header {
+    padding: var(--spacing-md);
+  }
+
+  .review-edit-modal__body {
+    padding: var(--spacing-md);
+  }
+
+  .review-edit-modal__footer {
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: var(--spacing-lg) 0;
+  }
+
+  .page__container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .manage-reviews__header {
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .page__title {
+    font-size: 1.6rem;
+  }
+
+  .reviews-list {
+    gap: var(--spacing-md);
+  }
+
+  .review-edit-modal {
+    border-radius: 12px;
+  }
+
+  .review-edit-modal__header h3 {
+    font-size: 1.2rem;
+  }
+
+  .review-edit-modal__body {
+    padding: var(--spacing-md);
+    max-height: 70vh;
+  }
+
+  .review-edit-modal__footer {
+    padding: var(--spacing-md);
+    flex-direction: column-reverse;
+  }
+
+  .review-edit-modal__footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: var(--spacing-md) 0;
+  }
+
+  .page__container {
+    padding: 0 var(--spacing-sm);
+  }
+
+  .manage-reviews__header {
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .page__title {
+    font-size: 1.3rem;
+  }
+
+  .reviews-list {
+    gap: var(--spacing-sm);
+  }
+
+  .review-edit-modal {
+    border-radius: 8px;
+    border-width: 1px;
+  }
+
+  .review-edit-modal__header {
+    padding: var(--spacing-md);
+  }
+
+  .review-edit-modal__header h3 {
+    font-size: 1rem;
+  }
+
+  .review-edit-modal__body {
+    padding: var(--spacing-md);
+    gap: var(--spacing-md);
+  }
+
+  .review-edit-modal__footer {
+    padding: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
+  .edit-form-label {
+    font-size: 0.85rem;
+  }
+
+  .edit-form-select,
+  .edit-form-textarea {
+    padding: var(--spacing-sm);
+    font-size: 0.95rem;
+  }
+
+  .empty-state {
+    padding: var(--spacing-2xl) var(--spacing-md);
+    min-height: 250px;
+  }
+
+  .empty-state::before {
+    font-size: 3rem;
+  }
+
+  .empty-state__text {
+    font-size: 1.1rem;
+  }
+}

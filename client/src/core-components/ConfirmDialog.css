@@ -1,0 +1,128 @@
+/* ============================================
+   CONFIRM DIALOG COMPONENT
+   Modal dialog for confirmations and alerts
+   ============================================ */
+
+.confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn var(--transition-base);
+}
+
+.confirm-dialog {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideInUp var(--transition-base) ease;
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.confirm-dialog__content {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.confirm-dialog__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-md) 0;
+  color: #333;
+}
+
+.confirm-dialog__message {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .confirm-dialog {
+    width: 95%;
+    padding: var(--spacing-xl) var(--spacing-md);
+  }
+
+  .confirm-dialog__actions {
+    flex-direction: column;
+  }
+
+  .confirm-dialog__actions .btn {
+    width: 100%;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .confirm-dialog__content {
+    width: 95%;
+  }
+
+  .confirm-dialog__body {
+    padding: var(--spacing-lg);
+  }
+
+  .confirm-dialog__footer {
+    flex-direction: column;
+    padding: var(--spacing-lg);
+  }
+
+  .confirm-dialog__footer .btn {
+    width: 100%;
+  }
+}

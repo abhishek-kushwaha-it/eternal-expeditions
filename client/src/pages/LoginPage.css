@@ -1,0 +1,14 @@
+/* ============================================
+   LOGIN PAGE
+   Imports shared auth styles from AuthPages.css
+   ============================================ */
+
+@import './AuthPages.css';
+
+/* Login page specific overrides if needed */
+.main {
+  padding: 0;
+  background: transparent;
+}
+
+/* Optional: Add login-specific animations or styles here */

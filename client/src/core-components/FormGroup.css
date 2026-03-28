@@ -1,0 +1,142 @@
+/* ============================================
+   FORM GROUP COMPONENT
+   Modern clean form styling inspired by
+   e-commerce platforms
+   ============================================ */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-2xl);
+  position: relative;
+}
+
+.form-group__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: #333;
+  display: block;
+  transition: color var(--transition-fast);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-group__label--required::after {
+  content: '*';
+  color: var(--color-danger);
+  margin-left: 0.25rem;
+}
+
+.form-group__input,
+.form-group__textarea,
+.form-group__select {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-lg);
+  background: var(--bg-white);
+  color: #333;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.form-group__input::placeholder,
+.form-group__textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-group__input:hover,
+.form-group__textarea:hover,
+.form-group__select:hover {
+  border-color: #ccc;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-group__input:focus,
+.form-group__textarea:focus,
+.form-group__select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.1);
+  background: white;
+}
+
+.form-group__input:disabled,
+.form-group__textarea:disabled,
+.form-group__select:disabled {
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  border-color: var(--border-light);
+}
+
+.form-group__textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-size: 1rem;
+}
+
+/* === VALIDATION STATES === */
+.form-group--error .form-group__label {
+  color: var(--color-danger);
+}
+
+.form-group--error .form-group__input,
+.form-group--error .form-group__textarea,
+.form-group--error .form-group__select {
+  border-color: var(--color-danger);
+  background: rgba(220, 38, 38, 0.02);
+}
+
+.form-group--error .form-group__input:focus,
+.form-group--error .form-group__textarea:focus,
+.form-group--error .form-group__select:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-group--success .form-group__input,
+.form-group--success .form-group__textarea,
+.form-group--success .form-group__select {
+  border-color: var(--color-success);
+  background: rgba(40, 167, 69, 0.02);
+}
+
+.form-group--success .form-group__input:focus,
+.form-group--success .form-group__textarea:focus,
+.form-group--success .form-group__select:focus {
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* === CHECKBOX & RADIO === */
+.form-group__checkbox,
+.form-group__radio {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.form-group__checkbox input[type='checkbox'],
+.form-group__radio input[type='radio'] {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.form-group__checkbox label,
+.form-group__radio label {
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* === HELP TEXT === */
+.form-group__help {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--spacing-xs);
+}

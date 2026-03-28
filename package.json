@@ -1,0 +1,38 @@
+{
+  "name": "eternal-expeditions",
+  "version": "1.0.0",
+  "description": "A full-stack tour booking platform - Learn Node.js, Express, MongoDB with React & Vite",
+  "author": "Abhishek Kushwaha",
+  "license": "ISC",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start --workspace=client\" \"npm run start --workspace=server\"",
+    "start:prod": "concurrently \"npm run start:prod --workspace=client\" \"npm run start:prod --workspace=server\"",
+    "lint": "npm run lint --workspace=client && npm run lint --workspace=server",
+    "format": "npm run format --workspace=client && npm run format --workspace=server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/eternal-expeditions.git"
+  },
+  "keywords": [
+    "tour-booking",
+    "mern-stack",
+    "nodejs",
+    "express",
+    "mongodb",
+    "react",
+    "vite"
+  ]
+}

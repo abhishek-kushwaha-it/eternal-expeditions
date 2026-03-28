@@ -1,0 +1,137 @@
+/* ============================================
+   LOADING STATE COMPONENT
+   Spinners and skeleton loading screens
+   ============================================ */
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  min-height: 300px;
+}
+
+/* === SPINNER === */
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(85, 197, 122, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner--sm {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+.loading-spinner--lg {
+  width: 56px;
+  height: 56px;
+  border-width: 4px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === TEXT === */
+
+.loading-state__text {
+  margin-top: var(--spacing-lg);
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+.loading-state__text--animated {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.loading-state__dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: pulse 1.4s infinite;
+}
+
+.loading-state__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-state__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-state__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* === SKELETON === */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-light) 25%,
+    var(--bg-lighter) 50%,
+    var(--bg-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s infinite;
+}
+
+.skeleton--text {
+  height: 16px;
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-sm);
+}
+
+.skeleton--avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.skeleton--card {
+  min-height: 200px;
+  border-radius: var(--radius-lg);
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .loading-state {
+    min-height: 200px;
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+  }
+}

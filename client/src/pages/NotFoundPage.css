@@ -1,0 +1,157 @@
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 100px);
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(85, 197, 122, 0.05), rgba(85, 197, 122, 0.02));
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 600px;
+  animation: slideInDown 0.6s ease;
+}
+
+.not-found-title {
+  font-size: 5rem;
+  font-weight: bold;
+  color: #55c57a;
+  margin: 0;
+  line-height: 1;
+}
+
+.not-found-heading {
+  font-size: 1.875rem;
+  color: #333;
+  margin: 1rem 0 1.5rem;
+  font-weight: 600;
+}
+
+.not-found-message {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.not-found-illustration {
+  margin: 2rem 0;
+  animation: float 3s ease-in-out infinite;
+}
+
+.not-found-illustration svg {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+  display: block;
+}
+
+.not-found-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.not-found-suggestions {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: left;
+  border-left: 4px solid #55c57a;
+}
+
+.not-found-suggestions h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.not-found-suggestions ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.not-found-suggestions li {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.not-found-suggestions a {
+  color: #55c57a;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.not-found-suggestions a:hover {
+  text-decoration: underline;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .not-found-title {
+    font-size: 3rem;
+  }
+
+  .not-found-heading {
+    font-size: 1.5rem;
+  }
+
+  .not-found-message {
+    font-size: 0.95rem;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+  }
+
+  .not-found-actions .btn {
+    width: 100%;
+  }
+
+  .not-found-illustration svg {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .not-found-container {
+    padding: var(--spacing-xl) var(--spacing-md);
+    min-height: 100vh;
+  }
+
+  .not-found-title {
+    font-size: 2.5rem;
+  }
+
+  .not-found-heading {
+    font-size: 1.25rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  .not-found-suggestions {
+    padding: 1rem;
+  }
+}

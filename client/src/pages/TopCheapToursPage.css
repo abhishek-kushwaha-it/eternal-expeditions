@@ -1,0 +1,168 @@
+/* ============================================
+   TOP CHEAP TOURS PAGE
+   Most affordable tours
+   ============================================ */
+
+.top-cheap-page {
+  min-height: 100vh;
+  background-color: var(--bg-light);
+}
+
+/* HEADER SECTION */
+.top-cheap-header-section {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #d4a574 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.top-cheap-header-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.top-cheap-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.top-cheap-main-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.top-cheap-badge {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.top-cheap-description {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+/* CONTENT SECTION */
+.top-cheap-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.top-cheap-tours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+/* FOOTER SECTION */
+.top-cheap-footer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+.top-cheap-footer-text {
+  font-size: 1rem;
+  color: #666;
+  margin: 0;
+}
+
+.top-cheap-empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.top-cheap-empty-text {
+  font-size: 1.1rem;
+  color: #999;
+  margin: 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .top-cheap-tours-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-cheap-header-section {
+    padding: 3rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .top-cheap-main-title {
+    font-size: 1.8rem;
+  }
+
+  .top-cheap-description {
+    font-size: 1rem;
+  }
+
+  .top-cheap-content {
+    padding: 0 1.5rem;
+  }
+
+  .top-cheap-tours-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .top-cheap-footer-section {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-cheap-header-section {
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .top-cheap-header-content {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .top-cheap-main-title {
+    font-size: 1.4rem;
+  }
+
+  .top-cheap-description {
+    font-size: 0.9rem;
+  }
+
+  .top-cheap-content {
+    padding: 0 1rem;
+  }
+
+  .top-cheap-tours-grid {
+    gap: 1rem;
+  }
+}
