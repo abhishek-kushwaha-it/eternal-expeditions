@@ -170,7 +170,11 @@ export default function BookingCard({
         <span
           className={`booking-status-badge booking-status-badge--${booking.stripePaymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
         >
-          {booking.stripePaymentStatus === 'succeeded' ? 'Paid' : booking.stripePaymentStatus === 'failed' ? 'Failed' : 'Pending'}
+          {booking.stripePaymentStatus === 'succeeded'
+            ? 'Paid'
+            : booking.stripePaymentStatus === 'failed'
+              ? 'Failed'
+              : 'Pending'}
         </span>
       </div>
 
@@ -179,19 +183,10 @@ export default function BookingCard({
         <DetailItem label="Duration" value={`${booking.tour?.duration} days`} />
         <DetailItem label="Price" value={`$${booking.price}`} isPrimary />
         <DetailItem label="Booking Date" value={formatDate(booking.createdAt)} />
-        <DetailItem 
-          label="Payment Status" 
-          value={booking.stripePaymentStatus || 'pending'} 
-        />
-        <DetailItem 
-          label="Payment Method" 
-          value={booking.paymentMethod || 'N/A'} 
-        />
+        <DetailItem label="Payment Status" value={booking.stripePaymentStatus || 'pending'} />
+        <DetailItem label="Payment Method" value={booking.paymentMethod || 'N/A'} />
         {booking.failureReason && (
-          <DetailItem 
-            label="Failure Reason" 
-            value={booking.failureReason}
-          />
+          <DetailItem label="Failure Reason" value={booking.failureReason} />
         )}
       </div>
 

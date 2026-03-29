@@ -79,6 +79,7 @@ server/
 ## 🔌 API Endpoints
 
 ### Authentication
+
 ```
 POST   /api/v1/users/signup               - Register user
 POST   /api/v1/users/login                - Login user
@@ -90,6 +91,7 @@ GET    /api/v1/users/me                   - Get current user (protected)
 ```
 
 ### Users (Admin)
+
 ```
 GET    /api/v1/users                     - Get all users (admin)
 GET    /api/v1/users/:id                 - Get user by ID (admin)
@@ -98,6 +100,7 @@ DELETE /api/v1/users/:id                 - Delete user (admin)
 ```
 
 ### Tours
+
 ```
 GET    /api/v1/tours                     - Get all tours (with filtering)
 GET    /api/v1/tours/top-5-cheap         - Get top 5 cheapest tours
@@ -110,6 +113,7 @@ POST   /api/v1/tours/:id/upload-images   - Upload images (owner/admin)
 ```
 
 ### Reviews
+
 ```
 GET    /api/v1/reviews                   - Get all reviews
 POST   /api/v1/tours/:tourId/reviews     - Create review (user)
@@ -118,6 +122,7 @@ DELETE /api/v1/reviews/:id               - Delete review (owner/admin)
 ```
 
 ### Bookings
+
 ```
 GET    /api/v1/bookings                  - Get all bookings (admin)
 GET    /api/v1/bookings/my-bookings      - Get user's bookings (user)
@@ -169,7 +174,7 @@ POST   /api/v1/bookings/webhook/stripe   - Stripe webhook handler
   price: Number (required),
   createdAt: Date (indexed),
   paid: Boolean (default: false, synced with stripePaymentStatus),
-  
+
   // Stripe Payment Fields
   stripeSessionId: String (unique, sparse, indexed),
   stripeChargeId: String (sparse),

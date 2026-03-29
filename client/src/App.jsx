@@ -64,164 +64,164 @@ function App() {
           <Toast />
           <Header />
           <Routes>
-          {/* ============================================
+            {/* ============================================
               PUBLIC ROUTES
               ============================================ */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/tours" element={<ToursPage />} />
-          <Route path="/top-5-cheap" element={<TopCheapToursPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          <Route path="/tour/:id" element={<TourPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/careers" element={<CareersPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/become-guide" element={<BecomeGuidePage />} />
-          <Route path="/monthly-plan" element={<GuideMonthlyPlanPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/tours" element={<ToursPage />} />
+            <Route path="/top-5-cheap" element={<TopCheapToursPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/tour/:id" element={<TourPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/become-guide" element={<BecomeGuidePage />} />
+            <Route path="/monthly-plan" element={<GuideMonthlyPlanPage />} />
 
-          {/* ============================================
+            {/* ============================================
               USER PROTECTED ROUTES (require authentication)
               ============================================ */}
 
-          {/* User Account Management */}
-          <Route
-            path="/me"
-            element={
-              <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
-                <AccountPage />
-              </RoleBasedRoute>
-            }
-          />
+            {/* User Account Management */}
+            <Route
+              path="/me"
+              element={
+                <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
+                  <AccountPage />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* User Bookings - RESTful: GET /bookings/my-bookings */}
-          <Route
-            path="/my-tour-bookings"
-            element={
-              <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
-                <BookingListPage />
-              </RoleBasedRoute>
-            }
-          />
-          {/* RESTful: GET /bookings/:id */}
-          <Route
-            path="/bookings/:bookingId"
-            element={
-              <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
-                <BookingDetailsPage />
-              </RoleBasedRoute>
-            }
-          />
+            {/* User Bookings - RESTful: GET /bookings/my-bookings */}
+            <Route
+              path="/my-tour-bookings"
+              element={
+                <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
+                  <BookingListPage />
+                </RoleBasedRoute>
+              }
+            />
+            {/* RESTful: GET /bookings/:id */}
+            <Route
+              path="/bookings/:bookingId"
+              element={
+                <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
+                  <BookingDetailsPage />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Booking Success - Stripe Webhook Callback */}
-          <Route
-            path="/booking-success"
-            element={
-              <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
-                <BookingSuccessPage />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Booking Success - Stripe Webhook Callback */}
+            <Route
+              path="/booking-success"
+              element={
+                <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
+                  <BookingSuccessPage />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* ============================================
+            {/* ============================================
               GUIDE + ADMIN ROUTES (restrictTo: admin, guide)
               ============================================ */}
 
-          {/* Tour Management - RESTful: GET/POST/PATCH/DELETE /tours */}
-          <Route
-            path="/manage/tours"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <ManageTours />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Tour Management - RESTful: GET/POST/PATCH/DELETE /tours */}
+            <Route
+              path="/manage/tours"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <ManageTours />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Tour Form - Create/Edit */}
-          <Route
-            path="/manage/tours/new"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <TourFormPage />
-              </RoleBasedRoute>
-            }
-          />
-          <Route
-            path="/manage/tours/:id/edit"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <TourFormPage />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Tour Form - Create/Edit */}
+            <Route
+              path="/manage/tours/new"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <TourFormPage />
+                </RoleBasedRoute>
+              }
+            />
+            <Route
+              path="/manage/tours/:id/edit"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <TourFormPage />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Review Management - RESTful: GET/PATCH/DELETE /reviews */}
-          <Route
-            path="/manage/reviews"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <ManageReviews />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Review Management - RESTful: GET/PATCH/DELETE /reviews */}
+            <Route
+              path="/manage/reviews"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <ManageReviews />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Booking Management - RESTful: GET/POST/PATCH/DELETE /bookings */}
-          <Route
-            path="/manage/bookings"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <ManageBookings />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Booking Management - RESTful: GET/POST/PATCH/DELETE /bookings */}
+            <Route
+              path="/manage/bookings"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <ManageBookings />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Tour Statistics - RESTful: GET /tours/tour-stats */}
-          <Route
-            path="/manage/stats"
-            element={
-              <RoleBasedRoute
-                allowedRoles={['admin', 'guide']}
-                fallback={<Navigate to="/" replace />}
-              >
-                <TourStatsPage />
-              </RoleBasedRoute>
-            }
-          />
+            {/* Tour Statistics - RESTful: GET /tours/tour-stats */}
+            <Route
+              path="/manage/stats"
+              element={
+                <RoleBasedRoute
+                  allowedRoles={['admin', 'guide']}
+                  fallback={<Navigate to="/" replace />}
+                >
+                  <TourStatsPage />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* ============================================
+            {/* ============================================
               ADMIN ONLY ROUTES (restrictTo: admin)
               ============================================ */}
 
-          {/* User Management - RESTful: GET/POST/PATCH/DELETE /users */}
-          <Route
-            path="/admin/users"
-            element={
-              <RoleBasedRoute allowedRoles={['admin']} fallback={<Navigate to="/" replace />}>
-                <ManageUsers />
-              </RoleBasedRoute>
-            }
-          />
+            {/* User Management - RESTful: GET/POST/PATCH/DELETE /users */}
+            <Route
+              path="/admin/users"
+              element={
+                <RoleBasedRoute allowedRoles={['admin']} fallback={<Navigate to="/" replace />}>
+                  <ManageUsers />
+                </RoleBasedRoute>
+              }
+            />
 
-          {/* Catch-all 404 */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-        <Footer />
+            {/* Catch-all 404 */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          <Footer />
         </Router>
       </Elements>
     </ErrorBoundary>

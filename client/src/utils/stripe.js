@@ -6,9 +6,7 @@ const getStripePublicKey = () => {
   const key = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
 
   if (!key) {
-    console.error(
-      'Stripe public key not configured. Add VITE_STRIPE_PUBLIC_KEY to .env files'
-    );
+    console.error('Stripe public key not configured. Add VITE_STRIPE_PUBLIC_KEY to .env files');
     return null;
   }
 

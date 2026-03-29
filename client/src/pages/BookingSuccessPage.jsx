@@ -58,9 +58,9 @@ export default function BookingSuccessPage() {
         // Query all bookings to find the one with this session ID
         const response = await api.get('/bookings/my-bookings');
         const bookings = response.data.data.bookings;
-        
+
         // Find booking by session ID (works for both dev and production)
-        const booking = bookings.find(b => b.stripeSessionId === sessionId);
+        const booking = bookings.find((b) => b.stripeSessionId === sessionId);
 
         if (!isMounted) return;
 
@@ -188,13 +188,7 @@ export default function BookingSuccessPage() {
   }, [sessionId, isCancelled, user]);
 
   if (status === 'loading') {
-    return (
-      <LoadingState
-        message="Processing your payment..."
-        minHeight="100vh"
-        showSpinner
-      />
-    );
+    return <LoadingState message="Processing your payment..." minHeight="100vh" showSpinner />;
   }
 
   if (status === 'cancelled') {
@@ -248,13 +242,18 @@ export default function BookingSuccessPage() {
 
               <div className="confirmation-row">
                 <span className="confirmation-label">Session ID:</span>
-                <span className="confirmation-value confirmation-code">{bookingData?.sessionId}</span>
+                <span className="confirmation-value confirmation-code">
+                  {bookingData?.sessionId}
+                </span>
               </div>
 
               <div className="confirmation-row">
                 <span className="confirmation-label">Amount Paid:</span>
                 <span className="confirmation-value confirmation-amount">
-                  ${typeof bookingData?.amount === 'number' ? bookingData.amount.toFixed(2) : bookingData?.amount}
+                  $
+                  {typeof bookingData?.amount === 'number'
+                    ? bookingData.amount.toFixed(2)
+                    : bookingData?.amount}
                 </span>
               </div>
 
@@ -274,7 +273,8 @@ export default function BookingSuccessPage() {
                 <div className="confirmation-row">
                   <span className="confirmation-label">Payment Status:</span>
                   <span className="confirmation-value confirmation-status">
-                    {bookingData.paymentStatus === 'succeeded' ? '✓' : ''} {bookingData.paymentStatus}
+                    {bookingData.paymentStatus === 'succeeded' ? '✓' : ''}{' '}
+                    {bookingData.paymentStatus}
                   </span>
                 </div>
               )}
@@ -345,9 +345,7 @@ export default function BookingSuccessPage() {
           <div className="support-info">
             <p>
               Need help? Contact us at{' '}
-              <a href="mailto:support@eternal-expeditions.com">
-                support@eternal-expeditions.com
-              </a>
+              <a href="mailto:support@eternal-expeditions.com">support@eternal-expeditions.com</a>
             </p>
           </div>
         </div>
