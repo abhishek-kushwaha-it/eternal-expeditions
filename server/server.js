@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const config = require('./utils/config');
+const { initializeSocket } = require('./utils/socket');
 
 process.on('uncaughtException', (err) => {
   // Always log critical errors even in production
@@ -37,6 +38,9 @@ const server = app.listen(port, () => {
     console.log(`App running on port ${port}...`);
   }
 });
+
+// Initialize Socket.io
+initializeSocket(server);
 
 process.on('unhandledRejection', (err) => {
   // Always log critical errors even in production

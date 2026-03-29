@@ -5,10 +5,15 @@
   "author": "Abhishek Kushwaha",
   "license": "ISC",
   "private": true,
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
+  "keywords": [  
+    "tour-booking",
+    "mern-stack",
+    "nodejs",
+    "express",
+    "mongodb",
+    "react",
+    "vite"
+  ], 
   "workspaces": [
     "client",
     "server"
@@ -24,15 +29,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/eternal-expeditions.git"
+    "url": "https://github.com/abhishek-kushwaha-it/eternal-expeditions.git"
   },
-  "keywords": [
-    "tour-booking",
-    "mern-stack",
-    "nodejs",
-    "express",
-    "mongodb",
-    "react",
-    "vite"
-  ]
+ "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
 }

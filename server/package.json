@@ -31,7 +31,8 @@
     "nodemailer": "^6.9.5",
     "sharp": "^0.32.6",
     "slugify": "^1.6.6",
-    "stripe": "^12.10.0",
+    "socket.io": "^4.8.3",
+    "stripe": "^12.18.0",
     "validator": "^13.9.0",
     "xss-clean": "^0.1.1"
   },

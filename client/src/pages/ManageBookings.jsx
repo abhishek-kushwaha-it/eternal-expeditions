@@ -41,6 +41,8 @@ export default function ManageBookings() {
     tour: '',
     user: '',
     price: '',
+    paid: false,
+    paymentMethod: 'other',
   });
 
   const filteredBookings = useMemo(() => {
@@ -92,11 +94,11 @@ export default function ManageBookings() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingBooking(null);
-    setFormData({ tour: '', user: '', price: '' });
+    setFormData({ tour: '', user: '', price: '', paid: false, paymentMethod: 'other' });
   };
 
   const handleFormChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
 
     if (name === 'tour') {
       // Auto-populate price from selected tour
@@ -105,6 +107,11 @@ export default function ManageBookings() {
         ...prev,
         [name]: value,
         price: selectedTour ? selectedTour.price : '',
+      }));
+    } else if (type === 'checkbox') {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: checked,
       }));
     } else {
       setFormData((prev) => ({
@@ -121,10 +128,12 @@ export default function ManageBookings() {
         tour: booking.tour._id,
         user: booking.user._id,
         price: booking.price,
+        paid: booking.paid,
+        paymentMethod: booking.paymentMethod || 'other',
       });
     } else {
       setEditingBooking(null);
-      setFormData({ tour: '', user: '', price: '' });
+      setFormData({ tour: '', user: '', price: '', paid: false, paymentMethod: 'other' });
     }
     setShowForm(true);
   };
@@ -144,14 +153,18 @@ export default function ManageBookings() {
             bookingId: editingBooking._id,
             data: {
               price: parseFloat(formData.price),
+              paid: formData.paid,
+              paymentMethod: formData.paymentMethod,
             },
           });
           addToast('Booking updated successfully!', 'success');
         } else {
           await createBookingMutation.mutateAsync({
-            tourId: formData.tour,
-            userId: formData.user,
+            tour: formData.tour,
+            user: formData.user,
             price: parseFloat(formData.price),
+            paid: formData.paid,
+            paymentMethod: formData.paymentMethod,
           });
           addToast('Booking created successfully!', 'success');
         }
@@ -305,6 +318,34 @@ export default function ManageBookings() {
                   step="0.01"
                   min="0"
                 />
+              </div>
+
+              <div className="form__group">
+                <label className="form__checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="paid"
+                    checked={formData.paid}
+                    onChange={handleFormChange}
+                    className="form__checkbox"
+                  />
+                  <span>Mark as Paid</span>
+                </label>
+              </div>
+
+              <div className="form__group">
+                <label className="form__label">Payment Method</label>
+                <select
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
+                  onChange={handleFormChange}
+                  className="form__select"
+                >
+                  <option value="card">Card</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="wallet">Wallet</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
 
               <div className="form-modal__footer">

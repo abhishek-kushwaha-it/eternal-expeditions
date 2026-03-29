@@ -431,16 +431,18 @@ export const useResetPasswordMutation = () => {
   });
 };
 
-// Create booking
+// Create booking (manual - admin/guide only)
 export const useCreateBookingMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ tourId, userId, price }) =>
-      api.post('/bookings/create-booking-checkout', {
-        tour: tourId,
-        user: userId,
+    mutationFn: ({ tour, user, price, paid = false, paymentMethod = 'other' }) =>
+      api.post('/bookings', {
+        tour,
+        user,
         price,
+        paid,
+        paymentMethod,
       }),
     onSuccess: () => {
       // Invalidate queries so they refetch with fresh data

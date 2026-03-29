@@ -21,7 +21,35 @@ const bookingSchema = new mongoose.Schema({
   },
   paid: {
     type: Boolean,
-    default: true,
+    default: false,
+  },
+  // Stripe Payment Fields
+  stripeSessionId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  stripeChargeId: {
+    type: String,
+    sparse: true,
+  },
+  stripePaymentIntentId: {
+    type: String,
+    sparse: true,
+  },
+  stripePaymentStatus: {
+    type: String,
+    enum: ['pending', 'succeeded', 'failed', 'canceled'],
+    default: 'pending',
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['card', 'bank_transfer', 'wallet', 'other'],
+    default: 'card',
+  },
+  failureReason: {
+    type: String,
+    default: null,
   },
 });
 
@@ -30,14 +58,9 @@ bookingSchema.pre(/^find/, function (next) {
   next();
 });
 
-// Post-find middleware to filter out bookings from inactive users (after population)
-bookingSchema.post(/^find/, (docs, next) => {
-  if (Array.isArray(docs)) {
-    // Filter out bookings from inactive users
-    docs = docs.filter((doc) => !doc.user || doc.user.active !== false);
-  }
-  next();
-});
+// Index for unique Stripe session ID
+bookingSchema.index({ stripeSessionId: 1 });
+bookingSchema.index({ stripePaymentStatus: 1 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

@@ -1,0 +1,106 @@
+/* Stripe Checkout Component Styles */
+
+.stripe-checkout-form {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.stripe-checkout-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stripe-checkout-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.card-element-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.card-element-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+/* Stripe CardElement Wrapper */
+.StripeElement {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 8px rgba(0, 27, 55, 0.09);
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.stripe-error-message {
+  color: #fa755a;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background-color: #ffe8e8;
+  border-radius: 4px;
+  border-left: 3px solid #fa755a;
+}
+
+.stripe-submit-btn {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+}
+
+.stripe-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stripe-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.stripe-disclaimer {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .stripe-checkout-container {
+    padding: 1.5rem;
+  }
+
+  .stripe-checkout-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-element-wrapper {
+    margin-bottom: 1rem;
+  }
+}

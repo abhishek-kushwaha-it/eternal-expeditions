@@ -2,28 +2,37 @@ const stripe = require('stripe');
 const config = require('../utils/config');
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
+const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+const { emitBookingStatusChange } = require('../utils/socket');
 
 const stripeClient = stripe(config.stripeSecretKey);
 
-// Stripe webhook signature verification
+// WEBHOOK MIDDLEWARE
 exports.verifyStripeWebhook = (req, res, next) => {
   if (!config.stripeWebhookSecret) {
+    console.error('Stripe webhook secret not configured');
     return res.status(400).json({ message: 'Webhook secret not configured' });
   }
 
   const sig = req.headers['stripe-signature'];
-  let event;
+  if (!sig) {
+    console.warn('Missing Stripe signature header');
+    return res.status(400).send('Missing stripe-signature header');
+  }
 
+  let event;
   try {
+    const rawBody = req.body;
     event = stripeClient.webhooks.constructEvent(
-      req.body,
+      typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody),
       sig,
       config.stripeWebhookSecret
     );
   } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -31,7 +40,127 @@ exports.verifyStripeWebhook = (req, res, next) => {
   next();
 };
 
-// Middleware to check if user can access a booking (own booking or is admin/guide)
+// WEBHOOK HANDLER - PRODUCTION ONLY
+exports.handleStripeWebhook = catchAsync(async (req, res) => {
+  // Webhooks only for production
+  if (config.nodeEnv !== 'production') {
+    return res
+      .status(200)
+      .json({ status: 'success', message: 'Webhook ignored in development' });
+  }
+
+  const event = req.stripeEvent;
+
+  console.log('Webhook event:', event.type);
+
+  // Handle checkout completion - create booking
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    try {
+      if (!session.client_reference_id || !session.customer_email) {
+        console.error('Missing required session data');
+        return res.status(200).json({ status: 'success' });
+      }
+
+      const tour = await Tour.findById(session.client_reference_id);
+      if (!tour) {
+        console.error(`Tour not found: ${session.client_reference_id}`);
+        return res.status(200).json({ status: 'success' });
+      }
+
+      const user = await User.findOne({ email: session.customer_email });
+      if (!user) {
+        console.error(`User not found: ${session.customer_email}`);
+        return res.status(200).json({ status: 'success' });
+      }
+
+      // Check for duplicates (idempotent)
+      const existing = await Booking.findOne({
+        tour: session.client_reference_id,
+        user: user._id,
+        stripeSessionId: session.id,
+      });
+
+      if (!existing) {
+        const booking = await Booking.create({
+          tour: session.client_reference_id,
+          user: user._id,
+          price: session.amount_total / 100,
+          paid: true,
+          stripeSessionId: session.id,
+          stripePaymentStatus: session.payment_status,
+          paymentMethod:
+            (session.payment_method_types && session.payment_method_types[0]) ||
+            'card',
+        });
+        console.log('Booking created successfully via webhook');
+
+        // Emit real-time update to user
+        emitBookingStatusChange(user._id.toString(), booking);
+      }
+    } catch (error) {
+      console.error('Error processing checkout session:', error.message);
+    }
+  }
+
+  // Handle charge succeeded
+  if (event.type === 'charge.succeeded') {
+    const charge = event.data.object;
+    try {
+      console.log(`Charge succeeded: ${charge.id}`);
+      if (charge.metadata && charge.metadata.booking_id) {
+        const booking = await Booking.findByIdAndUpdate(
+          charge.metadata.booking_id,
+          {
+            stripeChargeId: charge.id,
+            stripePaymentStatus: 'succeeded',
+          },
+          { new: true }
+        ).populate('user');
+
+        // Emit real-time update to user
+        if (booking && booking.user) {
+          emitBookingStatusChange(booking.user._id.toString(), booking);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling charge succeeded:', error.message);
+    }
+  }
+
+  // Handle charge failed
+  if (event.type === 'charge.failed') {
+    const charge = event.data.object;
+    try {
+      console.error(`Charge failed: ${charge.id}`);
+      if (charge.metadata && charge.metadata.booking_id) {
+        const booking = await Booking.findByIdAndUpdate(
+          charge.metadata.booking_id,
+          {
+            stripePaymentStatus: 'failed',
+            failureReason: charge.failure_message,
+          },
+          { new: true }
+        ).populate('user');
+
+        // Emit real-time update to user
+        if (booking && booking.user) {
+          emitBookingStatusChange(booking.user._id.toString(), booking);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling charge failed:', error.message);
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Webhook received and processed',
+    event: event.type,
+  });
+});
+
+// BOOKING CONTROLLERS
 exports.checkBookingAccess = catchAsync(async (req, res, next) => {
   const booking = await Booking.findById(req.params.id);
 
@@ -39,8 +168,6 @@ exports.checkBookingAccess = catchAsync(async (req, res, next) => {
     return next(new AppError('Booking not found', 404));
   }
 
-  // Allow access if user is admin/guide or booking owner
-  // booking.user is populated as an object, so use ._id
   if (
     req.user.role !== 'admin' &&
     req.user.role !== 'guide' &&
@@ -55,37 +182,36 @@ exports.checkBookingAccess = catchAsync(async (req, res, next) => {
 });
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
 
   if (!tour) {
     return next(new AppError('Tour not found', 404));
   }
 
-  // Get frontend URL from environment
   const frontendUrl =
     config.frontendUrl || `${req.protocol}://${req.get('host')}`;
 
-  // 2) Create checkout session
   const session = await stripeClient.checkout.sessions.create({
-    mode: 'payment',
     payment_method_types: ['card'],
-
-    success_url: `${frontendUrl}/my-tour-bookings/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`,
-    cancel_url: `${frontendUrl}/tour/${tour.id}`,
-
+    mode: 'payment',
+    metadata: {
+      tour_id: tour._id.toString(),
+      user_email: req.user.email,
+      user_id: req.user._id.toString(),
+    },
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
-
+    success_url: `${frontendUrl}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${frontendUrl}/tour/${tour.id}`,
     line_items: [
       {
         price_data: {
           currency: 'usd',
-          unit_amount: tour.price * 100, // cents
+          unit_amount: tour.price * 100,
           product_data: {
             name: `${tour.name} Tour`,
             description: tour.summary,
-            images: [`img/tours/${tour.imageCover}`],
+            images: [`${config.frontendUrl}/img/tours/${tour.imageCover}`],
           },
         },
         quantity: 1,
@@ -93,7 +219,35 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     ],
   });
 
-  // 3) Create session as response
+  // DEVELOPMENT MODE: Create booking immediately (for testing without webhooks)
+  if (config.nodeEnv === 'development') {
+    try {
+      const existingBooking = await Booking.findOne({
+        tour: req.params.tourId,
+        user: req.user._id,
+        stripeSessionId: session.id,
+      });
+
+      if (!existingBooking) {
+        await Booking.create({
+          tour: req.params.tourId,
+          user: req.user._id,
+          price: tour.price,
+          paid: true,
+          stripeSessionId: session.id,
+          stripeChargeId: `dev_charge_${session.id.substring(0, 16)}`,
+          stripePaymentIntentId: `dev_pi_${session.id.substring(0, 16)}`,
+          stripePaymentStatus: 'succeeded',
+          paymentMethod: 'card',
+        });
+        console.log('[DEV MODE] Booking created immediately (no webhook)');
+      }
+    } catch (error) {
+      console.error('[DEV MODE] Error creating booking:', error.message);
+      // Don't fail the request, still return session
+    }
+  }
+
   res.status(200).json({
     status: 'success',
     session,
@@ -101,43 +255,108 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyBookings = catchAsync(async (req, res, next) => {
-  // Get all bookings for the current user
-  const bookings = await Booking.find({ user: req.user.id }).populate('tour');
+  const bookings = await Booking.find({ user: req.user.id })
+    .populate('tour')
+    .sort('-createdAt');
 
   res.status(200).json({
     status: 'success',
     results: bookings.length,
-    data: {
-      bookings,
-    },
+    data: { bookings },
   });
 });
 
-exports.createBookingCheckout = catchAsync(async (req, res, next) => {
-  // This is only TEMPORARY, because it's UNSECURE: everyone can make bookings without paying and also from others users-ids
-  const { tour, user, price } = req.body;
+exports.createBooking = catchAsync(async (req, res, next) => {
+  // Manual booking creation with proper field handling
+  const { tour, user, price, paid, paymentMethod } = req.body;
 
+  // Validate required fields
   if (!tour || !user || !price) {
-    return next(new AppError('Missing tour, user or price information', 400));
+    return next(new AppError('Tour, User, and Price are required fields', 400));
   }
 
-  // Validate that tour exists
-  const tourExists = await Tour.findById(tour);
-  if (!tourExists) {
-    return next(new AppError('Tour not found', 404));
+  // Generate IDs for manual bookings
+  const manualBookingId = `manual_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+  const bookingData = {
+    tour,
+    user,
+    price,
+    paid: paid === true, // Only true if explicitly set
+    paymentMethod: paymentMethod || 'other',
+    stripeSessionId: manualBookingId, // Track as manual booking
+  };
+
+  // If paid=true, set payment status to succeeded and generate booking IDs
+  if (bookingData.paid) {
+    bookingData.stripePaymentStatus = 'succeeded';
+    bookingData.stripeChargeId = `manual_charge_${manualBookingId.substring(0, 16)}`;
+    bookingData.stripePaymentIntentId = `manual_pi_${manualBookingId.substring(0, 16)}`;
+  } else {
+    bookingData.stripePaymentStatus = 'pending';
   }
 
-  const booking = await Booking.create({ tour, user, price, paid: true });
+  const booking = await Booking.create(bookingData);
+
   res.status(201).json({
     status: 'success',
     data: {
-      booking,
+      data: booking,
     },
   });
 });
 
-exports.createBooking = factory.createOne(Booking);
 exports.getBooking = factory.getOne(Booking, 'tour');
 exports.getAllBookings = factory.getAll(Booking);
-exports.updateBooking = factory.updateOne(Booking);
+
+// Custom update to maintain paid/stripePaymentStatus consistency
+exports.updateBooking = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  // If paid field is being updated, sync stripePaymentStatus
+  if (Object.prototype.hasOwnProperty.call(updateData, 'paid')) {
+    if (updateData.paid === true) {
+      updateData.stripePaymentStatus = 'succeeded';
+    } else if (
+      updateData.paid === false &&
+      updateData.stripePaymentStatus === 'succeeded'
+    ) {
+      // If un-marking as paid, set to pending
+      updateData.stripePaymentStatus = 'pending';
+    }
+  }
+
+  // If stripePaymentStatus is being updated, sync paid field
+  if (
+    updateData.stripePaymentStatus === 'succeeded' &&
+    !Object.prototype.hasOwnProperty.call(updateData, 'paid')
+  ) {
+    updateData.paid = true;
+  } else if (
+    updateData.stripePaymentStatus === 'pending' &&
+    !Object.prototype.hasOwnProperty.call(updateData, 'paid')
+  ) {
+    updateData.paid = false;
+  } else if (updateData.stripePaymentStatus === 'failed') {
+    updateData.paid = false;
+  }
+
+  const booking = await Booking.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!booking) {
+    return next(new AppError('Booking not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: booking,
+    },
+  });
+});
+
 exports.deleteBooking = factory.deleteOne(Booking);

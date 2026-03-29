@@ -4,14 +4,19 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
+// Stripe webhook route (NO authentication, must be before bodyParser middleware in app.js)
+// This route receives raw body for signature verification
+router.post(
+  '/webhook/stripe',
+  bookingController.verifyStripeWebhook,
+  bookingController.handleStripeWebhook
+);
+
+// All routes below require authentication
 router.use(authController.protect);
 
 router.get('/checkout-session/:tourId', bookingController.getCheckoutSession);
 router.get('/my-bookings', bookingController.getMyBookings);
-router.post(
-  '/create-booking-checkout',
-  bookingController.createBookingCheckout
-); // Temporary unsecure route for Stripe webhook testing
 
 // Routes for specific booking - accessible to user (own booking) or admin/guide
 router
@@ -28,10 +33,9 @@ router
 
 // Admin/Guide only routes
 router.use(authController.restrictTo('admin', 'guide'));
-
 router
   .route('/')
-  .get(bookingController.getAllBookings)
-  .post(bookingController.createBooking);
+  .post(bookingController.createBooking)
+  .get(bookingController.getAllBookings);
 
 module.exports = router;

@@ -51,6 +51,15 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// Stripe webhook endpoint - must use raw body (BEFORE json parser)
+app.post(
+  '/api/v1/bookings/webhook/stripe',
+  express.raw({ type: 'application/json' }),
+  (req, res, next) => {
+    next();
+  }
+);
+
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));

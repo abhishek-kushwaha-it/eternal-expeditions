@@ -1,10 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import { Elements } from '@stripe/react-stripe-js';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
 import RoleBasedRoute from './components/RoleBasedRoute';
+import { getStripe } from './utils/stripe';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -26,6 +29,7 @@ import GuideMonthlyPlanPage from './pages/GuideMonthlyPlanPage';
 import AccountPage from './pages/AccountPage';
 import BookingListPage from './pages/BookingListPage';
 import BookingDetailsPage from './pages/BookingDetailsPage';
+import BookingSuccessPage from './pages/BookingSuccessPage';
 
 // Guide/Admin Pages
 import ManageReviews from './pages/ManageReviews';
@@ -38,12 +42,28 @@ import TourStatsPage from './pages/TourStatsPage';
 import ManageUsers from './pages/ManageUsers';
 
 function App() {
+  const [stripe, setStripe] = useState(null);
+
+  useEffect(() => {
+    const initStripe = async () => {
+      try {
+        const stripeInstance = await getStripe();
+        setStripe(stripeInstance);
+      } catch (error) {
+        console.error('Failed to initialize Stripe:', error);
+      }
+    };
+
+    initStripe();
+  }, []);
+
   return (
     <ErrorBoundary>
-      <Router>
-        <Toast />
-        <Header />
-        <Routes>
+      <Elements stripe={stripe || null}>
+        <Router>
+          <Toast />
+          <Header />
+          <Routes>
           {/* ============================================
               PUBLIC ROUTES
               ============================================ */}
@@ -90,6 +110,16 @@ function App() {
             element={
               <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
                 <BookingDetailsPage />
+              </RoleBasedRoute>
+            }
+          />
+
+          {/* Booking Success - Stripe Webhook Callback */}
+          <Route
+            path="/booking-success"
+            element={
+              <RoleBasedRoute allowedRoles={[]} fallback={<Navigate to="/login" replace />}>
+                <BookingSuccessPage />
               </RoleBasedRoute>
             }
           />
@@ -192,7 +222,8 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Footer />
-      </Router>
+        </Router>
+      </Elements>
     </ErrorBoundary>
   );
 }
