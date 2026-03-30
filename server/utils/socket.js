@@ -52,7 +52,7 @@ exports.emitBookingStatusChange = (userId, bookingData) => {
   io.to(`user-${userId}`).emit('bookingStatusChanged', {
     bookingId: bookingData._id,
     sessionId: bookingData.stripeSessionId,
-    status: bookingData.stripePaymentStatus,
+    paymentStatus: bookingData.stripePaymentStatus,
     paymentMethod: bookingData.paymentMethod,
     failureReason: bookingData.failureReason,
     timestamp: new Date().toISOString(),

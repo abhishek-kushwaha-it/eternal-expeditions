@@ -142,8 +142,29 @@ export default function ManageBookings() {
     async (e) => {
       e.preventDefault();
 
+      // Validate all required fields
       if (!formData.tour || !formData.user || !formData.price) {
         addToast('Please fill all required fields', 'error');
+        return;
+      }
+
+      // Validate that selected tour exists
+      const selectedTour = tours.find((t) => t._id === formData.tour);
+      if (!selectedTour) {
+        addToast('Selected tour does not exist', 'error');
+        return;
+      }
+
+      // Validate that selected user exists
+      const selectedUser = users.find((u) => u._id === formData.user);
+      if (!selectedUser) {
+        addToast('Selected user does not exist', 'error');
+        return;
+      }
+
+      // Validate price is positive
+      if (parseFloat(formData.price) <= 0) {
+        addToast('Price must be greater than 0', 'error');
         return;
       }
 
@@ -173,7 +194,7 @@ export default function ManageBookings() {
         addToast(editingBooking ? 'Failed to update booking' : 'Failed to create booking', 'error');
       }
     },
-    [formData, editingBooking, createBookingMutation, updateBookingMutation, addToast]
+    [formData, editingBooking, createBookingMutation, updateBookingMutation, addToast, tours, users]
   );
 
   if (isLoading) {

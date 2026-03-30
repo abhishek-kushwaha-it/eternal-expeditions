@@ -51,13 +51,10 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Stripe webhook endpoint - must use raw body (BEFORE json parser)
+// Stripe webhook endpoint - must use raw body BEFORE json parser for signature verification
 app.post(
   '/api/v1/bookings/webhook/stripe',
-  express.raw({ type: 'application/json' }),
-  (req, res, next) => {
-    next();
-  }
+  express.raw({ type: 'application/json' })
 );
 
 // Body parser, reading data from body into req.body

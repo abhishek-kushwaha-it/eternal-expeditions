@@ -32,7 +32,7 @@ mongoose
     process.exit(1);
   });
 
-const port = config.port;
+const { port } = config;
 const server = app.listen(port, () => {
   if (process.env.NODE_ENV === 'development') {
     console.log(`App running on port ${port}...`);

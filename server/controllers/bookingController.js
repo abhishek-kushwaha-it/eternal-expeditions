@@ -42,8 +42,8 @@ exports.verifyStripeWebhook = (req, res, next) => {
 
 // WEBHOOK HANDLER - PRODUCTION ONLY
 exports.handleStripeWebhook = catchAsync(async (req, res) => {
-  // Webhooks only for production
-  if (config.nodeEnv !== 'production') {
+  // Webhooks only for production - in development, booking is created when checkout session is created
+  if (process.env.NODE_ENV !== 'production') {
     return res
       .status(200)
       .json({ status: 'success', message: 'Webhook ignored in development' });
@@ -220,11 +220,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 
   // DEVELOPMENT MODE: Create booking immediately (for testing without webhooks)
-  if (config.nodeEnv === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     try {
+      // Check for duplicate using session ID that just came from Stripe
       const existingBooking = await Booking.findOne({
-        tour: req.params.tourId,
-        user: req.user._id,
         stripeSessionId: session.id,
       });
 
@@ -241,6 +240,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           paymentMethod: 'card',
         });
         console.log('[DEV MODE] Booking created immediately (no webhook)');
+      } else {
+        console.log(
+          '[DEV MODE] Duplicate booking prevented, session already processed'
+        );
       }
     } catch (error) {
       console.error('[DEV MODE] Error creating booking:', error.message);
