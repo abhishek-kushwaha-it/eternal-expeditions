@@ -1,41 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import compression from 'vite-plugin-compression'
-import dotenv from 'dotenv'
-import fs from 'fs'
-import path from 'path'
 
-// Load environment variables based on NODE_ENV
-// .env files are only used for local development
-// For Azure Web Apps: set environment variables in CI/CD pipeline before build
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development'
-const envPath = path.resolve(__dirname, envFile)
-
-if (fs.existsSync(envPath)) {
-  const envConfig = dotenv.parse(fs.readFileSync(envPath))
-  Object.keys(envConfig).forEach(key => {
-    process.env[key] = envConfig[key]
-  })
-} else if (process.env.NODE_ENV !== 'production') {
-  console.warn(
-    `⚠️  Environment file not found: ${envFile}. Using process.env variables.`
-  )
-}
-
-// Validate required environment variables for build
-const requiredEnvVars = process.env.NODE_ENV === 'production' 
-  ? ['VITE_API_URL', 'VITE_BACKEND_URL', 'VITE_STRIPE_PUBLIC_KEY']
-  : []
-
-const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar])
-if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production') {
-  console.warn(
-    `⚠️  Missing environment variables for production build: ${missingEnvVars.join(', ')}`
-  )
-}
-
-const isDevelopment = process.env.NODE_ENV !== 'production'
 // https://vite.dev/config/
+// Vite automatically loads .env and .env.{mode} files
+// For production builds: use .env.production
+// For development: use .env.development or .env
+const isDevelopment = process.env.NODE_ENV !== 'production'
+
 export default defineConfig({
   plugins: [
     react({
