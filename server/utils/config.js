@@ -1,17 +1,33 @@
 // Configuration Module - Loads from .env.development or .env.production
 // Based on NODE_ENV or defaults to development
+// For Azure App Services: environment variables are set via Application Settings
+// .env files are only used for local development
 
-require('dotenv').config({
-  path:
-    process.env.NODE_ENV === 'production'
-      ? '.env.production'
-      : '.env.development',
-});
+const path = require('path');
+const fs = require('fs');
+
+// Try to load .env files if they exist (local development)
+// Skip if on Azure or if variables are already set via environment
+const envFile =
+  process.env.NODE_ENV === 'production'
+    ? '.env.production'
+    : '.env.development';
+
+const envFilePath = path.join(__dirname, '..', envFile);
+
+// Only attempt to load .env file if it exists
+if (fs.existsSync(envFilePath)) {
+  // eslint-disable-next-line global-require
+  require('dotenv').config({ path: envFilePath });
+} else if (process.env.NODE_ENV !== 'production') {
+  // In development, warn if .env file is missing
+  console.warn(
+    `⚠️  Environment file not found: ${envFile}. Using process.env variables.`
+  );
+}
 
 // Validate required environment variables
 const requiredEnvVars = [
-  'NODE_ENV',
-  'PORT',
   'FRONTEND_URL',
   'DATABASE',
   'DATABASE_PASSWORD',
@@ -46,8 +62,7 @@ if (missingEnvVars.length > 0) {
 
 const config = {
   // Server Config
-  nodeEnv: process.env.NODE_ENV,
-  port: process.env.PORT,
+  port: process.env.PORT || 3000,
   frontendUrl: process.env.FRONTEND_URL,
 
   // Database Config

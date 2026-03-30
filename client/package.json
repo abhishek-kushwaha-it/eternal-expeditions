@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "vite",
-    "start:prod": "cross-env NODE_ENV=production vite",
-    "build": "cross-env NODE_ENV=development vite build",
-    "build:prod": "cross-env NODE_ENV=production vite build",
+    "build": "vite build",
     "preview": "vite preview",
+    "build:preview": "npm run build && npm run preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\""

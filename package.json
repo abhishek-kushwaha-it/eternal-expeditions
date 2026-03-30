@@ -20,8 +20,9 @@
   ],
   "scripts": {
     "start": "concurrently \"npm run start --workspace=client\" \"npm run start --workspace=server\"",
-    "start:prod": "concurrently \"npm run start:prod --workspace=client\" \"npm run start:prod --workspace=server\"",
+    "start:prod": "concurrently \"npm run build:preview --workspace=client\" \"npm run start:prod --workspace=server\"",
     "lint": "npm run lint --workspace=client && npm run lint --workspace=server",
+    "lint:fix": "npm run lint:fix --workspace=client && npm run lint:fix --workspace=server",
     "format": "npm run format --workspace=client && npm run format --workspace=server"
   },
   "devDependencies": {

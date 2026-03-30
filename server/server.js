@@ -32,7 +32,7 @@ mongoose
     process.exit(1);
   });
 
-const port = config.port || 3000;
+const port = config.port;
 const server = app.listen(port, () => {
   if (process.env.NODE_ENV === 'development') {
     console.log(`App running on port ${port}...`);
@@ -50,3 +50,33 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
   });
 });
+
+// Graceful shutdown for Azure App Services
+// Azure sends SIGTERM when recycling or scaling down
+const gracefulShutdown = async () => {
+  console.log('Graceful shutdown initiated...');
+
+  // Close HTTP server
+  server.close(async () => {
+    // Close database connection
+    try {
+      await mongoose.disconnect();
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Database disconnected');
+      }
+    } catch (err) {
+      console.error('Error disconnecting database:', err.message);
+    }
+
+    process.exit(0);
+  });
+
+  // Force shutdown after 30 seconds
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout');
+    process.exit(1);
+  }, 30000);
+};
+
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
