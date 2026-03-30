@@ -224,7 +224,7 @@ export default function TourPage() {
       <section className="section-cta">
         <div className="cta">
           <div className="cta__img cta__img--logo">
-            <Image src="/img/logo.png" alt="ashoka logo" />
+            <Image src="/img/logo-header.png" alt="ashoka logo" />
           </div>
           {tour.images?.length >= 3 && (
             <>
