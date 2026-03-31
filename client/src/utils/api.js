@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Environment-based API configuration
+// Environment-based API configuration via Vite's import.meta.env
 const apiUrl = import.meta.env.VITE_API_URL;
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
