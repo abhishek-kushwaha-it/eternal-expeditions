@@ -4,13 +4,9 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-// Stripe webhook route (NO authentication, must be before bodyParser middleware in app.js)
-// This route receives raw body for signature verification
-router.post(
-  '/webhook/stripe',
-  bookingController.verifyStripeWebhook,
-  bookingController.handleStripeWebhook
-);
+// NOTE: Stripe webhook route is defined in app.js BEFORE JSON parser
+// to ensure raw body is preserved for signature verification.
+// DO NOT add webhook route here as it would run after JSON middleware!
 
 // All routes below require authentication
 router.use(authController.protect);

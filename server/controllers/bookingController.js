@@ -25,10 +25,24 @@ exports.verifyStripeWebhook = (req, res, next) => {
 
   let event;
   try {
-    const rawBody = req.body;
+    let rawBody = req.body;
     console.log('[Webhook] Verifying signature, body type:', typeof rawBody);
+
+    if (Buffer.isBuffer(rawBody)) {
+      rawBody = rawBody.toString('utf8');
+      console.log(
+        '[Webhook] Converted Buffer to string, length:',
+        rawBody.length
+      );
+    } else if (typeof rawBody === 'object') {
+      console.error(
+        '[Webhook] ERROR: Body is already parsed object. express.raw() middleware may not have run!'
+      );
+      rawBody = JSON.stringify(rawBody);
+    }
+
     event = stripeClient.webhooks.constructEvent(
-      typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody),
+      rawBody,
       sig,
       config.stripeWebhookSecret
     );

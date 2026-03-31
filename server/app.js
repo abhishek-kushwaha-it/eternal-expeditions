@@ -47,6 +47,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Set security HTTP headers
 app.use(helmet());
 
+// Trust proxy for Azure App Services
+// Azure sends X-Forwarded-For header, so we need to trust the proxy
+app.set('trust proxy', 1);
+
 // Development logging with configurable log level
 if (process.env.NODE_ENV === 'development') {
   if (config.enableRequestLogging) {
@@ -60,6 +64,7 @@ const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour!',
+  skip: (req) => req.path === '/api/v1/bookings/webhook/stripe',
 });
 app.use('/api', limiter);
 
