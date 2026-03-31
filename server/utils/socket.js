@@ -17,25 +17,18 @@ exports.initializeSocket = (server) => {
   });
 
   io.on('connection', (socket) => {
-    console.log(`[Socket] User connected: ${socket.id}`);
-
     // Register user when they connect
     socket.on('registerUser', (userId) => {
       userSockets.set(userId, socket.id);
       socket.userId = userId;
       socket.join(`user-${userId}`); // Join room specific to user
-      console.log(
-        `[Socket] User ${userId} registered with socket ${socket.id}, joined room: user-${userId}`
-      );
+      console.log(`[Socket] User ${userId} registered`);
     });
 
     // Cleanup on disconnect
     socket.on('disconnect', () => {
       if (socket.userId) {
         userSockets.delete(socket.userId);
-        console.log(
-          `[Socket] User ${socket.userId} disconnected (socket: ${socket.id})`
-        );
       }
     });
 
@@ -71,20 +64,9 @@ exports.emitBookingStatusChange = (userId, bookingData) => {
     timestamp: new Date().toISOString(),
   };
 
-  console.log(`[Socket] Emitting bookingStatusChanged to user ${userId}`, {
-    bookingId: bookingData._id,
-    status: bookingData.paymentStatus,
-    room: `user-${userId}`,
-  });
+  console.log(`[Socket] ✓ Emitting status update to user ${userId}`);
 
-  const result = io
-    .to(`user-${userId}`)
-    .emit('bookingStatusChanged', eventData);
-
-  console.log(
-    `[Socket] Emit result for room user-${userId}:`,
-    result ? 'success' : 'room may not exist'
-  );
+  io.to(`user-${userId}`).emit('bookingStatusChanged', eventData);
 };
 
 exports.getIO = () => io;
