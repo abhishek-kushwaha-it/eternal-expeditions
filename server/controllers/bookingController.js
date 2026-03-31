@@ -116,12 +116,24 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           .json({ status: 'success', message: 'Booking already exists' });
       }
 
+      // Map Stripe payment_status to our enum
+      // Stripe can send: 'paid', 'unpaid', 'no_payment_required'
+      // We store: 'pending', 'succeeded', 'failed', 'cancelled'
+      const mapPaymentStatus = (stripeStatus) => {
+        const statusMap = {
+          paid: 'succeeded',
+          unpaid: 'pending',
+          no_payment_required: 'succeeded',
+        };
+        return statusMap[stripeStatus] || 'pending';
+      };
+
       const booking = await Booking.create({
         tour: session.client_reference_id,
         user: user._id,
         price: session.amount_total / 100,
         sessionId: session.id,
-        paymentStatus: session.payment_status,
+        paymentStatus: mapPaymentStatus(session.payment_status),
         paymentMethod:
           (session.payment_method_types && session.payment_method_types[0]) ||
           'card',
@@ -146,6 +158,8 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
     console.log('[Webhook] Charge ID:', charge.id);
 
     try {
+      // Look up booking by session_id from charge metadata
+      // Charge events don't always have booking_id, but they may reference the session
       if (charge.metadata && charge.metadata.booking_id) {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
@@ -164,7 +178,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           emitBookingStatusChange(booking.user._id.toString(), booking);
         }
       } else {
-        console.log('[Webhook] No booking_id in charge metadata');
+        console.log('[Webhook] Charge succeeded but no booking_id in metadata');
       }
     } catch (error) {
       console.error(
@@ -182,6 +196,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
     console.error('[Webhook] Failure Reason:', charge.failure_message);
 
     try {
+      // Look up booking by session_id from charge metadata
       if (charge.metadata && charge.metadata.booking_id) {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
@@ -200,10 +215,89 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           emitBookingStatusChange(booking.user._id.toString(), booking);
         }
       } else {
-        console.log('[Webhook] No booking_id in charge metadata');
+        console.log('[Webhook] Charge failed but no booking_id in metadata');
       }
     } catch (error) {
       console.error('[Webhook] Error handling charge failed:', error.message);
+    }
+  }
+
+  // Handle async payment failed (for sessions that fail after async processing)
+  if (event.type === 'checkout.session.async_payment_failed') {
+    const session = event.data.object;
+    console.error(
+      '[Webhook] Processing checkout.session.async_payment_failed event'
+    );
+    console.error('[Webhook] Session ID:', session.id);
+    console.error('[Webhook] Payment Status:', session.payment_status);
+
+    try {
+      // Find booking by session ID and mark as failed
+      const booking = await Booking.findOneAndUpdate(
+        { sessionId: session.id },
+        {
+          paymentStatus: 'failed',
+          failureReason: 'Async payment processing failed',
+        },
+        { new: true }
+      ).populate('user');
+
+      if (booking && booking.user) {
+        console.error(
+          '[Webhook] Booking marked as failed (async payment):',
+          booking._id
+        );
+        emitBookingStatusChange(booking.user._id.toString(), booking);
+      } else {
+        console.warn(
+          '[Webhook] Booking not found for failed async session:',
+          session.id
+        );
+      }
+    } catch (error) {
+      console.error(
+        '[Webhook] Error handling async payment failed:',
+        error.message
+      );
+    }
+  }
+
+  // Handle async payment succeeded (for sessions that complete after async processing)
+  if (event.type === 'checkout.session.async_payment_succeeded') {
+    const session = event.data.object;
+    console.log(
+      '[Webhook] Processing checkout.session.async_payment_succeeded event'
+    );
+    console.log('[Webhook] Session ID:', session.id);
+    console.log('[Webhook] Payment Status:', session.payment_status);
+
+    try {
+      // Find booking by session ID and mark as succeeded
+      const booking = await Booking.findOneAndUpdate(
+        { sessionId: session.id },
+        {
+          paymentStatus: 'succeeded',
+        },
+        { new: true }
+      ).populate('user');
+
+      if (booking && booking.user) {
+        console.log(
+          '[Webhook] Booking marked as succeeded (async payment):',
+          booking._id
+        );
+        emitBookingStatusChange(booking.user._id.toString(), booking);
+      } else {
+        console.warn(
+          '[Webhook] Booking not found for succeeded async session:',
+          session.id
+        );
+      }
+    } catch (error) {
+      console.error(
+        '[Webhook] Error handling async payment succeeded:',
+        error.message
+      );
     }
   }
 

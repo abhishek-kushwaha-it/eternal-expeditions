@@ -65,6 +65,11 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour!',
   skip: (req) => req.path === '/api/v1/bookings/webhook/stripe',
+  keyGenerator: (req) => {
+    // Extract IP without port (Azure sends format: IP:PORT)
+    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    return ip.split(':').pop(); // Get last part (handles IPv4 and IPv6)
+  },
 });
 app.use('/api', limiter);
 
