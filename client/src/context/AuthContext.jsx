@@ -13,16 +13,13 @@ export const AuthProvider = ({ children }) => {
     // The browser automatically includes the jwt cookie in the request
     const checkAuth = async () => {
       try {
-        // Use environment variable for API URL based on build mode
-        const isDev = import.meta.env.DEV;
-        const apiUrl = isDev ? import.meta.env.VITE_API_URL_DEV : import.meta.env.VITE_API_URL_PROD;
-        const finalApiUrl = apiUrl || 'http://localhost:3000/api/v1';
-
+        // Use import.meta.env.VITE_API_URL which is automatically set by Vite based on .env.development or .env.production
+        const apiUrl = import.meta.env.VITE_API_URL;
         // Add timeout to prevent indefinite waiting
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-        const response = await fetch(`${finalApiUrl}/users/me`, {
+        const response = await fetch(`${apiUrl}/users/me`, {
           credentials: 'include', // Important: include cookies in the request
           signal: controller.signal,
         });
