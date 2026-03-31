@@ -19,8 +19,7 @@
     "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run cross-env NODE_ENV=development nodemon server.js --workspace=server\"",
-    "start": "concurrently \"npm run build:preview --workspace=client\" \"npm run cross-env NODE_ENV=production node server.js --workspace=server\"",
+    "dev": "concurrently -n \"CLIENT,SERVER\" -c \"cyan,magenta\" \"npm run dev --workspace=client\" \"nodemon --watch server server/server.js\"",
     "lint": "npm run lint --workspace=client && npm run lint --workspace=server",
     "lint:fix": "npm run lint:fix --workspace=client && npm run lint:fix --workspace=server",
     "format": "npm run format --workspace=client && npm run format --workspace=server"
