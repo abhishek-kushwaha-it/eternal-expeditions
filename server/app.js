@@ -21,6 +21,17 @@ const bookingRouter = require('./routes/bookingRoutes');
 const app = express();
 const config = require('./utils/config');
 
+// Log environment at startup
+console.log('========================================');
+console.log('Application Starting...');
+console.log('NODE_ENV:', process.env.NODE_ENV || 'not set');
+console.log('Frontend URL:', config.frontendUrl);
+console.log(
+  'Running in:',
+  process.env.NODE_ENV === 'development' ? 'DEVELOPMENT' : 'PRODUCTION'
+);
+console.log('========================================');
+
 // Enable CORS for React frontend using environment-based configuration
 app.use(
   cors({

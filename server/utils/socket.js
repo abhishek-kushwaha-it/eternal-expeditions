@@ -4,9 +4,12 @@ let io;
 const userSockets = new Map(); // Map userId -> socketId
 
 exports.initializeSocket = (server) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  console.log('[Socket] Initializing socket.io with CORS origin:', frontendUrl);
+
   io = socketIO(server, {
     cors: {
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: frontendUrl,
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -14,7 +17,7 @@ exports.initializeSocket = (server) => {
   });
 
   io.on('connection', (socket) => {
-    console.log(`[WebSocket] User connected: ${socket.id}`);
+    console.log(`[Socket] User connected: ${socket.id}`);
 
     // Register user when they connect
     socket.on('registerUser', (userId) => {
@@ -22,7 +25,7 @@ exports.initializeSocket = (server) => {
       socket.userId = userId;
       socket.join(`user-${userId}`); // Join room specific to user
       console.log(
-        `[WebSocket] User ${userId} registered with socket ${socket.id}`
+        `[Socket] User ${userId} registered with socket ${socket.id}, joined room: user-${userId}`
       );
     });
 
@@ -30,36 +33,57 @@ exports.initializeSocket = (server) => {
     socket.on('disconnect', () => {
       if (socket.userId) {
         userSockets.delete(socket.userId);
-        console.log(`[WebSocket] User ${socket.userId} disconnected`);
+        console.log(
+          `[Socket] User ${socket.userId} disconnected (socket: ${socket.id})`
+        );
       }
     });
 
     socket.on('error', (error) => {
-      console.error('[WebSocket] Error:', error);
+      console.error('[Socket] Error:', error);
     });
   });
 
+  console.log('[Socket] Socket.io initialized successfully');
   return io;
 };
 
 // Emit booking status change to specific user
 exports.emitBookingStatusChange = (userId, bookingData) => {
   if (!io) {
-    console.warn('[WebSocket] Socket.io not initialized');
+    console.warn(
+      '[Socket] Socket.io not initialized when trying to emit booking status change'
+    );
     return;
   }
 
-  io.to(`user-${userId}`).emit('bookingStatusChanged', {
+  if (!userId) {
+    console.warn('[Socket] No userId provided for booking status change emit');
+    return;
+  }
+
+  const eventData = {
     bookingId: bookingData._id,
-    sessionId: bookingData.stripeSessionId,
+    sessionId: bookingData.sessionId,
     paymentStatus: bookingData.paymentStatus,
     paymentMethod: bookingData.paymentMethod,
     failureReason: bookingData.failureReason,
     timestamp: new Date().toISOString(),
+  };
+
+  console.log(`[Socket] Emitting bookingStatusChanged to user ${userId}`, {
+    bookingId: bookingData._id,
+    status: bookingData.paymentStatus,
+    room: `user-${userId}`,
   });
 
+  const result = io
+    .to(`user-${userId}`)
+    .emit('bookingStatusChanged', eventData);
+
   console.log(
-    `[WebSocket] Emitted status change to user ${userId}: ${bookingData.paymentStatus}`
+    `[Socket] Emit result for room user-${userId}:`,
+    result ? 'success' : 'room may not exist'
   );
 };
 

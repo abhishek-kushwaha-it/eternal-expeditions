@@ -13,26 +13,28 @@ const stripeClient = stripe(config.stripeSecretKey);
 // WEBHOOK MIDDLEWARE
 exports.verifyStripeWebhook = (req, res, next) => {
   if (!config.stripeWebhookSecret) {
-    console.error('Stripe webhook secret not configured');
+    console.error('[Webhook] Stripe webhook secret not configured');
     return res.status(400).json({ message: 'Webhook secret not configured' });
   }
 
   const sig = req.headers['stripe-signature'];
   if (!sig) {
-    console.warn('Missing Stripe signature header');
+    console.warn('[Webhook] Missing Stripe signature header');
     return res.status(400).send('Missing stripe-signature header');
   }
 
   let event;
   try {
     const rawBody = req.body;
+    console.log('[Webhook] Verifying signature, body type:', typeof rawBody);
     event = stripeClient.webhooks.constructEvent(
       typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody),
       sig,
       config.stripeWebhookSecret
     );
+    console.log('[Webhook] Signature verified successfully');
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
+    console.error('[Webhook] Signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -42,8 +44,11 @@ exports.verifyStripeWebhook = (req, res, next) => {
 
 // WEBHOOK HANDLER - PRODUCTION ONLY
 exports.handleStripeWebhook = catchAsync(async (req, res) => {
-  // Webhooks only for production - in development, booking is created when checkout session is created
-  if (process.env.NODE_ENV !== 'production') {
+  // Webhooks only for development are skipped - in development, booking is created when checkout session is created
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  if (isDevelopment) {
+    console.log('[Webhook] Ignoring webhook in development mode');
     return res
       .status(200)
       .json({ status: 'success', message: 'Webhook ignored in development' });
@@ -51,26 +56,35 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
 
   const event = req.stripeEvent;
 
-  console.log('Webhook event:', event.type);
+  console.log('[Webhook] Processing event type:', event.type);
+  console.log('[Webhook] Environment:', process.env.NODE_ENV || 'not set');
 
   // Handle checkout completion - create booking
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
+    console.log('[Webhook] Processing checkout.session.completed event');
+    console.log('[Webhook] Session ID:', session.id);
+    console.log('[Webhook] Customer Email:', session.customer_email);
+    console.log('[Webhook] Client Reference ID:', session.client_reference_id);
+
     try {
       if (!session.client_reference_id || !session.customer_email) {
-        console.error('Missing required session data');
+        console.error('[Webhook] Missing required session data', {
+          hasClientRef: !!session.client_reference_id,
+          hasEmail: !!session.customer_email,
+        });
         return res.status(200).json({ status: 'success' });
       }
 
       const tour = await Tour.findById(session.client_reference_id);
       if (!tour) {
-        console.error(`Tour not found: ${session.client_reference_id}`);
+        console.error('[Webhook] Tour not found:', session.client_reference_id);
         return res.status(200).json({ status: 'success' });
       }
 
       const user = await User.findOne({ email: session.customer_email });
       if (!user) {
-        console.error(`User not found: ${session.customer_email}`);
+        console.error('[Webhook] User not found:', session.customer_email);
         return res.status(200).json({ status: 'success' });
       }
 
@@ -81,32 +95,43 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         sessionId: session.id,
       });
 
-      if (!existing) {
-        const booking = await Booking.create({
-          tour: session.client_reference_id,
-          user: user._id,
-          price: session.amount_total / 100,
-          sessionId: session.id,
-          paymentStatus: session.payment_status,
-          paymentMethod:
-            (session.payment_method_types && session.payment_method_types[0]) ||
-            'card',
-        });
-        console.log('Booking created successfully via webhook');
-
-        // Emit real-time update to user
-        emitBookingStatusChange(user._id.toString(), booking);
+      if (existing) {
+        console.log('[Webhook] Duplicate booking detected, skipping creation');
+        return res
+          .status(200)
+          .json({ status: 'success', message: 'Booking already exists' });
       }
+
+      const booking = await Booking.create({
+        tour: session.client_reference_id,
+        user: user._id,
+        price: session.amount_total / 100,
+        sessionId: session.id,
+        paymentStatus: session.payment_status,
+        paymentMethod:
+          (session.payment_method_types && session.payment_method_types[0]) ||
+          'card',
+      });
+      console.log('[Webhook] Booking created successfully:', booking._id);
+
+      // Emit real-time update to user
+      emitBookingStatusChange(user._id.toString(), booking);
     } catch (error) {
-      console.error('Error processing checkout session:', error.message);
+      console.error(
+        '[Webhook] Error processing checkout session:',
+        error.message
+      );
+      console.error('[Webhook] Stack:', error.stack);
     }
   }
 
   // Handle charge succeeded
   if (event.type === 'charge.succeeded') {
     const charge = event.data.object;
+    console.log('[Webhook] Processing charge.succeeded event');
+    console.log('[Webhook] Charge ID:', charge.id);
+
     try {
-      console.log(`Charge succeeded: ${charge.id}`);
       if (charge.metadata && charge.metadata.booking_id) {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
@@ -117,21 +142,32 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           { new: true }
         ).populate('user');
 
-        // Emit real-time update to user
         if (booking && booking.user) {
+          console.log(
+            '[Webhook] Booking status updated to succeeded:',
+            booking._id
+          );
           emitBookingStatusChange(booking.user._id.toString(), booking);
         }
+      } else {
+        console.log('[Webhook] No booking_id in charge metadata');
       }
     } catch (error) {
-      console.error('Error handling charge succeeded:', error.message);
+      console.error(
+        '[Webhook] Error handling charge succeeded:',
+        error.message
+      );
     }
   }
 
   // Handle charge failed
   if (event.type === 'charge.failed') {
     const charge = event.data.object;
+    console.error('[Webhook] Processing charge.failed event');
+    console.error('[Webhook] Charge ID:', charge.id);
+    console.error('[Webhook] Failure Reason:', charge.failure_message);
+
     try {
-      console.error(`Charge failed: ${charge.id}`);
       if (charge.metadata && charge.metadata.booking_id) {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
@@ -142,13 +178,18 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           { new: true }
         ).populate('user');
 
-        // Emit real-time update to user
         if (booking && booking.user) {
+          console.error(
+            '[Webhook] Booking status updated to failed:',
+            booking._id
+          );
           emitBookingStatusChange(booking.user._id.toString(), booking);
         }
+      } else {
+        console.log('[Webhook] No booking_id in charge metadata');
       }
     } catch (error) {
-      console.error('Error handling charge failed:', error.message);
+      console.error('[Webhook] Error handling charge failed:', error.message);
     }
   }
 
