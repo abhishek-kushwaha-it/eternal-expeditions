@@ -12,6 +12,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
+const bookingController = require('./controllers/bookingController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -54,7 +55,9 @@ app.use('/api', limiter);
 // Stripe webhook endpoint - must use raw body BEFORE json parser for signature verification
 app.post(
   '/api/v1/bookings/webhook/stripe',
-  express.raw({ type: 'application/json' })
+  express.raw({ type: 'application/json' }),
+  bookingController.verifyStripeWebhook,
+  bookingController.handleStripeWebhook
 );
 
 // Body parser, reading data from body into req.body
