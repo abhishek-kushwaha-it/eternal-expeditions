@@ -13,33 +13,29 @@ const bookingSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    require: [true, 'Booking must have a price.'],
+    required: [true, 'Booking must have a price.'],
   },
   createdAt: {
     type: Date,
     default: Date.now(),
   },
-  paid: {
-    type: Boolean,
-    default: false,
-  },
-  // Stripe Payment Fields
-  stripeSessionId: {
+  // Payment Fields
+  sessionId: {
     type: String,
     unique: true,
     sparse: true,
   },
-  stripeChargeId: {
+  chargeId: {
     type: String,
     sparse: true,
   },
-  stripePaymentIntentId: {
+  paymentIntentId: {
     type: String,
     sparse: true,
   },
-  stripePaymentStatus: {
+  paymentStatus: {
     type: String,
-    enum: ['pending', 'succeeded', 'failed', 'canceled'],
+    enum: ['pending', 'succeeded', 'failed', 'cancelled'],
     default: 'pending',
   },
   paymentMethod: {
@@ -58,9 +54,9 @@ bookingSchema.pre(/^find/, function (next) {
   next();
 });
 
-// Index for unique Stripe session ID
-bookingSchema.index({ stripeSessionId: 1 });
-bookingSchema.index({ stripePaymentStatus: 1 });
+// Index for unique session ID
+bookingSchema.index({ sessionId: 1 });
+bookingSchema.index({ paymentStatus: 1 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

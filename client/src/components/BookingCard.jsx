@@ -168,11 +168,11 @@ export default function BookingCard({
       <div className="booking-card__header">
         <h3 className="booking-card__title">{booking.tour?.name}</h3>
         <span
-          className={`booking-status-badge booking-status-badge--${booking.stripePaymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
+          className={`booking-status-badge booking-status-badge--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
         >
-          {booking.stripePaymentStatus === 'succeeded'
+          {booking.paymentStatus === 'succeeded'
             ? 'Paid'
-            : booking.stripePaymentStatus === 'failed'
+            : booking.paymentStatus === 'failed'
               ? 'Failed'
               : 'Pending'}
         </span>
@@ -183,14 +183,14 @@ export default function BookingCard({
         <DetailItem label="Duration" value={`${booking.tour?.duration} days`} />
         <DetailItem label="Price" value={`$${booking.price}`} isPrimary />
         <DetailItem label="Booking Date" value={formatDate(booking.createdAt)} />
-        <DetailItem label="Payment Status" value={booking.stripePaymentStatus || 'pending'} />
+        <DetailItem label="Payment Status" value={booking.paymentStatus || 'pending'} />
         <DetailItem label="Payment Method" value={booking.paymentMethod || 'N/A'} />
         {booking.failureReason && (
           <DetailItem label="Failure Reason" value={booking.failureReason} />
         )}
       </div>
 
-      {showReviews && booking.stripePaymentStatus === 'succeeded' && (
+      {showReviews && booking.paymentStatus === 'succeeded' && (
         <div className="booking-reviews">
           {tourReviews.length > 0 && (
             <div className="booking-reviews__list">

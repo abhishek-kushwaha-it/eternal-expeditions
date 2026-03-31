@@ -78,7 +78,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
       const existing = await Booking.findOne({
         tour: session.client_reference_id,
         user: user._id,
-        stripeSessionId: session.id,
+        sessionId: session.id,
       });
 
       if (!existing) {
@@ -86,9 +86,8 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           tour: session.client_reference_id,
           user: user._id,
           price: session.amount_total / 100,
-          paid: true,
-          stripeSessionId: session.id,
-          stripePaymentStatus: session.payment_status,
+          sessionId: session.id,
+          paymentStatus: session.payment_status,
           paymentMethod:
             (session.payment_method_types && session.payment_method_types[0]) ||
             'card',
@@ -112,8 +111,8 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
           {
-            stripeChargeId: charge.id,
-            stripePaymentStatus: 'succeeded',
+            chargeId: charge.id,
+            paymentStatus: 'succeeded',
           },
           { new: true }
         ).populate('user');
@@ -137,7 +136,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         const booking = await Booking.findByIdAndUpdate(
           charge.metadata.booking_id,
           {
-            stripePaymentStatus: 'failed',
+            paymentStatus: 'failed',
             failureReason: charge.failure_message,
           },
           { new: true }
@@ -224,7 +223,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     try {
       // Check for duplicate using session ID that just came from Stripe
       const existingBooking = await Booking.findOne({
-        stripeSessionId: session.id,
+        sessionId: session.id,
       });
 
       if (!existingBooking) {
@@ -232,11 +231,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           tour: req.params.tourId,
           user: req.user._id,
           price: tour.price,
-          paid: true,
-          stripeSessionId: session.id,
-          stripeChargeId: `dev_charge_${session.id.substring(0, 16)}`,
-          stripePaymentIntentId: `dev_pi_${session.id.substring(0, 16)}`,
-          stripePaymentStatus: 'succeeded',
+          sessionId: session.id,
+          chargeId: `dev_charge_${session.id.substring(0, 16)}`,
+          paymentIntentId: `dev_pi_${session.id.substring(0, 16)}`,
+          paymentStatus: 'succeeded',
           paymentMethod: 'card',
         });
         console.log('[DEV MODE] Booking created immediately (no webhook)');
@@ -271,7 +269,7 @@ exports.getMyBookings = catchAsync(async (req, res, next) => {
 
 exports.createBooking = catchAsync(async (req, res, next) => {
   // Manual booking creation with proper field handling
-  const { tour, user, price, paid, paymentMethod } = req.body;
+  const { tour, user, price, paymentMethod, paymentStatus } = req.body;
 
   // Validate required fields
   if (!tour || !user || !price) {
@@ -285,19 +283,12 @@ exports.createBooking = catchAsync(async (req, res, next) => {
     tour,
     user,
     price,
-    paid: paid === true, // Only true if explicitly set
     paymentMethod: paymentMethod || 'other',
-    stripeSessionId: manualBookingId, // Track as manual booking
+    sessionId: manualBookingId, // Track as manual booking
+    paymentStatus: paymentStatus || 'pending', // Allow manual status setting
+    chargeId: `manual_charge_${manualBookingId.substring(0, 16)}`,
+    paymentIntentId: `manual_pi_${manualBookingId.substring(0, 16)}`,
   };
-
-  // If paid=true, set payment status to succeeded and generate booking IDs
-  if (bookingData.paid) {
-    bookingData.stripePaymentStatus = 'succeeded';
-    bookingData.stripeChargeId = `manual_charge_${manualBookingId.substring(0, 16)}`;
-    bookingData.stripePaymentIntentId = `manual_pi_${manualBookingId.substring(0, 16)}`;
-  } else {
-    bookingData.stripePaymentStatus = 'pending';
-  }
 
   const booking = await Booking.create(bookingData);
 
@@ -312,38 +303,10 @@ exports.createBooking = catchAsync(async (req, res, next) => {
 exports.getBooking = factory.getOne(Booking, 'tour');
 exports.getAllBookings = factory.getAll(Booking);
 
-// Custom update to maintain paid/stripePaymentStatus consistency
+// Custom update for payment status consistency
 exports.updateBooking = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const updateData = req.body;
-
-  // If paid field is being updated, sync stripePaymentStatus
-  if (Object.prototype.hasOwnProperty.call(updateData, 'paid')) {
-    if (updateData.paid === true) {
-      updateData.stripePaymentStatus = 'succeeded';
-    } else if (
-      updateData.paid === false &&
-      updateData.stripePaymentStatus === 'succeeded'
-    ) {
-      // If un-marking as paid, set to pending
-      updateData.stripePaymentStatus = 'pending';
-    }
-  }
-
-  // If stripePaymentStatus is being updated, sync paid field
-  if (
-    updateData.stripePaymentStatus === 'succeeded' &&
-    !Object.prototype.hasOwnProperty.call(updateData, 'paid')
-  ) {
-    updateData.paid = true;
-  } else if (
-    updateData.stripePaymentStatus === 'pending' &&
-    !Object.prototype.hasOwnProperty.call(updateData, 'paid')
-  ) {
-    updateData.paid = false;
-  } else if (updateData.stripePaymentStatus === 'failed') {
-    updateData.paid = false;
-  }
 
   const booking = await Booking.findByIdAndUpdate(id, updateData, {
     new: true,

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { io } from 'socket.io-client';
 import { Button, Card, ErrorState, LoadingState } from '../core-components';
 import { useToasts } from '../store/hooks';
@@ -10,22 +9,57 @@ import './BookingSuccessPage.css';
 
 /**
  * BookingSuccessPage
- * Displays after successful Stripe payment checkout
+ * Displays after successful payment checkout
  * Fetches and displays actual booking data
  * Listens for real-time status updates via WebSocket
  */
+
+// Helper: Handle payment status and show appropriate message
+const handlePaymentStatus = (paymentStatus, failureReason, setStatus, addToast) => {
+  if (paymentStatus === 'succeeded') {
+    setStatus('success');
+    addToast('💚 Payment confirmed! Your booking is complete.', 'success');
+  } else if (paymentStatus === 'failed') {
+    setStatus('error');
+    addToast(`❌ Payment failed: ${failureReason || 'Please try again'}`, 'error');
+  } else {
+    setStatus('success');
+    addToast('Payment received! Your booking is being processed.', 'success');
+  }
+};
+
+// Helper: Format date to readable string
+const formatDate = (date) =>
+  new Date(date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+// Helper: Render detail row consistently
+const renderDetailRow = (label, value, valueClass = '', isWarning = false) => {
+  if (!value) return null;
+  return (
+    <div className={`detail-row${isWarning ? ' detail-row--warning' : ''}`}>
+      <span className="detail-label">{label}</span>
+      <span className={`detail-value${valueClass ? ` ${valueClass}` : ''}`}>{value}</span>
+    </div>
+  );
+};
+
 export default function BookingSuccessPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToast } = useToasts();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [status, setStatus] = useState('loading');
   const [bookingData, setBookingData] = useState(null);
   const [socket, setSocket] = useState(null);
 
   const sessionId = searchParams.get('session_id');
   const isCancelled = searchParams.get('cancelled') === 'true';
+  const isDev = import.meta.env.MODE === 'development';
 
   useEffect(() => {
     let isMounted = true;
@@ -49,117 +83,58 @@ export default function BookingSuccessPage() {
         return;
       }
 
-      // Process payment based on environment
-      if (import.meta.env.MODE === 'development') {
-        // DEVELOPMENT MODE: Booking created immediately on backend
-        processPaymentDev();
-      } else {
-        // PRODUCTION MODE: Wait for webhook to create booking
-        processPaymentProd();
-      }
+      processPayment();
     };
 
-    const processPaymentDev = async () => {
+    const processPayment = async () => {
       try {
-        // In development, booking is created immediately when checkout session is created
-        // Just fetch and display it
         const response = await api.get('/bookings/my-bookings');
         const bookings = response.data.data.bookings;
-        const booking = bookings.find((b) => b.stripeSessionId === sessionId);
+        const booking = bookings.find((b) => b.sessionId === sessionId);
 
         if (!isMounted) return;
 
         if (booking) {
+          // Booking found - update display and handle status
           updateBookingDisplay(booking);
-          setStatus('success');
-          addToast('Payment successful! Your booking is confirmed.', 'success');
-        } else {
-          // Should not happen in dev, but fallback
+        } else if (isDev) {
+          // Dev mode: booking should exist
           setStatus('error');
           addToast('Booking not found. Please check your bookings.', 'error');
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        console.error('Error fetching booking (dev):', err);
-        setStatus('error');
-        addToast('Failed to load booking details. Please try again.', 'error');
-      }
-    };
-
-    const processPaymentProd = async () => {
-      try {
-        // In production, webhook creates booking asynchronously
-        // Query for it with retry logic, and listen via Socket.io for updates
-        const response = await api.get('/bookings/my-bookings');
-        const bookings = response.data.data.bookings;
-        const booking = bookings.find((b) => b.stripeSessionId === sessionId);
-
-        if (!isMounted) return;
-
-        if (booking) {
-          updateBookingDisplay(booking);
         } else {
-          // Webhook hasn't processed yet - show pending state and listen via Socket.io
+          // Prod mode: webhook hasn't processed yet, show pending
           setBookingData({
             sessionId,
             amount: 'Pending verification',
-            date: new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            }),
+            date: formatDate(new Date()),
           });
           setStatus('pending');
           addToast('Payment received! Your booking is being processed via webhook.', 'info');
-
-          // Setup Socket.io for webhook updates
           setupWebsocket();
         }
       } catch (err) {
         if (!isMounted) return;
-        console.error('Error fetching booking (prod):', err);
+        console.error('Error fetching booking:', err);
         setStatus('error');
-        addToast('Failed to process payment. Please contact support.', 'error');
+        addToast('Failed to process payment. Please try again or contact support.', 'error');
       }
     };
 
     const updateBookingDisplay = (booking) => {
       setBookingData({
         bookingId: booking._id,
-        sessionId: booking.stripeSessionId,
+        sessionId: booking.sessionId,
         tourName: booking.tour?.name,
         amount: booking.price,
-        date: new Date(booking.createdAt).toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
-        paymentStatus: booking.stripePaymentStatus,
+        date: formatDate(booking.createdAt),
+        paymentStatus: booking.paymentStatus,
         paymentMethod: booking.paymentMethod,
         failureReason: booking.failureReason,
-        tourStartDate: new Date(booking.tour?.startDates?.[0]).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
+        tourStartDate: formatDate(booking.tour?.startDates?.[0]),
       });
 
-      // Show appropriate message based on status
-      if (booking.stripePaymentStatus === 'succeeded') {
-        setStatus('success');
-        addToast('Payment successful! Your booking is confirmed.', 'success');
-        // Invalidate bookings queries so they fetch fresh data
-        queryClient.invalidateQueries({ queryKey: ['myBookings'] });
-        queryClient.invalidateQueries({ queryKey: ['allBookings'] });
-      } else if (booking.stripePaymentStatus === 'failed') {
-        setStatus('error');
-        addToast(`Payment failed: ${booking.failureReason || 'Unknown error'}`, 'error');
-      } else {
-        setStatus('success');
-        addToast('Payment received! Your booking is being processed.', 'success');
-      }
+      // Handle payment status
+      handlePaymentStatus(booking.paymentStatus, booking.failureReason, setStatus, addToast);
     };
 
     const setupWebsocket = () => {
@@ -191,17 +166,8 @@ export default function BookingSuccessPage() {
             failureReason: data.failureReason,
           }));
 
-          // Show toast notification based on new status
-          if (data.paymentStatus === 'succeeded') {
-            addToast('💚 Payment confirmed! Your booking is complete.', 'success');
-            setStatus('success');
-            // Invalidate queries to fetch fresh booking data
-            queryClient.invalidateQueries({ queryKey: ['myBookings'] });
-            queryClient.invalidateQueries({ queryKey: ['allBookings'] });
-          } else if (data.paymentStatus === 'failed') {
-            addToast(`❌ Payment failed: ${data.failureReason || 'Please try again'}`, 'error');
-            setStatus('error');
-          }
+          // Reuse payment status handler for consistency
+          handlePaymentStatus(data.paymentStatus, data.failureReason, setStatus, addToast);
         }
       });
 
@@ -283,66 +249,21 @@ export default function BookingSuccessPage() {
 
           {/* Booking Details */}
           <div className="booking-details">
-            {bookingData?.tourName && (
-              <div className="detail-row">
-                <span className="detail-label">Tour</span>
-                <span className="detail-value">{bookingData.tourName}</span>
-              </div>
+            {renderDetailRow('Tour', bookingData?.tourName)}
+            {renderDetailRow(
+              'Amount Paid',
+              bookingData?.amount
+                ? `$${typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : bookingData.amount}`
+                : null,
+              'detail-amount'
             )}
-
-            {bookingData?.amount && (
-              <div className="detail-row">
-                <span className="detail-label">Amount Paid</span>
-                <span className="detail-value detail-amount">
-                  $
-                  {typeof bookingData.amount === 'number'
-                    ? bookingData.amount.toFixed(2)
-                    : bookingData.amount}
-                </span>
-              </div>
-            )}
-
-            {bookingData?.paymentStatus && (
-              <div className="detail-row">
-                <span className="detail-label">Payment Status</span>
-                <span className="detail-value detail-status">{bookingData.paymentStatus}</span>
-              </div>
-            )}
-
-            {bookingData?.paymentMethod && (
-              <div className="detail-row">
-                <span className="detail-label">Payment Method</span>
-                <span className="detail-value">{bookingData.paymentMethod}</span>
-              </div>
-            )}
-
-            {bookingData?.date && (
-              <div className="detail-row">
-                <span className="detail-label">Booked On</span>
-                <span className="detail-value">{bookingData.date}</span>
-              </div>
-            )}
-
-            {bookingData?.tourStartDate && (
-              <div className="detail-row">
-                <span className="detail-label">Tour Starts</span>
-                <span className="detail-value">{bookingData.tourStartDate}</span>
-              </div>
-            )}
-
-            {bookingData?.sessionId && (
-              <div className="detail-row">
-                <span className="detail-label">Session ID</span>
-                <span className="detail-value detail-code">{bookingData.sessionId}</span>
-              </div>
-            )}
-
-            {bookingData?.failureReason && (
-              <div className="detail-row detail-row--warning">
-                <span className="detail-label">Note</span>
-                <span className="detail-value">{bookingData.failureReason}</span>
-              </div>
-            )}
+            {renderDetailRow('Payment Status', bookingData?.paymentStatus, 'detail-status')}
+            {renderDetailRow('Payment Method', bookingData?.paymentMethod)}
+            {renderDetailRow('Booked On', bookingData?.date)}
+            {renderDetailRow('Tour Starts', bookingData?.tourStartDate)}
+            {renderDetailRow('Session ID', bookingData?.sessionId, 'detail-code')}
+            {bookingData?.failureReason &&
+              renderDetailRow('Note', bookingData.failureReason, null, true)}
           </div>
 
           {/* Action Buttons */}

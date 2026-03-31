@@ -41,8 +41,8 @@ export default function ManageBookings() {
     tour: '',
     user: '',
     price: '',
-    paid: false,
     paymentMethod: 'other',
+    paymentStatus: 'pending',
   });
 
   const filteredBookings = useMemo(() => {
@@ -94,7 +94,13 @@ export default function ManageBookings() {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingBooking(null);
-    setFormData({ tour: '', user: '', price: '', paid: false, paymentMethod: 'other' });
+    setFormData({
+      tour: '',
+      user: '',
+      price: '',
+      paymentMethod: 'other',
+      paymentStatus: 'pending',
+    });
   };
 
   const handleFormChange = (e) => {
@@ -128,12 +134,18 @@ export default function ManageBookings() {
         tour: booking.tour._id,
         user: booking.user._id,
         price: booking.price,
-        paid: booking.paid,
         paymentMethod: booking.paymentMethod || 'other',
+        paymentStatus: booking.paymentStatus || 'pending',
       });
     } else {
       setEditingBooking(null);
-      setFormData({ tour: '', user: '', price: '', paid: false, paymentMethod: 'other' });
+      setFormData({
+        tour: '',
+        user: '',
+        price: '',
+        paymentMethod: 'other',
+        paymentStatus: 'pending',
+      });
     }
     setShowForm(true);
   };
@@ -174,7 +186,7 @@ export default function ManageBookings() {
             bookingId: editingBooking._id,
             data: {
               price: parseFloat(formData.price),
-              paid: formData.paid,
+              paymentStatus: formData.paymentStatus,
               paymentMethod: formData.paymentMethod,
             },
           });
@@ -184,7 +196,7 @@ export default function ManageBookings() {
             tour: formData.tour,
             user: formData.user,
             price: parseFloat(formData.price),
-            paid: formData.paid,
+            paymentStatus: formData.paymentStatus,
             paymentMethod: formData.paymentMethod,
           });
           addToast('Booking created successfully!', 'success');
@@ -342,19 +354,6 @@ export default function ManageBookings() {
               </div>
 
               <div className="form__group">
-                <label className="form__checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="paid"
-                    checked={formData.paid}
-                    onChange={handleFormChange}
-                    className="form__checkbox"
-                  />
-                  <span>Mark as Paid</span>
-                </label>
-              </div>
-
-              <div className="form__group">
                 <label className="form__label">Payment Method</label>
                 <select
                   name="paymentMethod"
@@ -366,6 +365,22 @@ export default function ManageBookings() {
                   <option value="bank_transfer">Bank Transfer</option>
                   <option value="wallet">Wallet</option>
                   <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div className="form__group">
+                <label className="form__label">Payment Status</label>
+                <select
+                  name="paymentStatus"
+                  value={formData.paymentStatus}
+                  onChange={handleFormChange}
+                  className="form__select"
+                >
+                  <option value="pending">Pending</option>
+
+                  <option value="succeeded">Succeeded</option>
+                  <option value="failed">Failed</option>
+                  <option value="canceled">Canceled</option>
                 </select>
               </div>
 

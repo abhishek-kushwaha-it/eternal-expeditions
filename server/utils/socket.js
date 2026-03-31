@@ -52,14 +52,14 @@ exports.emitBookingStatusChange = (userId, bookingData) => {
   io.to(`user-${userId}`).emit('bookingStatusChanged', {
     bookingId: bookingData._id,
     sessionId: bookingData.stripeSessionId,
-    paymentStatus: bookingData.stripePaymentStatus,
+    paymentStatus: bookingData.paymentStatus,
     paymentMethod: bookingData.paymentMethod,
     failureReason: bookingData.failureReason,
     timestamp: new Date().toISOString(),
   });
 
   console.log(
-    `[WebSocket] Emitted status change to user ${userId}: ${bookingData.stripePaymentStatus}`
+    `[WebSocket] Emitted status change to user ${userId}: ${bookingData.paymentStatus}`
   );
 };
 

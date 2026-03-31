@@ -3,6 +3,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './useAuth';
 import api from '../utils/api';
 
+// ============ Query Invalidation Helpers ============
+const invalidateBookingQueries = (queryClient) => {
+  queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+  queryClient.invalidateQueries({ queryKey: ['allBookings'] });
+};
+
+const invalidateTourQueries = (queryClient) => {
+  queryClient.invalidateQueries({ queryKey: ['tours'] });
+  queryClient.invalidateQueries({ queryKey: ['allToursAdmin'] });
+};
+
+const invalidateReviewQueries = (queryClient, tourId = null) => {
+  queryClient.invalidateQueries({ queryKey: ['myReviews'] });
+  queryClient.invalidateQueries({ queryKey: ['allReviews'] });
+  if (tourId) {
+    queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
+  }
+};
+
 // Tours queries
 export const useTours = () => {
   return useQuery({
@@ -151,15 +170,7 @@ export const useCreateTourMutation = () => {
       return response.data;
     },
     onSuccess: () => {
-      // Invalidate and immediately refetch tour lists (all instances)
-      queryClient.invalidateQueries({
-        queryKey: ['tours'],
-        refetchType: 'all',
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['allToursAdmin'],
-        refetchType: 'all',
-      });
+      invalidateTourQueries(queryClient);
     },
   });
 };
@@ -171,17 +182,8 @@ export const useUpdateTourMutation = () => {
   return useMutation({
     mutationFn: ({ tourId, data }) => api.patch(`/tours/${tourId}`, data),
     onSuccess: (response, variables) => {
-      // Update the specific tour in cache
       queryClient.setQueryData(['tour', variables.tourId], response.data.data);
-      // Invalidate and immediately refetch tour lists (all instances)
-      queryClient.invalidateQueries({
-        queryKey: ['tours'],
-        refetchType: 'all',
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['allToursAdmin'],
-        refetchType: 'all',
-      });
+      invalidateTourQueries(queryClient);
     },
   });
 };
@@ -193,17 +195,8 @@ export const useDeleteTourMutation = () => {
   return useMutation({
     mutationFn: (tourId) => api.delete(`/tours/${tourId}`),
     onSuccess: (response, tourId) => {
-      // Remove from cache
       queryClient.removeQueries({ queryKey: ['tour', tourId] });
-      // Invalidate and immediately refetch tour lists (all instances)
-      queryClient.invalidateQueries({
-        queryKey: ['tours'],
-        refetchType: 'all',
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['allToursAdmin'],
-        refetchType: 'all',
-      });
+      invalidateTourQueries(queryClient);
     },
   });
 };
@@ -436,18 +429,16 @@ export const useCreateBookingMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ tour, user, price, paid = false, paymentMethod = 'other' }) =>
+    mutationFn: ({ tour, user, price, paymentStatus = 'pending', paymentMethod = 'other' }) =>
       api.post('/bookings', {
         tour,
         user,
         price,
-        paid,
+        paymentStatus,
         paymentMethod,
       }),
     onSuccess: () => {
-      // Invalidate queries so they refetch with fresh data
-      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
-      queryClient.invalidateQueries({ queryKey: ['allBookings'] });
+      invalidateBookingQueries(queryClient);
     },
   });
 };
@@ -466,8 +457,7 @@ export const useUpdateBookingMutation = () => {
   return useMutation({
     mutationFn: ({ bookingId, data }) => api.patch(`/bookings/${bookingId}`, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allBookings'] });
-      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      invalidateBookingQueries(queryClient);
     },
   });
 };
@@ -479,8 +469,7 @@ export const useDeleteBookingMutation = () => {
   return useMutation({
     mutationFn: (bookingId) => api.delete(`/bookings/${bookingId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allBookings'] });
-      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
+      invalidateBookingQueries(queryClient);
     },
   });
 };
@@ -492,21 +481,13 @@ export const useCreateReviewMutation = () => {
   return useMutation({
     mutationFn: ({ tour, rating, review }) => api.post('/reviews', { tour, rating, review }),
     onSuccess: (response) => {
-      // Invalidate user's reviews and all reviews (reviews are read-heavy, cache invalidation is reasonable)
-      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
-      queryClient.invalidateQueries({ queryKey: ['allReviews'] });
-
-      // Invalidate the specific tour to update its rating stats
       let tourId = null;
       try {
         tourId = response.data?.data?.tour?._id || response.data?.data?.tour;
       } catch {
         // Silently ignore - tourId extraction is not critical
       }
-
-      if (tourId) {
-        queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
-      }
+      invalidateReviewQueries(queryClient, tourId);
     },
   });
 };
@@ -519,14 +500,13 @@ export const useUpdateReviewMutation = () => {
     mutationFn: ({ reviewId, rating, review }) =>
       api.patch(`/reviews/${reviewId}`, { rating, review }),
     onSuccess: (response, variables) => {
-      // Invalidate user's reviews and all reviews
-      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
-      queryClient.invalidateQueries({ queryKey: ['allReviews'] });
-
-      // Invalidate specific tour if tourId provided
-      if (variables.tourId) {
-        queryClient.invalidateQueries({ queryKey: ['tour', variables.tourId] });
+      let tourId = null;
+      try {
+        tourId = response.data?.data?.tour?._id || response.data?.data?.tour || variables.tourId;
+      } catch {
+        // Silently ignore
       }
+      invalidateReviewQueries(queryClient, tourId);
     },
   });
 };
@@ -538,14 +518,13 @@ export const useDeleteReviewMutation = () => {
   return useMutation({
     mutationFn: ({ reviewId }) => api.delete(`/reviews/${reviewId}`),
     onSuccess: (response, variables) => {
-      // Invalidate user's reviews and all reviews
-      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
-      queryClient.invalidateQueries({ queryKey: ['allReviews'] });
-
-      // Invalidate specific tour if tourId provided
-      if (variables.tourId) {
-        queryClient.invalidateQueries({ queryKey: ['tour', variables.tourId] });
+      let tourId = null;
+      try {
+        tourId = response.data?.data?.tour?._id || response.data?.data?.tour || variables.tourId;
+      } catch {
+        // Silently ignore
       }
+      invalidateReviewQueries(queryClient, tourId);
     },
   });
 };

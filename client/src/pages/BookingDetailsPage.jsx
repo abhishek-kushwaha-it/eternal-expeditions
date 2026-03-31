@@ -50,9 +50,9 @@ export default function BookingDetailsPage() {
           <div className="booking-details-header">
             <h1 className="booking-details-header__title">Booking Details</h1>
             <span
-              className={`booking-status booking-status--${booking.paid ? 'confirmed' : 'pending'}`}
+              className={`booking-status booking-status--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
             >
-              {booking.paid ? '✓ Paid' : 'Awaiting Payment'}
+              {booking.paymentStatus === 'succeeded' ? '✓ Paid' : 'Awaiting Payment'}
             </span>
           </div>
 
