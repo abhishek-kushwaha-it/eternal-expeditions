@@ -10,6 +10,7 @@ const Button = forwardRef(
       fullWidth = false,
       disabled = false,
       as = 'button',
+      loading = false,
       children,
       onClick,
       className = '',
@@ -37,7 +38,7 @@ const Button = forwardRef(
         ref={ref}
         type={type}
         className={computedClassName}
-        disabled={disabled}
+        disabled={disabled || loading}
         onClick={onClick}
         {...props}
       >
