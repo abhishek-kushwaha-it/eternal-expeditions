@@ -7,6 +7,11 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 const { emitBookingStatusChange } = require('../utils/socket');
+const {
+  mapStripePaymentStatus,
+  createManualBookingData,
+  isStripeEventSupported,
+} = require('../utils/bookingUtils');
 
 const stripeClient = stripe(config.stripeSecretKey);
 
@@ -65,6 +70,15 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
 
   const event = req.stripeEvent;
 
+  if (!isStripeEventSupported(event.type)) {
+    console.log('[Webhook] Ignoring unsupported event type:', event.type);
+    return res.status(200).json({
+      status: 'success',
+      message: 'Event type not processed',
+      event: event.type,
+    });
+  }
+
   // Handle checkout completion - create booking
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
@@ -100,24 +114,12 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
           .json({ status: 'success', message: 'Booking already exists' });
       }
 
-      // Map Stripe payment_status to our enum
-      // Stripe can send: 'paid', 'unpaid', 'no_payment_required'
-      // We store: 'pending', 'succeeded', 'failed', 'cancelled'
-      const mapPaymentStatus = (stripeStatus) => {
-        const statusMap = {
-          paid: 'succeeded',
-          unpaid: 'pending',
-          no_payment_required: 'succeeded',
-        };
-        return statusMap[stripeStatus] || 'pending';
-      };
-
       const booking = await Booking.create({
         tour: session.client_reference_id,
         user: user._id,
         price: session.amount_total / 100,
         sessionId: session.id,
-        paymentStatus: mapPaymentStatus(session.payment_status),
+        paymentStatus: mapStripePaymentStatus(session.payment_status),
         paymentMethod:
           (session.payment_method_types && session.payment_method_types[0]) ||
           'card',
@@ -309,16 +311,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       });
 
       if (!existingBooking) {
-        await Booking.create({
-          tour: req.params.tourId,
-          user: req.user._id,
-          price: tour.price,
-          sessionId: session.id,
-          chargeId: `dev_charge_${session.id.substring(0, 16)}`,
-          paymentIntentId: `dev_pi_${session.id.substring(0, 16)}`,
-          paymentStatus: 'succeeded',
-          paymentMethod: 'card',
-        });
+        await Booking.create(
+          createManualBookingData({
+            tour: req.params.tourId,
+            user: req.user._id,
+            price: tour.price,
+            paymentMethod: 'card',
+            paymentStatus: 'succeeded',
+            sessionId: session.id,
+          })
+        );
       }
     } catch (error) {
       console.error('[DEV MODE] Error creating booking:', error.message);
@@ -352,19 +354,13 @@ exports.createBooking = catchAsync(async (req, res, next) => {
     return next(new AppError('Tour, User, and Price are required fields', 400));
   }
 
-  // Generate IDs for manual bookings
-  const manualBookingId = `manual_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-
-  const bookingData = {
+  const bookingData = createManualBookingData({
     tour,
     user,
     price,
-    paymentMethod: paymentMethod || 'other',
-    sessionId: manualBookingId, // Track as manual booking
-    paymentStatus: paymentStatus || 'pending', // Allow manual status setting
-    chargeId: `manual_charge_${manualBookingId.substring(0, 16)}`,
-    paymentIntentId: `manual_pi_${manualBookingId.substring(0, 16)}`,
-  };
+    paymentMethod,
+    paymentStatus,
+  });
 
   const booking = await Booking.create(bookingData);
 

@@ -1,7 +1,4 @@
-const multer = require('multer');
 const sharp = require('sharp');
-const util = require('util');
-const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const User = require('../models/userModel');
@@ -12,8 +9,9 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const config = require('../utils/config');
 const factory = require('./handlerFactory');
-
-const unlinkAsync = util.promisify(fs.unlink);
+const { filterObject } = require('../utils/objectUtils');
+const { safeUnlink } = require('../utils/fileUtils');
+const { createImageUploader } = require('../utils/uploadUtils');
 
 // const multerStorage = multer.diskStorage({
 //   destination: (req, file, cb) => {
@@ -24,30 +22,9 @@ const unlinkAsync = util.promisify(fs.unlink);
 //     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
 //   }
 // });
-const multerStorage = multer.memoryStorage();
-
-const multerFilter = (req, file, cb) => {
-  const allowedTypes = config.allowedImageTypes.split(',');
-
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(
-      new AppError(
-        `Invalid file type. Allowed types: ${config.allowedImageTypes}`,
-        400
-      ),
-      false
-    );
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-  limits: {
-    fileSize: config.maxFileSize,
-  },
+const upload = createImageUploader({
+  allowedTypes: config.allowedImageTypes.split(','),
+  maxFileSize: config.maxFileSize,
 });
 
 exports.uploadUserPhoto = upload.single('photo');
@@ -60,16 +37,12 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   // Delete old profile photo if it exists
   if (oldUser && oldUser.photo && oldUser.photo !== 'default.jpg') {
-    try {
-      const oldPhotoPath = path.join(
-        __dirname,
-        '../public/img/users',
-        oldUser.photo
-      );
-      await unlinkAsync(oldPhotoPath);
-    } catch (err) {
-      // Continue even if deletion fails (file might not exist)
-    }
+    const oldPhotoPath = path.join(
+      __dirname,
+      '../public/img/users',
+      oldUser.photo
+    );
+    await safeUnlink(oldPhotoPath);
   }
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
@@ -82,14 +55,6 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   next();
 });
-
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
 
 exports.getMe = (req, res, next) => {
   req.params.id = req.user.id;
@@ -108,7 +73,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, 'name', 'email');
+  const filteredBody = filterObject(req.body, 'name', 'email');
   if (req.file) filteredBody.photo = req.file.filename;
 
   // 3) Update user document
@@ -203,22 +168,12 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
     // 6) Delete user's profile photo from filesystem (after transaction is safely committed)
     if (user.photo && user.photo !== 'default.jpg') {
-      try {
-        const userPhotoPath = path.join(
-          __dirname,
-          '../public/img/users',
-          user.photo
-        );
-        await unlinkAsync(userPhotoPath);
-        // console.log(`✅ Deleted profile photo: ${user.photo}`); // Helpful for development
-      } catch (err) {
-        // Continue even if photo deletion fails (file might not exist)
-        if (process.env.NODE_ENV === 'development') {
-          console.log(
-            `⚠️ Profile photo deletion failed: ${user.photo} - ${err.message}`
-          );
-        }
-      }
+      const userPhotoPath = path.join(
+        __dirname,
+        '../public/img/users',
+        user.photo
+      );
+      await safeUnlink(userPhotoPath);
     }
 
     res.status(204).json({

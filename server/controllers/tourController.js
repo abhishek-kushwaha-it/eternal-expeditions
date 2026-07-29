@@ -1,11 +1,7 @@
-const multer = require('multer');
 const sharp = require('sharp');
-const util = require('util');
-const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 
-const unlinkAsync = util.promisify(fs.unlink);
 const Tour = require('../models/tourModel');
 const Review = require('../models/reviewModel');
 const Booking = require('../models/bookingModel');
@@ -13,20 +9,13 @@ const catchAsync = require('../utils/catchAsync');
 const APIFeatures = require('../utils/apiFeatures');
 const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
+const config = require('../utils/config');
+const { createImageUploader } = require('../utils/uploadUtils');
+const { safeUnlink, deleteFiles } = require('../utils/fileUtils');
 
-const multerStorage = multer.memoryStorage();
-
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not an image! Please upload only images.', 400), false);
-  }
-};
-
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
+const upload = createImageUploader({
+  allowedTypes: config.allowedImageTypes.split(','),
+  maxFileSize: config.maxFileSize,
 });
 
 exports.uploadTourImages = upload.fields([
@@ -60,16 +49,12 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
   if (req.files.imageCover) {
     // Delete old cover image if updating
     if (oldTour && oldTour.imageCover) {
-      try {
-        const oldCoverPath = path.join(
-          __dirname,
-          '../public/img/tours',
-          oldTour.imageCover
-        );
-        await unlinkAsync(oldCoverPath);
-      } catch (err) {
-        // Continue even if deletion fails (file might not exist)
-      }
+      const oldCoverPath = path.join(
+        __dirname,
+        '../public/img/tours',
+        oldTour.imageCover
+      );
+      await safeUnlink(oldCoverPath);
     }
 
     req.body.imageCover = `tour-${tourUniqueName}-${Date.now()}-cover.jpeg`;
@@ -87,20 +72,10 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
     if (req.files.images) {
       // Delete old additional images if updating
       if (oldTour && oldTour.images && Array.isArray(oldTour.images)) {
-        await Promise.all(
-          oldTour.images.map(async (imageName) => {
-            try {
-              const oldImagePath = path.join(
-                __dirname,
-                '../public/img/tours',
-                imageName
-              );
-              await unlinkAsync(oldImagePath);
-            } catch (err) {
-              // Continue even if deletion fails
-            }
-          })
+        const oldImagePaths = oldTour.images.map((imageName) =>
+          path.join(__dirname, '../public/img/tours', imageName)
         );
+        await deleteFiles(oldImagePaths);
       }
 
       req.body.images = [];
@@ -139,20 +114,10 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
           );
 
           // Delete removed images from filesystem
-          await Promise.all(
-            imagesToDelete.map(async (imageName) => {
-              try {
-                const oldImagePath = path.join(
-                  __dirname,
-                  '../public/img/tours',
-                  imageName
-                );
-                await unlinkAsync(oldImagePath);
-              } catch (err) {
-                // Continue even if deletion fails
-              }
-            })
+          const imagesToDeletePaths = imagesToDelete.map((imageName) =>
+            path.join(__dirname, '../public/img/tours', imageName)
           );
+          await deleteFiles(imagesToDeletePaths);
 
           // Update images array to keep only the specified ones
           req.body.images = imagesToKeep;
@@ -489,24 +454,10 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
     }
 
     // Delete each image file from the filesystem
-    await Promise.all(
-      imagesToDelete.map(async (imageName) => {
-        try {
-          const imagePath = path.join(
-            __dirname,
-            '../public/img/tours',
-            imageName
-          );
-          await unlinkAsync(imagePath);
-          // console.log(`✅ Deleted image: ${imageName}`); // Helpful for development
-        } catch (err) {
-          // Log but continue - files may not exist, but transaction data is safe
-          // console.log(
-          //   `⚠️ Image deletion failed: ${imageName} - ${err.message}`
-          // ); // Helpful for development
-        }
-      })
+    const imagesToDeletePaths = imagesToDelete.map((imageName) =>
+      path.join(__dirname, '../public/img/tours', imageName)
     );
+    await deleteFiles(imagesToDeletePaths);
 
     // Commit transaction
     await session.commitTransaction();

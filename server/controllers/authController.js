@@ -5,37 +5,8 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Email = require('../utils/email');
+const { createSendToken, sendBackgroundEmail } = require('../utils/authToken');
 const config = require('../utils/config');
-
-const signToken = (id) =>
-  jwt.sign({ id }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
-  });
-
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + config.jwtCookieExpiresIn * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: config.cookieHttpOnly,
-    secure: config.cookieSecure,
-    sameSite: config.cookieSameSite,
-  };
-
-  res.cookie('jwt', token, cookieOptions);
-
-  // Remove password from output
-  user.password = undefined;
-
-  res.status(statusCode).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  });
-};
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -50,9 +21,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   createSendToken(newUser, 201, res);
 
-  welcomeEmailPromise.catch((err) => {
-    console.error('Failed to send welcome email:', err);
-  });
+  sendBackgroundEmail(welcomeEmailPromise, 'welcome email');
 });
 
 exports.login = catchAsync(async (req, res, next) => {
