@@ -1,203 +1,212 @@
 # 🚀 Backend Server - Eternal Expeditions
 
-> Express.js + MongoDB server with Stripe payments and real-time WebSocket support
+> Backend API for Eternal Expeditions with Express, MongoDB, Stripe, and real-time Socket.io updates.
 
 ## 📋 Quick Start
 
 ```bash
-# Install dependencies
+cd server
 npm install
-
-# Setup environment
-cp config.env.example config.env
-# Edit config.env with your values
-
-# Development mode
 npm start
-
-# Production mode
-NODE_ENV=production npm start
-
-# Linting
-npm run lint
-npm run lint:fix
-
-# Code formatting
-npm run format
 ```
 
-## 🏗 Architecture
+### Scripts
 
-### Directory Structure
+- `npm run dev` — start server in development mode with nodemon
+- `npm start` — start server in production mode
+- `npm run lint` — run ESLint on server source files
+- `npm run lint:fix` — automatically fix lintable issues
+- `npm run format` — run Prettier formatting against JS/JSON/MD files
+
+## 🧩 Server Architecture
+
+### Directory structure
 
 ```
 server/
-├── app.js                    # Express app initialization
-├── server.js                 # HTTP/Socket.io server entry point
-├── config.env                # Environment variables
-├── package.json              # Dependencies
+├── app.js                    # Express app setup and middleware
+├── server.js                 # HTTP and Socket.io server bootstrap
+├── package.json              # Server dependencies and scripts
+├── .eslintrc.json            # ESLint rules
+├── .prettierrc               # Prettier configuration
+├── .env.development          # Local development environment variables
+├── .env.production           # Production environment variables
 │
-├── controllers/
-│   ├── authController.js     # User authentication
-│   ├── userController.js     # User management
-│   ├── tourController.js     # Tour CRUD & statistics
-│   ├── reviewController.js   # Review management
-│   ├── bookingController.js  # Booking + Stripe webhook
-│   ├── errorController.js    # Global error handler
-│   └── handlerFactory.js     # Reusable CRUD operations
+├── controllers/              # Route handlers and business logic
+│   ├── authController.js
+│   ├── bookingController.js
+│   ├── errorController.js
+│   ├── handlerFactory.js
+│   ├── reviewController.js
+│   ├── tourController.js
+│   └── userController.js
 │
-├── models/
-│   ├── userModel.js          # User schema
-│   ├── tourModel.js          # Tour schema
-│   ├── bookingModel.js       # Booking schema (10 fields)
-│   └── reviewModel.js        # Review schema
+├── models/                   # Mongoose schemas
+│   ├── bookingModel.js
+│   ├── reviewModel.js
+│   ├── tourModel.js
+│   └── userModel.js
 │
-├── routes/
-│   ├── userRoutes.js         # User endpoints
-│   ├── tourRoutes.js         # Tour endpoints
-│   ├── bookingRoutes.js      # Booking endpoints
-│   └── reviewRoutes.js       # Review endpoints
+├── routes/                   # Route definitions
+│   ├── bookingRoutes.js
+│   ├── reviewRoutes.js
+│   ├── tourRoutes.js
+│   └── userRoutes.js
 │
-├── utils/
-│   ├── config.js             # Config management
-│   ├── appError.js           # Custom error class
-│   ├── catchAsync.js         # Async error wrapper
-│   ├── email.js              # Email service
-│   ├── apiFeatures.js        # Query filters/sort/pagination
-│   └── socket.js             # Socket.io server
+├── utils/                    # Helpers and services
+│   ├── apiFeatures.js
+│   ├── appError.js
+│   ├── authToken.js
+│   ├── bookingUtils.js
+│   ├── catchAsync.js
+│   ├── config.js
+│   ├── email.js
+│   ├── fileUtils.js
+│   ├── objectUtils.js
+│   ├── socket.js
+│   ├── stripeSetup.js
+│   └── uploadUtils.js
 │
-├── middleware/
-│   └── [auth/validation]
-│
-├── public/
-│   └── img/                  # Static images
-│
-└── dev-data/
-    └── data/                 # Sample data for seeding
+├── public/                   # Static files served by Express
+│   └── img/
+└── dev-data/                 # Sample data importers
+    └── data/
 ```
+
+## ⚙️ Environment Variables
+
+The backend loads `.env.development` or `.env.production` depending on `NODE_ENV`. The config module validates these values:
+
+- `FRONTEND_URL`
+- `DATABASE`
+- `DATABASE_PASSWORD`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+- `JWT_COOKIE_EXPIRES_IN`
+- `EMAIL_FROM`
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `SENDGRID_USERNAME`
+- `SENDGRID_PASSWORD`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `MAX_FILE_SIZE`
+- `ALLOWED_IMAGE_TYPES`
+- `LOG_LEVEL`
+- `ENABLE_REQUEST_LOGGING`
+- `COOKIE_SECURE`
+- `COOKIE_HTTP_ONLY`
+- `COOKIE_SAME_SITE`
+
+## 📦 Key Dependencies
+
+- `express`
+- `mongoose`
+- `stripe`
+- `socket.io`
+- `bcryptjs`
+- `jsonwebtoken`
+- `dotenv`
+- `helmet`
+- `cors`
+- `express-mongo-sanitize`
+- `xss-clean`
+- `multer`
+- `sharp`
+- `nodemailer`
 
 ## 🔌 API Endpoints
 
-### Authentication
+### Auth routes
 
-```
-POST   /api/v1/users/signup               - Register user
-POST   /api/v1/users/login                - Login user
-POST   /api/v1/users/logout               - Logout user
-POST   /api/v1/users/forgotPassword       - Request password reset
-PATCH  /api/v1/users/resetPassword/:token - Reset password
-PATCH  /api/v1/users/updateMyPassword     - Change password (protected)
-GET    /api/v1/users/me                   - Get current user (protected)
-```
+- `POST /api/v1/users/signup`
+- `POST /api/v1/users/login`
+- `POST /api/v1/users/logout`
+- `POST /api/v1/users/forgotPassword`
+- `PATCH /api/v1/users/resetPassword/:token`
+- `PATCH /api/v1/users/updateMyPassword`
+- `GET /api/v1/users/me`
 
-### Users (Admin)
+### User routes
 
-```
-GET    /api/v1/users                     - Get all users (admin)
-GET    /api/v1/users/:id                 - Get user by ID (admin)
-PATCH  /api/v1/users/:id                 - Update user (admin)
-DELETE /api/v1/users/:id                 - Delete user (admin)
-```
+- `GET /api/v1/users`
+- `GET /api/v1/users/:id`
+- `PATCH /api/v1/users/:id`
+- `DELETE /api/v1/users/:id`
 
-### Tours
+### Tour routes
 
-```
-GET    /api/v1/tours                     - Get all tours (with filtering)
-GET    /api/v1/tours/top-5-cheap         - Get top 5 cheapest tours
-GET    /api/v1/tours/monthly-plan/:year  - Get monthly statistics (guide)
-GET    /api/v1/tours/:id                 - Get tour by ID
-POST   /api/v1/tours                     - Create tour (guide/admin)
-PATCH  /api/v1/tours/:id                 - Update tour (owner/admin)
-DELETE /api/v1/tours/:id                 - Delete tour (owner/admin)
-POST   /api/v1/tours/:id/upload-images   - Upload images (owner/admin)
-```
+- `GET /api/v1/tours`
+- `GET /api/v1/tours/top-5-cheap`
+- `GET /api/v1/tours/monthly-plan/:year`
+- `GET /api/v1/tours/:id`
+- `POST /api/v1/tours`
+- `PATCH /api/v1/tours/:id`
+- `DELETE /api/v1/tours/:id`
+- `POST /api/v1/tours/:id/upload-images`
 
-### Reviews
+### Review routes
 
-```
-GET    /api/v1/reviews                   - Get all reviews
-POST   /api/v1/tours/:tourId/reviews     - Create review (user)
-PATCH  /api/v1/reviews/:id               - Update review (owner)
-DELETE /api/v1/reviews/:id               - Delete review (owner/admin)
-```
+- `GET /api/v1/reviews`
+- `GET /api/v1/reviews/:id`
+- `POST /api/v1/tours/:tourId/reviews`
+- `PATCH /api/v1/reviews/:id`
+- `DELETE /api/v1/reviews/:id`
 
-### Bookings
+### Booking routes
 
-```
-GET    /api/v1/bookings                  - Get all bookings (admin)
-GET    /api/v1/bookings/my-bookings      - Get user's bookings (user)
-POST   /api/v1/bookings                  - Create booking (admin/manual)
-GET    /api/v1/bookings/:id              - Get booking
-PATCH  /api/v1/bookings/:id              - Update booking
-DELETE /api/v1/bookings/:id              - Delete booking (admin)
-GET    /api/v1/bookings/checkout-session/:tourId - Stripe checkout (user)
-POST   /api/v1/bookings/webhook/stripe   - Stripe webhook handler
-```
+- `GET /api/v1/bookings`
+- `GET /api/v1/bookings/my-bookings`
+- `GET /api/v1/bookings/:id`
+- `POST /api/v1/bookings`
+- `PATCH /api/v1/bookings/:id`
+- `DELETE /api/v1/bookings/:id`
+- `GET /api/v1/bookings/checkout-session/:tourId`
+- `POST /api/v1/bookings/webhook/stripe`
 
-## 💳 Stripe Payment System
+## 💳 Stripe Integration
 
-### Three Booking Paths
+- The backend handles Stripe Checkout creation and webhook validation.
+- `checkout.session.completed` creates bookings in production.
+- In development mode, booking records are created immediately after checkout session creation.
+- Webhook handlers also process `charge.succeeded`, `charge.failed`, `checkout.session.async_payment_failed`, and `checkout.session.async_payment_succeeded`.
+- Webhook signature verification is performed using `stripe.webhooks.constructEvent`.
 
-1. **Production**: Stripe webhook → booking created → WebSocket event
-2. **Development**: Booking created immediately (no webhook wait)
-3. **Manual**: Admin creates booking via form
+## 🔄 Real-Time Socket.io
 
-### Webhook Events
+- `server.js` initializes Socket.io alongside Express.
+- Clients join rooms by user ID.
+- Booking status updates are emitted using `emitBookingStatusChange`.
+- Useful for booking lifecycle updates after Stripe webhooks.
 
-- `checkout.session.completed`: Create booking, emit WebSocket
-- `charge.succeeded`: Update status to succeeded
-- `charge.failed`: Update status to failed, store reason
+## 🧠 Booking & Payment Data
 
-### Signature Verification
+The booking model includes fields for real-time tracking and Stripe metadata:
 
-- Uses HMAC-SHA256 signature verification
-- Validates `stripe-signature` header
+- `tour`
+- `user`
+- `price`
+- `sessionId`
+- `chargeId`
+- `paymentIntentId`
+- `paymentStatus`
+- `paymentMethod`
+- `failureReason`
+- `createdAt`
 
-## 🔄 WebSocket Real-Time Updates
+## 🔒 Security and Validation
 
-**File**: `/server/utils/socket.js`
+- JWT authentication with HTTP-only cookies
+- Role-based access control for admin/guide/user flows
+- Data sanitization and validation on request payloads
+- Image upload restrictions and server-side resizing
+- Global error handling via `errorController`
 
-- Client registers with `registerUser` event
-- Joins room: `user-{userId}`
-- Server emits `bookingStatusChanged` on updates
-- Payload: `{ bookingId, sessionId, status, paymentMethod, failureReason }`
+## 📚 Notes
 
-## 📊 Booking Model Schema
+- The server package is configured for both development and production via `NODE_ENV`.
+- Use the root workspace README for overall repository instructions and links to the frontend and backend docs.
 
-### 10 Fields (with Stripe Tracking)
-
-```javascript
-{
-  // Core Fields
-  tour: ObjectId (required, ref: Tour),
-  user: ObjectId (required, ref: User),
-  price: Number (required),
-  createdAt: Date (indexed),
-  paid: Boolean (default: false, synced with stripePaymentStatus),
-
-  // Stripe Payment Fields
-  stripeSessionId: String (unique, sparse, indexed),
-  stripeChargeId: String (sparse),
-  stripePaymentIntentId: String (sparse),
-  stripePaymentStatus: String (
-    enum: ['pending', 'succeeded', 'failed', 'canceled'],
-    default: 'pending',
-    indexed
-  ),
-  paymentMethod: String (
-    enum: ['card', 'bank_transfer', 'wallet', 'other'],
-    default: 'card'
-  ),
-  failureReason: String (optional, populated on failed payment)
-}
-```
-
-### Field Sync Logic
-
-- `paid` ↔ `stripePaymentStatus` auto-sync
-- Ensures consistency across webhook, admin, dev modes
-
-## 🔒 Security Features
 
 ### Middleware Stack
 

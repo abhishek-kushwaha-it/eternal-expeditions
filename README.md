@@ -1,181 +1,146 @@
-# 🌍 Eternal Expeditions - Adventure Tour Booking Platform
+# 🌍 Eternal Expeditions
 
-> A full-stack web application for discovering, booking, and managing adventure tours worldwide. **Production-ready** with Stripe payment integration and real-time WebSocket updates.
+> Full-stack MERN tour booking platform with Stripe payments, real-time updates, role-based access, and image upload support.
 
 ## 📌 Overview
 
-Eternal Expeditions is a comprehensive adventure tour booking platform that connects travelers with unforgettable experiences. Users can browse, book, and review tours; guides can create and manage tours; admins oversee the entire platform.
+Eternal Expeditions is a production-style travel booking application built as a monorepo with separate frontend and backend packages. It provides a user-facing tour marketplace, guide/admin management tools, Stripe checkout integration, and real-time booking updates using Socket.io.
 
-### Key Features
-- 🌐 Browse & search adventure tours with advanced filtering
-- 💳 Secure payment processing with **Stripe integration**
-- ⭐ User reviews and ratings system
-- 🗺️ Interactive maps with Mapbox
-- 🔐 Role-based access control (user, guide, admin)
-- 🔄 **Real-time updates with WebSocket** (Socket.io)
-- 📱 Fully responsive design
+## 🚀 What this app does
+
+- Allows users to browse and filter tours
+- Enables user registration, login, and account management
+- Supports booking a tour with Stripe payment flow
+- Sends booking status updates in real-time
+- Lets users create and manage reviews
+- Supports guide/admin tour creation and management
+- Handles image upload and processing for tours and user profiles
+- Uses JWT and role-based authentication for secure access control
 
 ## 🛠 Tech Stack
 
-| Category | Technology |
-|----------|-----------|
-| **Backend** | Node.js, Express.js, MongoDB, Socket.io v4.8 |
-| **Frontend** | React 19, Vite, React Router, Redux, React Query |
-| **Payment** | Stripe API with webhook signature verification |
-| **Real-time** | Socket.io for bidirectional communication |
-| **Security** | JWT, bcryptjs, Helmet, CORS, Rate Limiting |
-| **Other** | Mapbox, SendGrid, Sharp, ESLint |
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, Vite, React Router, React Redux, @tanstack/react-query |
+| Backend | Node.js 18+, Express, MongoDB, Mongoose, Socket.io |
+| Payments | Stripe Checkout, Stripe webhooks, payment status mapping |
+| Auth | JWT, bcryptjs, cookies, role-based access control |
+| Email | SendGrid / nodemailer email delivery |
+| Images | Sharp image resizing, multer memory uploads |
+| Security | Helmet, CORS, express-mongo-sanitize, xss-clean, rate limiting |
+| Tooling | ESLint, Prettier, nodemon, vite-plugin-compression |
 
-## 🚀 Quick Start
+## 📁 Monorepo Structure
 
-### Prerequisites
-- Node.js >= 14.0.0 (recommended: 18+)
-- MongoDB (local or Atlas)
-- Stripe account for payment processing
-
-### Backend Setup
-```bash
-git clone <repository-url>
-cd eternal-expeditions
-npm install
-cp config.env.example config.env
-# Edit config.env with your credentials
-npm start
-# Server runs on http://localhost:3000
+```
+eternal-expeditions/
+├── client/                    # Frontend application
+│   ├── public/                # Static assets
+│   ├── src/                   # React source code
+│   ├── package.json
+│   └── README.md
+├── server/                    # Backend API and services
+│   ├── controllers/           # Business logic
+│   ├── models/                # MongoDB schemas
+│   ├── routes/                # Express route definitions
+│   ├── utils/                 # Helpers and services
+│   ├── public/                # Static uploaded images
+│   ├── package.json
+│   └── README.md
+├── package.json               # Root workspace scripts
+└── README.md                  # This file
 ```
 
-### Frontend Setup
+## 🧩 Workspace Scripts
+
+From the repository root:
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run lint:fix
+npm run format
+```
+
+### Root workspace script details
+
+- `npm run dev` - starts frontend and backend concurrently
+- `npm run lint` - runs linting in both `client` and `server`
+- `npm run lint:fix` - fixes lint issues across both packages
+- `npm run format` - formats both packages with Prettier
+
+## ⚙️ Client Setup
+
 ```bash
 cd client
 npm install
 npm run dev
-# Frontend runs on http://localhost:5173
 ```
 
-**For detailed setup instructions**, see [`server/README.md`](./server/README.md) and [`client/README.md`](./client/README.md)
+The frontend runs by default on `http://localhost:5173`.
 
-## 📂 Project Structure
+## ⚙️ Server Setup
 
-```
-eternal-expeditions/
-├── server/               # Backend (Node.js + Express + MongoDB)
-│   ├── README.md        # Detailed backend documentation ⭐
-│   ├── controllers/     # Business logic
-│   ├── models/          # Database schemas
-│   ├── routes/          # API endpoints
-│   ├── utils/           # Utility functions (Socket.io, email, etc.)
-│   └── config.env       # Environment variables
-│
-└── client/              # Frontend (React + Vite)
-    ├── README.md        # Detailed frontend documentation ⭐
-    ├── src/
-    │   ├── pages/       # Page components
-    │   ├── components/  # Reusable components
-    │   ├── hooks/       # Custom React hooks
-    │   ├── context/     # Context API
-    │   ├── store/       # Redux state
-    │   └── utils/       # Utilities
-    └── vite.config.js   # Vite configuration
-```
-
-## 🔄 High-Level System Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    CLIENT TIER (Browser)                            │
-│  React 19 + Vite | React Router | Redux + React Query               │
-│  Pages: 20+ | Components: 30+ | Real-time WebSocket listeners       │
-└────────────────────┬────────────────────┬────────────────────────────┘
-                     │ REST API           │ WebSocket
-                     ↓ (HTTPS/HTTP)       ↓ (ws://)
-┌─────────────────────────────────────────────────────────────────────┐
-│                   API TIER (Express.js + Socket.io)                 │
-│  REST API v1 with middleware stack | Stripe Webhook Handler         │
-│  Routes: Tours, Users, Bookings, Reviews | 25+ Endpoints            │
-│  Socket.io Server | Real-time event emission | 3 booking paths      │
-└────────────────────┬────────────────────────────────────────────────┘
-                     │ Mongoose
-                     ↓
-┌─────────────────────────────────────────────────────────────────────┐
-│              DATABASE TIER (MongoDB Atlas)                          │
-│  Collections: Users | Tours | Bookings | Reviews                    │
-│  10-field Booking schema with Stripe tracking                       │
-└─────────────────────────────────────────────────────────────────────┘
-                     │ HTTPS
-                     ↓
-┌─────────────────────────────────────────────────────────────────────┐
-│              PAYMENT TIER (Stripe API)                              │
-│  Payment Processing | Webhook Events | Signature Verification       │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-## 🔒 Security Features
-
-✅ JWT authentication (90-day expiration)  
-✅ Password hashing (bcryptjs, 12 rounds)  
-✅ CORS properly configured  
-✅ Security headers (Helmet)  
-✅ MongoDB injection prevention  
-✅ XSS protection  
-✅ Rate limiting  
-✅ Role-based access control  
-
-## 📚 Detailed Documentation
-
-For comprehensive information, refer to:
-
-- **[`server/README.md`](./server/README.md)** - Backend documentation
-  - Installation & setup
-  - Environment configuration
-  - Complete API endpoints
-  - Database models
-  - Stripe implementation
-  - WebSocket server setup
-  - Security details
-  - Deployment guide
-
-- **[`client/README.md`](./client/README.md)** - Frontend documentation
-  - Installation & setup
-  - Project structure
-  - Component library
-  - State management
-  - WebSocket integration
-  - Payment flow
-  - Development guide
-
-## 🚀 Deployment
-
-### Quick Deployment
-
-**Backend** (Heroku/AWS):
 ```bash
-npm install --production
-NODE_ENV=production npm start
+cd server
+npm install
+npm start
 ```
 
-**Frontend** (Vercel/Netlify):
-```bash
-npm run build
-# Deploy dist/ folder
-```
+The backend runs by default on `http://localhost:3000`.
 
-## 🔮 Future Roadmap
+## 🔧 Environment Configuration
 
-- [ ] Two-Factor Authentication
-- [ ] Advanced Analytics Dashboard
-- [ ] Mobile App (React Native)
-- [ ] Additional Payment Methods (PayPal, Apple Pay)
-- [ ] TypeScript Migration
-- [ ] Test Suite (Jest)
-- [ ] Dark Mode
+The backend uses `.env.development` and `.env.production` files. The server config module validates required variables such as:
 
-## 📞 Contact
+- `FRONTEND_URL`
+- `DATABASE`
+- `DATABASE_PASSWORD`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+- `JWT_COOKIE_EXPIRES_IN`
+- `EMAIL_FROM`
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `SENDGRID_USERNAME`
+- `SENDGRID_PASSWORD`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `MAX_FILE_SIZE`
+- `ALLOWED_IMAGE_TYPES`
+- `LOG_LEVEL`
+- `ENABLE_REQUEST_LOGGING`
+- `COOKIE_SECURE`
+- `COOKIE_HTTP_ONLY`
+- `COOKIE_SAME_SITE`
 
-For inquiries or collaboration:
-- **Email**: [abhishek.kushwaha.it@gmail.com]
-- **LinkedIn**: [https://www.linkedin.com/in/abhishekkushwahait/]
-- **GitHub**: [https://github.com/abhishek-kushwaha-it]
+## 📦 Frontend Details
 
-## 📄 License
+- React 19 with Vite
+- ESM package type
+- `@reduxjs/toolkit`, `react-redux` for state management
+- `axios` for API calls
+- `socket.io-client` for live booking updates
+- `@stripe/react-stripe-js` for Stripe payment UI
+- `mapbox-gl` for map rendering
 
-ISC License - See LICENSE file for details
+## 🧠 Backend Details
+
+- Node.js 18+ and Express
+- MongoDB with Mongoose
+- `stripe` package for payments and webhook validation
+- `socket.io` for real-time communication
+- `sharp` for server-side image resizing
+- `multer` upload middleware using memory storage
+- `bcryptjs` for hashing user passwords
+
+## 📚 Documentation Links
+
+- [Client README](./client/README.md)
+- [Server README](./server/README.md)
+
+## 💡 Notes
+
+This repository is designed as a complete full-stack learning application with separate client and server packages managed through npm workspaces. It is ready for local development and can be extended with unit tests, deployment automation, and additional payment providers.
+

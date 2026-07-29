@@ -1,303 +1,113 @@
-# 🎨 Frontend Client - Eternal Expeditions
+﻿# 🎨 Frontend Client - Eternal Expeditions
 
-> React 19 + Vite web application with real-time WebSocket updates and Stripe payments
+> React 19 + Vite frontend application for Eternal Expeditions, with Stripe checkout, real-time booking updates, and role-aware navigation.
 
 ## 📋 Quick Start
 
 ```bash
-# Install dependencies
+cd client
 npm install
-
-# Setup environment (optional - uses defaults)
-touch .env.local
-# VITE_API_URL=http://localhost:3000/api/v1
-# VITE_BACKEND_URL=http://localhost:3000
-# VITE_STRIPE_PUBLIC_KEY=pk_test_xxxxx
-
-# Development
 npm run dev
-
-# Production build
-npm run build
-npm run build:prod
-
-# Preview build
-npm run preview
-
-# Linting
-npm run lint
-npm run lint:fix
-
-# Formatting
-npm run format
 ```
 
-## 🏗 Architecture
+### Available Scripts
 
-### Directory Structure
+- `npm run dev` — start the Vite development server
+- `npm run build` — build the production bundle
+- `npm run preview` — preview the production build locally
+- `npm run lint` — run ESLint on the client source
+- `npm run lint:fix` — auto-fix lintable issues
+- `npm run format` — format source files with Prettier
+
+## 🛠 Technology Stack
+
+- React 19
+- Vite
+- React Router DOM
+- Redux Toolkit + React Redux
+- @tanstack/react-query
+- Axios
+- Stripe React SDK (`@stripe/react-stripe-js`)
+- socket.io-client
+- Mapbox GL
+- ESLint and Prettier
+
+## 📁 Project Structure
 
 ```
 client/
-├── index.html                # HTML entry point
-├── vite.config.js            # Vite configuration
-├── eslint.config.js          # ESLint rules
-├── package.json              # Dependencies
-│
-├── src/
-│   ├── main.jsx              # React entry + providers
-│   ├── App.jsx               # Routes & layout
-│   ├── index.css             # Global styles + design tokens
-│   │
-│   ├── pages/ (20+ pages)
-│   │   ├── HomePage.jsx
-│   │   ├── ToursPage.jsx
-│   │   ├── TourPage.jsx
-│   │   ├── LoginPage.jsx
-│   │   ├── SignUpPage.jsx
-│   │   ├── AccountPage.jsx
-│   │   ├── BookingListPage.jsx
-│   │   ├── BookingDetailsPage.jsx
-│   │   ├── BookingSuccessPage.jsx
-│   │   ├── ManageBookings.jsx
-│   │   ├── ManageReviews.jsx
-│   │   ├── ManageUsers.jsx
-│   │   ├── ManageTours.jsx
-│   │   ├── BecomeGuidePage.jsx
-│   │   ├── AboutPage.jsx
-│   │   ├── ContactPage.jsx
-│   │   ├── CareersPage.jsx
-│   │   ├── ForgotPasswordPage.jsx
-│   │   ├── ResetPasswordPage.jsx
-│   │   └── [CSS files for each page]
-│   │
-│   ├── components/ (Feature components)
-│   │   ├── Header.jsx
-│   │   ├── Footer.jsx
-│   │   ├── TourCard.jsx
-│   │   ├── BookingCard.jsx
-│   │   ├── ReviewCard.jsx
-│   │   ├── FilterPanel.jsx
-│   │   ├── TourTable.jsx
-│   │   ├── Toast.jsx
-│   │   ├── ErrorBoundary.jsx
-│   │   ├── RoleBasedRoute.jsx
-│   │   └── [CSS files for each]
-│   │
-│   ├── core-components/ (Reusable UI library)
-│   │   ├── Button.jsx
-│   │   ├── Card.jsx
-│   │   ├── Image.jsx
-│   │   ├── FormGroup.jsx
-│   │   ├── LoadingState.jsx
-│   │   ├── ErrorState.jsx
-│   │   ├── ConfirmDialog.jsx
-│   │   ├── index.js
-│   │   └── [CSS files for each]
-│   │
-│   ├── hooks/ (Custom React hooks)
-│   │   ├── useAuth.js - Authentication context
-│   │   ├── useForm.js - Form state management
-│   │   ├── useModal.js - Modal/dialog state
-│   │   ├── useQueries.js - React Query data fetching
-│   │   └── index.js
-│   │
-│   ├── context/ (Context API)
-│   │   ├── AuthContext.jsx - User authentication
-│   │   └── authContextValue.js - Auth utilities
-│   │
-│   ├── store/ (Redux state)
-│   │   ├── toastSlice.js - Toast notifications
-│   │   ├── store.js - Redux store config
-│   │   ├── hooks.js - Redux hooks
-│   │   └── index.js
-│   │
-│   ├── utils/
-│   │   ├── api.js - Axios with interceptors
-│   │   ├── validators.js - Form validation
-│   │   ├── tourValidation.js - Tour-specific validation
-│   │   ├── mapbox.js - Mapbox integration
-│   │   └── errorHandling.js - Error utilities
-│   │
-│   └── assets/
-│       └── icons/ - Icon files
-│
-├── public/
-│   └── img/ - Static images
-│
-└── .env.local - Environment variables (optional)
+├── public/                    # Static public assets and images
+├── src/                       # React application source files
+│   ├── assets/                # Icons and static image assets
+│   ├── components/            # Feature-specific UI components
+│   ├── core-components/       # Reusable UI primitives
+│   ├── context/               # React context providers
+│   ├── hooks/                 # Custom hooks for auth, forms, queries
+│   ├── pages/                 # Page-level components
+│   ├── store/                 # Redux state and slices
+│   ├── utils/                 # API and utility helpers
+│   ├── App.jsx                # Route definitions and layout
+│   └── main.jsx               # App bootstrap and provider setup
+├── package.json               # Frontend dependencies and scripts
+├── vite.config.js             # Vite configuration and build settings
+└── README.md                  # Frontend documentation
 ```
 
-## 🎨 Component Structure
+## 🔧 Frontend Behavior
 
-### Pages (20+ Full-Page Components)
+### User workflows
 
-**Public Pages**:
-- `HomePage` - Landing page with featured tours
-- `ToursPage` - Tour catalog with filtering
-- `TourPage` - Tour details with map & reviews
-- `LoginPage` - User authentication
-- `SignUpPage` - User registration
-- `ForgotPasswordPage` - Password recovery
-- `ResetPasswordPage` - Password reset
-- `AboutPage` - About the platform
-- `CareersPage` - Careers opportunities
-- `ContactPage` - Contact form
-- `BecomeGuidePage` - Guide application
-- `NotFoundPage` - 404 error
+- Browse tours and apply filters
+- View individual tour details with map and reviews
+- Sign up, log in, and manage account details
+- Book tours via Stripe checkout
+- View booking confirmation and status updates
+- Write and manage reviews for booked tours
 
-**Protected Pages**:
-- `AccountPage` - User profile management
-- `BookingListPage` - View user bookings
-- `BookingDetailsPage` - Booking details
-- `BookingSuccessPage` - Post-payment confirmation with real-time updates
+### Admin / guide workflows
 
-**Admin/Guide Pages**:
-- `ManageTours` - Create/edit tours
-- `TourFormPage` - Tour form
-- `TourStatsPage` - Tour statistics
-- `ManageBookings` - Booking management with payment fields
-- `ManageReviews` - Review moderation
-- `ManageUsers` - User management
-- `GuideMonthlyPlanPage` - Monthly statistics
+- Create, update, and delete tours
+- Upload tour images
+- Manage bookings and reviews
+- Manage users and access
+- View guide monthly plan stats
 
-### Core Components (Reusable UI Library)
+## 🔌 Real-Time Interaction
 
-**Buttons & Input**:
-- `Button` - Primary, secondary, text variants
-- `FormGroup` - Input with label & error
-- `Card` - Container with header/footer
+- Socket.io connection is used for real-time booking updates
+- The client registers the logged-in user and listens for `bookingStatusChanged`
+- Booking status changes update the UI and trigger toast notifications
 
-**Display**:
-- `Image` - Lazy-loaded images
-- `LoadingState` - Loading spinner
-- `ErrorState` - Error display
-- `ConfirmDialog` - Modal confirmation
+## 💳 Stripe Integration
 
-**Layout**:
-- `Header` - Navigation bar
-- `Footer` - Footer section
-- `ErrorBoundary` - Error fallback
-- `RoleBasedRoute` - Protected routes
+- Payment flow uses Stripe Checkout
+- The frontend uses `@stripe/react-stripe-js` for Stripe-specific components and hooks
+- A complete booking lifecycle is supported through the backend webhook and socket events
 
-### Feature Components
+## 🌐 Environment Variables
 
-- `TourCard` - Tour listing card
-- `BookingCard` - Booking display with payment status
-- `ReviewCard` - Review display
-- `FilterPanel` - Search/filter controls
-- `TourTable` - Admin data table
-- `Toast` - Notification toasts
+Set local variables in `.env.local` or Vite environment files:
 
-## 🔌 Real-Time Features
+- `VITE_API_URL` — backend API URL, e.g. `http://localhost:3000/api/v1`
+- `VITE_BACKEND_URL` — backend base URL, e.g. `http://localhost:3000`
+- `VITE_STRIPE_PUBLIC_KEY` — Stripe publishable key
 
-**File**: `/src/pages/BookingSuccessPage.jsx`
+## 📌 Key Files
 
-- Socket.io connection on mount
-- Emits `registerUser` with user ID  
-- Listens for `bookingStatusChanged` events
-- Updates UI with toast notifications
+- `src/main.jsx` — entry point and provider setup
+- `src/App.jsx` — app routes and global layout
+- `src/context/AuthContext.jsx` — auth provider and context logic
+- `src/utils/api.js` — Axios API client and interceptors
+- `src/pages/BookingSuccessPage.jsx` — post-payment flow and socket handling
+- `src/components/RoleBasedRoute.jsx` — protected route wrapper
 
-**Payment Status Badge**:
-- Green: Paid (succeeded)
-- Red: Failed
-- Yellow: Pending
+## 🧠 Notes
 
-## 💳 Payment Integration
+- Vite config includes gzip compression and production optimizations
+- Build output is in `dist/`
+- ESLint is configured for React, hooks, and Prettier compatibility
 
-### Stripe Setup
+## 📚 Related Documentation
 
-**Environment Variables**:
-```bash
-VITE_STRIPE_PUBLIC_KEY=pk_test_xxxxx (test) or pk_live_xxxxx (prod)
-```
-
-### Booking Flows
-
-**Stripe Checkout**: Click → Payment → Redirect → WebSocket → Real-time update
-
-**Admin Manual**: Form → Create → Visible in list
-
-### ManageBookings Form
-
-- `tour`, `user`, `price` (auto-populated)
-- `paid`: Checkbox
-- `paymentMethod`: card | bank_transfer | wallet | other
-
-## 🎯 State Management
-
-### Redux (Redux Toolkit)
-
-**Store**: `/src/store/store.js`
-
-**Slices**:
-- `toastSlice` - Toast notifications (addToast, removeToast)
-- Global UI state management
-
-**Usage**:
-```javascript
-const { addToast } = useToasts();
-addToast('Success!', 'success');
-```
-
-### React Query
-
-**File**: `/src/hooks/useQueries.js`
-
-- Server state caching (10 min stale time)
-- Optimistic updates & cache invalidation
-- Hooks: useTours, useMyBookings, useCreateBookingMutation, and 20+
-
-### Context API
-
-**AuthContext**: Provides `user`, `isAuthenticated`, `login`, `logout`, `token`
-
-## 🔒 Security & Authorization
-
-### Protected Routes
-
-- Authenticated users: `<ProtectedRoute>`
-- Role-based: `<RoleBasedRoute requiredRole="admin">`
-
-### Authentication
-
-- JWT in headers via Axios interceptors
-- Auto-logout on 401 (token expired)
-- HttpOnly cookies for XSS protection
-
-## 🎨 Styling
-
-### Design System
-
-**File**: `/src/index.css`
-
-- CSS variables for colors, spacing, radius, shadows, typography
-- Breakpoints: 640px, 768px, 1024px, 1280px
-- Mobile-first, Flexbox & Grid
-
-### Component Styling
-
-Each component has its own CSS file (BEM methodology):
-```
-ComponentName.jsx  → ComponentName.css
-Button.jsx         → Button.css
-TourCard.jsx       → TourCard.css
-```
-
-## 🚀 Production Build
-
-### Build Optimizations
-
-- Code splitting, tree shaking, minification
-- Image optimization, asset compression
-
-### Output
-
-```
-dist/
-├── index.html
-├── assets/
-│   ├── index-xxxxx.js (main bundle)
-│   ├── style-xxxxx.css (global styles)
-│   └── [component chunks]
-└── [images & other assets]
-```
+- [Root README](../README.md)
+- [Server README](../server/README.md)
