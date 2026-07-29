@@ -46,9 +46,13 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
+  const welcomeEmailPromise = new Email(newUser, url).sendWelcome();
 
   createSendToken(newUser, 201, res);
+
+  welcomeEmailPromise.catch((err) => {
+    console.error('Failed to send welcome email:', err);
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
