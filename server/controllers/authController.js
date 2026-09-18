@@ -16,12 +16,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
-  const welcomeEmailPromise = new Email(newUser, url).sendWelcome();
+  const emailServiceUnavailable = !config.emailEnabled;
+  createSendToken(newUser, 201, res, { emailServiceUnavailable });
 
-  createSendToken(newUser, 201, res);
-
-  sendBackgroundEmail(welcomeEmailPromise, 'welcome email');
+  if (!emailServiceUnavailable) {
+    const url = `${req.protocol}://${req.get('host')}/me`;
+    sendBackgroundEmail(new Email(newUser, url).sendWelcome(), 'welcome email');
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {

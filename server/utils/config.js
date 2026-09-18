@@ -80,6 +80,7 @@ const config = {
   emailPort: process.env.EMAIL_PORT,
   sendgridUsername: process.env.SENDGRID_USERNAME,
   sendgridPassword: process.env.SENDGRID_PASSWORD,
+  emailEnabled: process.env.EMAIL_ENABLED === 'true',
 
   // Stripe Config
   stripeSecretKey: process.env.STRIPE_SECRET_KEY,

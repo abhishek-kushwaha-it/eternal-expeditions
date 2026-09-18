@@ -6,7 +6,7 @@ const signToken = (id) =>
     expiresIn: config.jwtExpiresIn,
   });
 
-const createSendToken = (user, statusCode, res) => {
+const createSendToken = (user, statusCode, res, responseData = {}) => {
   const token = signToken(user._id);
   const cookieOptions = {
     expires: new Date(
@@ -27,6 +27,7 @@ const createSendToken = (user, statusCode, res) => {
     data: {
       user,
     },
+    ...responseData,
   });
 };
 

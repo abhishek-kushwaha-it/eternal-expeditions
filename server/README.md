@@ -86,6 +86,7 @@ The backend loads `.env.development` or `.env.production` depending on `NODE_ENV
 - `EMAIL_FROM`
 - `EMAIL_HOST`
 - `EMAIL_PORT`
+- `EMAIL_ENABLED` (`true` to send welcome emails; `false` keeps signup independent of email service)
 - `SENDGRID_USERNAME`
 - `SENDGRID_PASSWORD`
 - `STRIPE_SECRET_KEY`

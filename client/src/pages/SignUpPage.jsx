@@ -60,8 +60,15 @@ export default function SignUpPage() {
 
     try {
       // console.log('Starting signup for email:', formData.email); // Helpful for development
-      await signupMutation.mutateAsync(formData);
+      const response = await signupMutation.mutateAsync(formData);
       addToast('Account created! Welcome!', 'success');
+      if (response.data.emailServiceUnavailable) {
+        addToast(
+          'Email service is temporarily unavailable, but your account is ready. Sorry for the inconvenience.',
+          'warning',
+          10000
+        );
+      }
       // Clear form after success
       setFormData({
         name: '',

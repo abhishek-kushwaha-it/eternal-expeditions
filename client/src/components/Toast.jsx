@@ -13,6 +13,7 @@ export default function Toast() {
             <span className="toast-icon">
               {toast.type === 'success' && '✓'}
               {toast.type === 'error' && '✕'}
+              {toast.type === 'warning' && '!'}
               {toast.type === 'info' && 'ℹ'}
             </span>
             <span className="toast-message">{toast.message}</span>
