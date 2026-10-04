@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Image, Button, Card } from '../core-components';
 import { IMAGE_URL } from '../utils/api';
-import './TourCard.css';
+import styles from './TourCard.module.css';
 
 // Helper function to calculate discounted price
 const getDiscountedPrice = (price, discount) => {
@@ -24,37 +24,37 @@ function TourCard({ tour, distance, unit = 'mi' }) {
   });
 
   const cardHeader = (
-    <div className="tour-card__image-wrapper">
+    <div className={styles['tour-card__image-wrapper']}>
       <Image
         src={`${IMAGE_URL}/tours/${tour.imageCover}`}
         alt={tour.name}
-        className="tour-card__image"
+        className={styles['tour-card__image']}
       />
     </div>
   );
 
   const cardFooter = (
     <>
-      <div className="tour-card__pricing">
+      <div className={styles['tour-card__pricing']}>
         {tour.priceDiscount ? (
-          <div className="price-section">
-            <div className="original-price">${tour.price}</div>
-            <div className="discounted-price">
+          <div className={styles['price-section']}>
+            <div className={styles['original-price']}>${tour.price}</div>
+            <div className={styles['discounted-price']}>
               ${getDiscountedPrice(tour.price, tour.priceDiscount).toFixed(2)}
             </div>
-            <div className="discount-badge">
+            <div className={styles['discount-badge']}>
               -{getDiscountPercentage(tour.price, tour.priceDiscount)}%
             </div>
           </div>
         ) : (
-          <div className="price-section">
-            <div className="discounted-price">${tour.price}</div>
+          <div className={styles['price-section']}>
+            <div className={styles['discounted-price']}>${tour.price}</div>
           </div>
         )}
-        <div className="per-person">per person</div>
+        <div className={styles['per-person']}>per person</div>
       </div>
 
-      <Link to={`/tour/${tour.id}`} className="tour-card__link">
+      <Link to={`/tour/${tour.id}`} className={styles['tour-card__link']}>
         <Button variant="primary" size="sm">
           View Details
         </Button>
@@ -63,57 +63,57 @@ function TourCard({ tour, distance, unit = 'mi' }) {
   );
 
   return (
-    <Card header={cardHeader} footer={cardFooter} className="tour-card">
-      <div className="tour-card__header-section">
-        <h3 className="tour-card__title">{tour.name}</h3>
-        <div className="tour-card__header-right">
-          <div className="tour-card__difficulty">{tour.difficulty}</div>
-          <div className="tour-card__rating-header">
-            <span className="rating-value">{tour.ratingsAverage}</span>
-            <span className="rating-count">({tour.ratingsQuantity})</span>
+    <Card header={cardHeader} footer={cardFooter} className={styles['tour-card']}>
+      <div className={styles['tour-card__header-section']}>
+        <h3 className={styles['tour-card__title']}>{tour.name}</h3>
+        <div className={styles['tour-card__header-right']}>
+          <div className={styles['tour-card__difficulty']}>{tour.difficulty}</div>
+          <div className={styles['tour-card__rating-header']}>
+            <span className={styles['rating-value']}>{tour.ratingsAverage}</span>
+            <span className={styles['rating-count']}>({tour.ratingsQuantity})</span>
           </div>
         </div>
       </div>
 
-      <p className="tour-card__summary">{tour.summary}</p>
+      <p className={styles['tour-card__summary']}>{tour.summary}</p>
 
       {/* Key Details Grid */}
-      <div className="tour-card__details-grid">
-        <div className="detail-item">
-          <div className="detail-icon">📅</div>
-          <div className="detail-label">Start</div>
-          <div className="detail-value">{startDate}</div>
+      <div className={styles['tour-card__details-grid']}>
+        <div className={styles['detail-item']}>
+          <div className={styles['detail-icon']}>📅</div>
+          <div className={styles['detail-label']}>Start</div>
+          <div className={styles['detail-value']}>{startDate}</div>
         </div>
 
-        <div className="detail-item">
-          <div className="detail-icon">🛑</div>
-          <div className="detail-label">Stops</div>
-          <div className="detail-value">{tour.locations.length}</div>
+        <div className={styles['detail-item']}>
+          <div className={styles['detail-icon']}>🛑</div>
+          <div className={styles['detail-label']}>Stops</div>
+          <div className={styles['detail-value']}>{tour.locations.length}</div>
         </div>
 
-        <div className="detail-item">
-          <div className="detail-icon">📍</div>
-          <div className="detail-label">Duration</div>
-          <div className="detail-value">{tour.duration} days</div>
+        <div className={styles['detail-item']}>
+          <div className={styles['detail-icon']}>📍</div>
+          <div className={styles['detail-label']}>Duration</div>
+          <div className={styles['detail-value']}>{tour.duration} days</div>
         </div>
 
-        <div className="detail-item">
-          <div className="detail-icon">👥</div>
-          <div className="detail-label">Group</div>
-          <div className="detail-value">{tour.maxGroupSize}</div>
+        <div className={styles['detail-item']}>
+          <div className={styles['detail-icon']}>👥</div>
+          <div className={styles['detail-label']}>Group</div>
+          <div className={styles['detail-value']}>{tour.maxGroupSize}</div>
         </div>
       </div>
 
       {/* Location */}
-      <div className="tour-card__location">
-        <span className="location-icon">📌</span>
-        <span className="location-text">{tour.startLocation.description}</span>
+      <div className={styles['tour-card__location']}>
+        <span className={styles['location-icon']}>📌</span>
+        <span className={styles['location-text']}>{tour.startLocation.description}</span>
       </div>
 
       {distance !== undefined && distance !== null && (
-        <div className="tour-card__distance">
-          <span className="distance-icon">📍</span>
-          <span className="distance-text">
+        <div className={styles['tour-card__distance']}>
+          <span className={styles['distance-icon']}>📍</span>
+          <span className={styles['distance-text']}>
             {distance.toFixed(2)} {unit === 'mi' ? 'mi' : 'km'} from you
           </span>
         </div>

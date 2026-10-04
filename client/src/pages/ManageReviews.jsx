@@ -13,7 +13,7 @@ import {
   useConfirmDialog,
 } from '../core-components';
 import { ReviewCard, FilterPanel } from '../components';
-import './ManageReviews.css';
+import styles from './ManageReviews.module.css';
 
 export default function ManageReviews() {
   const { data: reviews = [], isLoading, error } = useAllReviews();
@@ -151,30 +151,38 @@ export default function ManageReviews() {
   );
 
   if (isLoading) {
-    return <LoadingState message="Loading reviews..." minHeight="60vh" />;
+    return (
+      <LoadingState
+        message="Loading reviews..."
+        minHeight="60vh"
+        className={styles['manage-reviews-root']}
+        animated
+      />
+    );
   }
 
   if (error) {
     return (
-      <main className="main">
+      <main className={`main ${styles['manage-reviews-root']}`}>
         <ErrorState
           title="Failed to Load Reviews"
           message={error?.message || 'An error occurred while loading reviews.'}
           emoji="⚠️"
           showAction={false}
+          animated
         />
       </main>
     );
   }
 
   return (
-    <main className="main">
-      <div className="page__container">
-        <div className="manage-reviews__header">
-          <h2 className="page__title">📝 Manage Reviews ({reviews.length})</h2>
+    <main className={`main ${styles['manage-reviews-root']}`}>
+      <div className={styles['page__container']}>
+        <div className={styles['manage-reviews__header']}>
+          <h2 className={styles['page__title']}>📝 Manage Reviews ({reviews.length})</h2>
         </div>
 
-        <div className="manage-reviews__filters">
+        <div className={styles['manage-reviews__filters']}>
           <FilterPanel
             filters={ratingFilters}
             activeFilter={filterRating}
@@ -190,11 +198,11 @@ export default function ManageReviews() {
         </div>
 
         {filteredReviews.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state__text">No reviews match your filters</p>
+          <div className={styles['empty-state']}>
+            <p className={styles['empty-state__text']}>No reviews match your filters</p>
           </div>
         ) : (
-          <div className="reviews-list">
+          <div className={styles['reviews-list']}>
             {filteredReviews.map((review) => (
               <ReviewCard
                 key={review._id}

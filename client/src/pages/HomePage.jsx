@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import TourCard from '../components/TourCard';
 import { LoadingState, ErrorState, Button } from '../core-components';
 import { useTours } from '../hooks/useQueries';
-import './HomePage.css';
+import styles from './HomePage.module.css';
 
 export default function HomePage() {
   const { data: tours = [], isLoading, error } = useTours();
@@ -14,7 +14,7 @@ export default function HomePage() {
 
   if (error) {
     return (
-      <main className="main">
+      <main className={`main ${styles['home-page-root']}`}>
         <ErrorState
           title="Failed to Load Tours"
           message={error?.message || 'An error occurred while loading tours.'}
@@ -26,15 +26,17 @@ export default function HomePage() {
   }
 
   return (
-    <main className="main">
+    <main className={`main ${styles['home-page-root']}`}>
       {/* PROMO SECTION - TOP 5 CHEAP TOURS */}
-      <section className="overview-section overview-promo">
-        <div className="overview-header">
-          <div className="overview-header-top">
-            <h2 className="overview-heading">💰 Looking for Budget-Friendly Tours?</h2>
-            <div className="overview-badge">Special Offer</div>
+      <section
+        className={`${styles['overview-section']} ${styles['overview-promo']}`}
+      >
+        <div className={styles['overview-header']}>
+          <div className={styles['overview-header-top']}>
+            <h2 className={styles['overview-heading']}>💰 Looking for Budget-Friendly Tours?</h2>
+            <div className={styles['overview-badge']}>Special Offer</div>
           </div>
-          <p className="overview-description">
+          <p className={styles['overview-description']}>
             Check out our top 5 most affordable and amazing tour experiences with all the details
             you need to decide!
           </p>
@@ -45,14 +47,14 @@ export default function HomePage() {
       </section>
 
       {/* ALL TOURS SECTION */}
-      <div className="overview-content">
-        <h2 className="overview-title">🌍 All Tours</h2>
-        <div className="card-container">
+      <div className={styles['overview-content']}>
+        <h2 className={styles['overview-title']}>🌍 All Tours</h2>
+        <div className={styles['card-container']}>
           {tours.length > 0 ? (
             tours.map((tour) => <TourCard key={tour.id} tour={tour} />)
           ) : (
-            <div className="empty-state">
-              <p className="empty-state-text">No tours available at the moment</p>
+            <div className={styles['empty-state']}>
+              <p className={styles['empty-state-text']}>No tours available at the moment</p>
             </div>
           )}
         </div>

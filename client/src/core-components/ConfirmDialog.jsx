@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { Button } from '.';
-import './ConfirmDialog.css';
+import styles from './ConfirmDialog.module.css';
 
 /**
  * ConfirmDialog Component
@@ -21,14 +21,14 @@ export default function ConfirmDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="confirm-dialog-overlay">
-      <div className="confirm-dialog">
-        <div className="confirm-dialog__content">
-          <h2 className="confirm-dialog__title">{title}</h2>
-          <p className="confirm-dialog__message">{message}</p>
+    <div className={styles['confirm-dialog-overlay']}>
+      <div className={styles['confirm-dialog']}>
+        <div className={styles['confirm-dialog__content']}>
+          <h2 className={styles['confirm-dialog__title']}>{title}</h2>
+          <p className={styles['confirm-dialog__message']}>{message}</p>
         </div>
 
-        <div className="confirm-dialog__actions">
+        <div className={styles['confirm-dialog__actions']}>
           <Button variant="secondary" size="md" onClick={onCancel} disabled={isLoading}>
             {cancelText}
           </Button>

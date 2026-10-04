@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Card, LoadingState, ErrorState } from '../core-components';
 import { useMonthlyPlan } from '../hooks/useQueries';
-import './GuideMonthlyPlanPage.css';
+import styles from './GuideMonthlyPlanPage.module.css';
 
 /**
  * GuideMonthlyPlanPage
@@ -19,7 +19,7 @@ export default function GuideMonthlyPlanPage() {
 
   if (error) {
     return (
-      <main className="main">
+      <main className={`main ${styles['monthly-plan-root']}`}>
         <ErrorState
           title="Failed to Load Monthly Plan"
           message="Failed to load monthly plan data. Please try again."
@@ -31,20 +31,26 @@ export default function GuideMonthlyPlanPage() {
   }
 
   if (isLoading) {
-    return <LoadingState message="Loading monthly plan..." minHeight="100vh" />;
+    return (
+      <LoadingState
+        message="Loading monthly plan..."
+        minHeight="100vh"
+        className={styles['monthly-plan-root']}
+      />
+    );
   }
 
   return (
-    <main className="main">
-      <div className="monthly-plan-container">
+    <main className={`main ${styles['monthly-plan-root']}`}>
+      <div className={styles['monthly-plan-container']}>
         <h1>Monthly Tour Plan</h1>
 
-        <div className="year-selector">
+        <div className={styles['year-selector']}>
           <label>Select Year:</label>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="year-select"
+            className={styles['year-select']}
           >
             {years.map((year) => (
               <option key={year} value={year}>
@@ -55,7 +61,7 @@ export default function GuideMonthlyPlanPage() {
         </div>
 
         {monthlyPlan && monthlyPlan.length > 0 ? (
-          <div className="monthly-plan-grid">
+          <div className={styles['monthly-plan-grid']}>
             {monthlyPlan.map((monthData) => {
               const monthName = new Date(2024, monthData.month - 1).toLocaleString('en-US', {
                 month: 'long',
@@ -63,26 +69,28 @@ export default function GuideMonthlyPlanPage() {
               return (
                 <Card
                   key={monthData.month}
-                  className="month-card"
+                  className={styles['month-card']}
                   header={
-                    <div className="month-card__header">
-                      <h3 className="month-card__month">{monthName}</h3>
-                      <span className="month-card__count">{monthData.numTourStarts}</span>
+                    <div className={styles['month-card__header']}>
+                      <h3 className={styles['month-card__month']}>{monthName}</h3>
+                      <span className={styles['month-card__count']}>{monthData.numTourStarts}</span>
                     </div>
                   }
                 >
-                  <div className="month-card__body">
-                    <div className="month-card__tours-label">Tours Starting:</div>
-                    <ul className="month-card__tours-list">
+                  <div className={styles['month-card__body']}>
+                    <div className={styles['month-card__tours-label']}>Tours Starting:</div>
+                    <ul className={styles['month-card__tours-list']}>
                       {monthData.tours && monthData.tours.length > 0 ? (
                         monthData.tours.map((tourName, idx) => (
-                          <li key={idx} className="month-card__tour-item">
-                            <span className="tour-bullet">•</span>
+                          <li key={idx} className={styles['month-card__tour-item']}>
+                            <span className={styles['tour-bullet']}>•</span>
                             {tourName}
                           </li>
                         ))
                       ) : (
-                        <li className="month-card__tour-item month-card__tour-item--empty">
+                        <li
+                          className={`${styles['month-card__tour-item']} ${styles['month-card__tour-item--empty']}`}
+                        >
                           No tours scheduled
                         </li>
                       )}
@@ -93,22 +101,22 @@ export default function GuideMonthlyPlanPage() {
             })}
           </div>
         ) : (
-          <div className="empty-state">
+          <div className={styles['empty-state']}>
             <p>No tour data available for {selectedYear}</p>
           </div>
         )}
 
         {monthlyPlan && monthlyPlan.length > 0 && (
-          <div className="plan-summary">
-            <div className="summary-stat">
+          <div className={styles['plan-summary']}>
+            <div className={styles['summary-stat']}>
               <span>Total Tours Started:</span>
-              <span className="stat-value">
+              <span className={styles['stat-value']}>
                 {monthlyPlan.reduce((sum, m) => sum + m.numTourStarts, 0)}
               </span>
             </div>
-            <div className="summary-stat">
+            <div className={styles['summary-stat']}>
               <span>Total Months Active:</span>
-              <span className="stat-value">{monthlyPlan.length}</span>
+              <span className={styles['stat-value']}>{monthlyPlan.length}</span>
             </div>
           </div>
         )}

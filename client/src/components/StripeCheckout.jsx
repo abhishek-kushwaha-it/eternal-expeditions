@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '../core-components';
 import { useToasts } from '../store/hooks';
-import './StripeCheckout.css';
+import styles from './StripeCheckout.module.css';
 
 /**
  * StripeCheckout Component
@@ -88,30 +88,30 @@ export default function StripeCheckout({ onPaymentSuccess }) {
   };
 
   return (
-    <form className="stripe-checkout-form" onSubmit={handleSubmit}>
-      <div className="stripe-checkout-container">
-        <h2 className="stripe-checkout-title">Payment Information</h2>
+    <form className={styles['stripe-checkout-form']} onSubmit={handleSubmit}>
+      <div className={styles['stripe-checkout-container']}>
+        <h2 className={styles['stripe-checkout-title']}>Payment Information</h2>
 
-        <div className="card-element-wrapper">
-          <label htmlFor="card-element" className="card-element-label">
+        <div className={styles['card-element-wrapper']}>
+          <label htmlFor="card-element" className={styles['card-element-label']}>
             Credit or debit card
           </label>
           <CardElement id="card-element" options={cardElementOptions} />
         </div>
 
-        {error && <div className="stripe-error-message">{error}</div>}
+        {error && <div className={styles['stripe-error-message']}>{error}</div>}
 
         <Button
           type="submit"
           variant="primary"
           fullWidth
           disabled={!stripe || isProcessing}
-          className="stripe-submit-btn"
+          className={styles['stripe-submit-btn']}
         >
           {isProcessing ? 'Processing Payment...' : 'Complete Payment'}
         </Button>
 
-        <p className="stripe-disclaimer">
+        <p className={styles['stripe-disclaimer']}>
           Your payment information is secure and encrypted. We use Stripe to process all payments.
         </p>
       </div>

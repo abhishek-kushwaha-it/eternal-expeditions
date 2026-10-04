@@ -18,7 +18,7 @@ import {
 } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
 import { IMAGE_URL } from '../utils/api';
-import './BookingCard.css';
+import styles from './BookingCard.module.css';
 
 const formatDate = (date) =>
   new Date(date).toLocaleDateString('en-US', {
@@ -28,9 +28,11 @@ const formatDate = (date) =>
   });
 
 const DetailItem = ({ label, value, isPrimary = false }) => (
-  <div className="booking-detail">
-    <span className="booking-detail__label">{label}:</span>
-    <span className={`booking-detail__value ${isPrimary ? 'booking-detail__value--primary' : ''}`}>
+  <div className={styles['booking-detail']}>
+    <span className={styles['booking-detail__label']}>{label}:</span>
+    <span
+      className={`${styles['booking-detail__value']} ${isPrimary ? styles['booking-detail__value--primary'] : ''}`.trim()}
+    >
       {value}
     </span>
   </div>
@@ -150,13 +152,13 @@ export default function BookingCard({
   );
 
   const cardHeader = booking.tour?.imageCover && (
-    <div className="booking-card__cover">
+    <div className={styles['booking-card__cover']}>
       <Image src={`${IMAGE_URL}/tours/${booking.tour.imageCover}`} alt={booking.tour.name} />
     </div>
   );
 
   const cardFooter = (
-    <Link to={`/bookings/${booking._id}`} className="booking-footer__link">
+    <Link to={`/bookings/${booking._id}`} className={styles['booking-footer__link']}>
       <Button variant="primary" size="sm">
         View Details
       </Button>
@@ -164,11 +166,11 @@ export default function BookingCard({
   );
 
   return (
-    <Card header={cardHeader} footer={cardFooter} className="booking-card">
-      <div className="booking-card__header">
-        <h3 className="booking-card__title">{booking.tour?.name}</h3>
+    <Card header={cardHeader} footer={cardFooter} className={styles['booking-card']}>
+      <div className={styles['booking-card__header']}>
+        <h3 className={styles['booking-card__title']}>{booking.tour?.name}</h3>
         <span
-          className={`booking-status-badge booking-status-badge--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
+          className={`${styles['booking-status-badge']} ${styles[`booking-status-badge--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`]}`}
         >
           {booking.paymentStatus === 'succeeded'
             ? 'Paid'
@@ -178,7 +180,7 @@ export default function BookingCard({
         </span>
       </div>
 
-      <div className="booking-details">
+      <div className={styles['booking-details']}>
         <DetailItem label="Start Date" value={formatDate(booking.tour?.startDates?.[0])} />
         <DetailItem label="Duration" value={`${booking.tour?.duration} days`} />
         <DetailItem label="Price" value={`$${booking.price}`} isPrimary />
@@ -191,15 +193,18 @@ export default function BookingCard({
       </div>
 
       {showReviews && booking.paymentStatus === 'succeeded' && (
-        <div className="booking-reviews">
+        <div className={styles['booking-reviews']}>
           {tourReviews.length > 0 && (
-            <div className="booking-reviews__list">
-              <h4 className="booking-reviews__title">Your Reviews ({tourReviews.length})</h4>
-              <div className="booking-reviews__items">
+            <div className={styles['booking-reviews__list']}>
+              <h4 className={styles['booking-reviews__title']}>
+                Your Reviews ({tourReviews.length})
+              </h4>
+              <div className={styles['booking-reviews__items']}>
                 {tourReviews.map((review) => (
                   <ReviewCard
                     key={review._id}
                     review={review}
+                    compact
                     isOwnReview={true}
                     canManage={true}
                     onEdit={handleUpdateReview}
@@ -212,7 +217,7 @@ export default function BookingCard({
           )}
 
           {!hasExistingReview && (
-            <div className="review-trigger">
+            <div className={styles['review-trigger']}>
               {!showReviewForm ? (
                 <Button
                   variant="secondary"
@@ -223,8 +228,8 @@ export default function BookingCard({
                   ⭐ Rate & Review
                 </Button>
               ) : (
-                <div className="review-form-wrapper">
-                  <div className="review-form__header">
+                <div className={styles['review-form-wrapper']}>
+                  <div className={styles['review-form__header']}>
                     <h4>Write Your Review</h4>
                     <Button
                       variant="ghost"
@@ -235,7 +240,7 @@ export default function BookingCard({
                       ✕
                     </Button>
                   </div>
-                  <div className="review-form__content">
+                  <div className={styles['review-form__content']}>
                     <FormGroup
                       name="rating"
                       label="Rating (1-5 stars)"
@@ -261,7 +266,7 @@ export default function BookingCard({
                       required
                     />
                   </div>
-                  <div className="review-form__actions">
+                  <div className={styles['review-form__actions']}>
                     <Button variant="secondary" size="sm" onClick={() => setShowReviewForm(false)}>
                       Cancel
                     </Button>
@@ -288,13 +293,13 @@ export default function BookingCard({
       )}
 
       {showAdminControls && (
-        <div className="booking-card-admin-controls">
-          <div className="admin-control-user">
-            <label className="admin-control-label">Booked by:</label>
+        <div className={styles['booking-card-admin-controls']}>
+          <div className={styles['admin-control-user']}>
+            <label className={styles['admin-control-label']}>Booked by:</label>
             <span>{booking.user?.name || 'Unknown'}</span>
           </div>
 
-          <div className="admin-actions">
+          <div className={styles['admin-actions']}>
             <Button
               onClick={() => onEditBooking && onEditBooking(booking)}
               variant="primary"

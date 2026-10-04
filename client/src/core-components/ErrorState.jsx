@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import Button from './Button';
-import './ErrorState.css';
+import styles from './ErrorState.module.css';
 
 /**
  * ErrorState Component
@@ -16,17 +16,20 @@ const ErrorState = memo(
     onAction,
     actionLink,
     showAction = true,
+    animated = false,
   }) => {
     return (
-      <div className="error-state">
-        <div className="error-state__content">
-          {emoji && <span className="error-state__emoji">{emoji}</span>}
-          <h2 className="error-state__title">{title}</h2>
-          <p className="error-state__message">{message}</p>
+      <div
+        className={`${styles['error-state']} ${animated ? styles['error-state--animated'] : ''}`.trim()}
+      >
+        <div>
+          {emoji && <span className={styles['error-state__emoji']}>{emoji}</span>}
+          <h2 className={styles['error-state__title']}>{title}</h2>
+          <p className={styles['error-state__message']}>{message}</p>
         </div>
 
         {showAction && (
-          <div className="error-state__action">
+          <div className={styles['error-state__action']}>
             {onAction ? (
               <Button variant="primary" size="md" onClick={onAction}>
                 {actionLabel}

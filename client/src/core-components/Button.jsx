@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import './Button.css';
+import styles from './Button.module.css';
 
 const Button = forwardRef(
   (
@@ -18,16 +18,20 @@ const Button = forwardRef(
     },
     ref
   ) => {
-    const baseClass = 'btn';
-    const variantClass = `btn--${variant}`;
-    const sizeClass = `btn--${size}`;
-    const fullWidthClass = fullWidth ? 'btn--full' : '';
-    const computedClassName =
-      `${baseClass} ${variantClass} ${sizeClass} ${fullWidthClass} ${className}`.trim();
+    const computedClassName = [
+      styles.btn,
+      styles[`btn--${variant}`],
+      styles[`btn--${size}`],
+      fullWidth && styles['btn--full'],
+      loading && styles['btn--loading'],
+      className,
+    ]
+      .filter(Boolean)
+      .join(' ');
 
     if (as === 'a') {
       return (
-        <a ref={ref} className={computedClassName} onClick={onClick} {...props}>
+        <a ref={ref} className={computedClassName} data-button onClick={onClick} {...props}>
           {children}
         </a>
       );
@@ -38,6 +42,7 @@ const Button = forwardRef(
         ref={ref}
         type={type}
         className={computedClassName}
+        data-button
         disabled={disabled || loading}
         onClick={onClick}
         {...props}

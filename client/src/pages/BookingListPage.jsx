@@ -1,7 +1,7 @@
 import { BookingCard } from '../components';
 import { LoadingState, Button, ErrorState } from '../core-components';
 import { useMyBookings } from '../hooks/useQueries';
-import './BookingListPage.css';
+import styles from './BookingListPage.module.css';
 
 /**
  * BookingListPage (My Tour Bookings)
@@ -30,13 +30,13 @@ export default function BookingListPage() {
 
   return (
     <main className="main">
-      <div className="bookings-list-page">
-        <div className="bookings-list-container">
+      <div className={styles['bookings-list-page']}>
+        <div className={styles['bookings-list-container']}>
           {/* Page Header */}
-          <div className="bookings-list-header">
-            <div className="bookings-list-header__content">
-              <h1 className="bookings-list-header__title">My Tour Bookings</h1>
-              <span className="bookings-list-header__count">
+          <div className={styles['bookings-list-header']}>
+            <div className={styles['bookings-list-header__content']}>
+              <h1 className={styles['bookings-list-header__title']}>My Tour Bookings</h1>
+              <span className={styles['bookings-list-header__count']}>
                 {bookings.length} {bookings.length === 1 ? 'booking' : 'bookings'}
               </span>
             </div>
@@ -44,12 +44,12 @@ export default function BookingListPage() {
 
           {/* Bookings List or Empty State */}
           {bookings.length > 0 ? (
-            <div className="bookings-list-content">
-              <div className="bookings-list-grid">
+            <div className={styles['bookings-list-content']}>
+              <div className={styles['bookings-list-grid']}>
                 {bookings.map((booking, index) => (
                   <div
                     key={booking._id}
-                    className="bookings-list-item"
+                    className={styles['bookings-list-item']}
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <BookingCard booking={booking} />
@@ -58,11 +58,11 @@ export default function BookingListPage() {
               </div>
             </div>
           ) : (
-            <div className="bookings-list-empty">
-              <div className="bookings-empty-content">
-                <span className="bookings-empty-icon">📭</span>
-                <h2 className="bookings-empty-title">No Bookings Yet</h2>
-                <p className="bookings-empty-message">
+            <div className={styles['bookings-list-empty']}>
+              <div className={styles['bookings-empty-content']}>
+                <span className={styles['bookings-empty-icon']}>📭</span>
+                <h2 className={styles['bookings-empty-title']}>No Bookings Yet</h2>
+                <p className={styles['bookings-empty-message']}>
                   You haven't booked any tours yet. Start your adventure today!
                 </p>
                 <Button
@@ -70,7 +70,7 @@ export default function BookingListPage() {
                   href="/"
                   variant="primary"
                   size="md"
-                  className="bookings-empty-button"
+                  className={styles['bookings-empty-button']}
                 >
                   🌍 Explore Tours
                 </Button>

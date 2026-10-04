@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, FormGroup, LoadingState } from '../core-components';
 import { useForgotPasswordMutation } from '../hooks/useQueries';
 import { useAuth } from '../hooks/useAuth';
-import './ForgotPasswordPage.css';
+import styles from './AuthPages.module.css';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -47,18 +47,18 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <main className="main">
-        <div className="auth-container">
-          <div className="auth-card success-card">
-            <div className="success-icon">✓</div>
-            <h2 className="success-title">Check Your Email</h2>
-            <p className="success-message">
+        <div className={styles['auth-container']}>
+          <div className={styles['auth-card']}>
+            <div>✓</div>
+            <h2>Check Your Email</h2>
+            <p>
               Reset link sent to <strong>{email}</strong>
             </p>
-            <p className="success-instructions">
+            <p>
               Click the link in your email to reset your password. Check your spam folder if you
               don't see it.
             </p>
-            <p className="success-note">⏱️ Link expires in 10 minutes.</p>
+            <p>⏱️ Link expires in 10 minutes.</p>
             <Button variant="primary" size="md" fullWidth onClick={() => navigate('/login')}>
               Back to Login
             </Button>
@@ -70,14 +70,14 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="main">
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
+      <div className={styles['auth-container']}>
+        <div className={styles['auth-card']}>
+          <div className={styles['auth-header']}>
             <h1 className="heading-primary">Reset Password</h1>
-            <p className="auth-subtitle">We'll send you a reset link</p>
+            <p className={styles['auth-subtitle']}>We'll send you a reset link</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className={styles['auth-form']} onSubmit={handleSubmit}>
             <FormGroup
               type="email"
               name="email"
@@ -101,9 +101,9 @@ export default function ForgotPasswordPage() {
             </Button>
           </form>
 
-          <div className="auth-footer">
+          <div className={styles['auth-footer']}>
             Remember your password?{' '}
-            <Link to="/login" className="auth-footer-link">
+            <Link to="/login" className={styles['auth-footer-link']}>
               Log in here
             </Link>
           </div>

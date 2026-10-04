@@ -7,7 +7,7 @@ import { displayMap } from '../utils/mapbox';
 import { useToasts } from '../store/hooks';
 import { useAuth } from '../hooks/useAuth';
 import { IMAGE_URL } from '../utils/api';
-import './TourPage.css';
+import styles from './TourPage.module.css';
 
 export default function TourPage() {
   const { id } = useParams();
@@ -81,92 +81,92 @@ export default function TourPage() {
   return (
     <main className="main">
       {/* SECTION HEADER */}
-      <section className="section-header">
-        <div className="header__hero">
-          <div className="header__hero-overlay">&nbsp;</div>
+      <section className={styles['section-header']}>
+        <div className={styles['header__hero']}>
+          <div className={styles['header__hero-overlay']}>&nbsp;</div>
           <Image
-            className="header__hero-img"
+            className={styles['header__hero-img']}
             src={`${IMAGE_URL}/tours/${tour.imageCover}`}
             alt={`${tour.name}`}
           />
         </div>
 
-        <div className="heading-box">
+        <div className={styles['heading-box']}>
           <h1 className="heading-primary">
             <span>{tour.name} tour</span>
           </h1>
-          <div className="heading-box__group">
-            <div className="heading-box__detail">
-              <svg className="heading-box__icon">
+          <div className={styles['heading-box__group']}>
+            <div className={styles['heading-box__detail']}>
+              <svg className={styles['heading-box__icon']}>
                 <use xlinkHref="/img/icons.svg#icon-clock"></use>
               </svg>
-              <span className="heading-box__text">{tour.duration} days</span>
+              <span className={styles['heading-box__text']}>{tour.duration} days</span>
             </div>
-            <div className="heading-box__detail">
-              <svg className="heading-box__icon">
+            <div className={styles['heading-box__detail']}>
+              <svg className={styles['heading-box__icon']}>
                 <use xlinkHref="/img/icons.svg#icon-map-pin"></use>
               </svg>
-              <span className="heading-box__text">{tour.startLocation.description}</span>
+              <span className={styles['heading-box__text']}>{tour.startLocation.description}</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION DESCRIPTION */}
-      <section className="section-description">
+      <section className={styles['section-description']}>
         <div>
-          <div className="overview-box">
+          <div className={styles['overview-box']}>
             <div>
-              <div className="overview-box__group">
+              <div className={styles['overview-box__group']}>
                 <h2 className="heading-secondary ma-bt-lg">Quick facts</h2>
 
-                <div className="overview-box__detail">
-                  <svg className="overview-box__icon">
+                <div className={styles['overview-box__detail']}>
+                  <svg className={styles['overview-box__icon']}>
                     <use xlinkHref="/img/icons.svg#icon-calendar"></use>
                   </svg>
-                  <span className="overview-box__label">Next date</span>
-                  <span className="overview-box__text">{startDate}</span>
+                  <span className={styles['overview-box__label']}>Next date</span>
+                  <span className={styles['overview-box__text']}>{startDate}</span>
                 </div>
 
-                <div className="overview-box__detail">
-                  <svg className="overview-box__icon">
+                <div className={styles['overview-box__detail']}>
+                  <svg className={styles['overview-box__icon']}>
                     <use xlinkHref="/img/icons.svg#icon-trending-up"></use>
                   </svg>
-                  <span className="overview-box__label">Difficulty</span>
-                  <span className="overview-box__text">{tour.difficulty}</span>
+                  <span className={styles['overview-box__label']}>Difficulty</span>
+                  <span className={styles['overview-box__text']}>{tour.difficulty}</span>
                 </div>
 
-                <div className="overview-box__detail">
-                  <svg className="overview-box__icon">
+                <div className={styles['overview-box__detail']}>
+                  <svg className={styles['overview-box__icon']}>
                     <use xlinkHref="/img/icons.svg#icon-user"></use>
                   </svg>
-                  <span className="overview-box__label">Participants</span>
-                  <span className="overview-box__text">{tour.maxGroupSize} people</span>
+                  <span className={styles['overview-box__label']}>Participants</span>
+                  <span className={styles['overview-box__text']}>{tour.maxGroupSize} people</span>
                 </div>
 
-                <div className="overview-box__detail">
-                  <svg className="overview-box__icon">
+                <div className={styles['overview-box__detail']}>
+                  <svg className={styles['overview-box__icon']}>
                     <use xlinkHref="/img/icons.svg#icon-star"></use>
                   </svg>
-                  <span className="overview-box__label">Rating</span>
-                  <span className="overview-box__text">{tour.ratingsAverage} / 5</span>
+                  <span className={styles['overview-box__label']}>Rating</span>
+                  <span className={styles['overview-box__text']}>{tour.ratingsAverage} / 5</span>
                 </div>
               </div>
 
-              <div className="overview-box__group">
+              <div className={styles['overview-box__group']}>
                 <h2 className="heading-secondary ma-bt-lg">Your tour guides</h2>
 
                 {guides.map((guide) => (
-                  <div key={guide._id} className="overview-box__detail">
+                  <div key={guide._id} className={styles['overview-box__detail']}>
                     <Image
-                      className="overview-box__img"
+                      className={styles['overview-box__img']}
                       src={`${IMAGE_URL}/users/${guide.photo}`}
                       alt={`${guide.name}`}
                       size="sm"
                     />
                     <div>
-                      <span className="overview-box__label">Guide</span>
-                      <span className="overview-box__text">{guide.name}</span>
+                      <span className={styles['overview-box__label']}>Guide</span>
+                      <span className={styles['overview-box__text']}>{guide.name}</span>
                     </div>
                   </div>
                 ))}
@@ -175,10 +175,10 @@ export default function TourPage() {
           </div>
         </div>
 
-        <div className="description-box">
+        <div className={styles['description-box']}>
           <h2 className="heading-secondary ma-bt-lg">About {tour.name} tour</h2>
           {descriptions.map((p, index) => (
-            <p key={index} className="description__text">
+            <p key={index} className={styles['description__text']}>
               {p}
             </p>
           ))}
@@ -186,11 +186,11 @@ export default function TourPage() {
       </section>
 
       {/* SECTION PICTURES */}
-      <section className="section-pictures">
+      <section className={styles['section-pictures']}>
         {tour.images?.map((img, i) => (
-          <div key={i} className="picture-box">
+          <div key={i}>
             <Image
-              className={`picture-box__img picture-box__img--${i + 1}`}
+              className={`${styles['picture-box__img']} ${styles[`picture-box__img--${i + 1}`] ?? ''}`}
               src={`${IMAGE_URL}/tours/${img}`}
               alt={`${tour.name} - Image ${i + 1}`}
               loading="lazy"
@@ -200,14 +200,14 @@ export default function TourPage() {
       </section>
 
       {/* SECTION MAP */}
-      <section className="section-map">
+      <section className={styles['section-map']}>
         <div ref={mapContainer} id="map"></div>
       </section>
 
       {/* SECTION REVIEWS */}
       {reviews.length > 0 && (
-        <section className="section-reviews">
-          <div className="reviews">
+        <section className={styles['section-reviews']}>
+          <div className={styles.reviews}>
             {reviews.map((review) => (
               <ReviewCard
                 key={review._id}
@@ -221,30 +221,30 @@ export default function TourPage() {
       )}
 
       {/* SECTION CTA */}
-      <section className="section-cta">
-        <div className="cta">
-          <div className="cta__img cta__img--logo">
+      <section className={styles['section-cta']}>
+        <div className={styles.cta}>
+          <div className={`${styles['cta__img']} ${styles['cta__img--logo']}`}>
             <Image src="/img/logo-header.png" alt="ashoka logo" />
           </div>
           {tour.images?.length >= 3 && (
             <>
               <Image
-                className="cta__img cta__img--1"
+                className={`${styles['cta__img']} ${styles['cta__img--1']}`}
                 src={`${IMAGE_URL}/tours/${tour.images[1]}`}
                 alt="Tour promotional image 1"
                 loading="lazy"
               />
               <Image
-                className="cta__img cta__img--2"
+                className={`${styles['cta__img']} ${styles['cta__img--2']}`}
                 src={`${IMAGE_URL}/tours/${tour.images[2]}`}
                 alt="Tour promotional image 2"
                 loading="lazy"
               />
             </>
           )}
-          <div className="cta__content">
+          <div className={styles['cta__content']}>
             <h2 className="heading-secondary">What are you waiting for?</h2>
-            <p className="cta__text">
+            <p className={styles['cta__text']}>
               {tour.duration} days. 1 adventure. Infinite memories. Make it yours today!
             </p>
             <Button

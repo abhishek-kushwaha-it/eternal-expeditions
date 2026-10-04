@@ -1,4 +1,4 @@
-import './AboutPage.css';
+import styles from './AboutPage.module.css';
 
 export default function AboutPage() {
   const stats = [
@@ -61,12 +61,12 @@ export default function AboutPage() {
 
   return (
     <main className="main">
-      <div className="about-page">
+      <div className={styles['about-page']}>
         {/* Hero Section */}
-        <div className="about-hero">
-          <div className="about-hero__content">
-            <h1 className="about-hero__title">About Eternal Expeditions</h1>
-            <p className="about-hero__subtitle">
+        <div className={styles['about-hero']}>
+          <div>
+            <h1 className={styles['about-hero__title']}>About Eternal Expeditions</h1>
+            <p className={styles['about-hero__subtitle']}>
               Connecting adventurers with unforgettable experiences worldwide. We make travel dreams
               come true through expertly crafted tours, trusted guides, and seamless booking.
             </p>
@@ -74,9 +74,9 @@ export default function AboutPage() {
         </div>
 
         {/* Mission Section */}
-        <section className="about-section">
-          <h2 className="section-title">🎯 Our Mission</h2>
-          <p className="mission-text">
+        <section className={styles['about-section']}>
+          <h2 className={styles['section-title']}>🎯 Our Mission</h2>
+          <p className={styles['mission-text']}>
             To create extraordinary travel experiences that inspire, educate, and connect people
             with the world's most beautiful destinations. We believe in responsible tourism that
             benefits local communities and preserves natural wonders.
@@ -84,53 +84,53 @@ export default function AboutPage() {
         </section>
 
         {/* Stats Section */}
-        <section className="about-stats">
-          <div className="stats-grid">
+        <section className={styles['about-stats']}>
+          <div className={styles['stats-grid']}>
             {stats.map((stat, idx) => (
-              <div key={idx} className="stat-card">
-                <div className="stat-number">{stat.number}</div>
-                <div className="stat-label">{stat.label}</div>
+              <div key={idx} className={styles['stat-card']}>
+                <div className={styles['stat-number']}>{stat.number}</div>
+                <div className={styles['stat-label']}>{stat.label}</div>
               </div>
             ))}
           </div>
         </section>
 
         {/* Services Section */}
-        <section className="about-section">
-          <h2 className="section-title">🚀 Our Services</h2>
-          <div className="services-grid">
+        <section className={styles['about-section']}>
+          <h2 className={styles['section-title']}>🚀 Our Services</h2>
+          <div className={styles['services-grid']}>
             {services.map((service, idx) => (
-              <div key={idx} className="service-card">
-                <div className="service-icon">{service.icon}</div>
-                <h3 className="service-title">{service.title}</h3>
-                <p className="service-description">{service.description}</p>
+              <div key={idx} className={styles['service-card']}>
+                <div className={styles['service-icon']}>{service.icon}</div>
+                <h3 className={styles['service-title']}>{service.title}</h3>
+                <p className={styles['service-description']}>{service.description}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Team Section */}
-        <section className="about-section">
-          <h2 className="section-title">👥 Our Community</h2>
-          <div className="team-grid">
+        <section className={styles['about-section']}>
+          <h2 className={styles['section-title']}>👥 Our Community</h2>
+          <div className={styles['team-grid']}>
             {team.map((member, idx) => (
-              <div key={idx} className="team-card">
-                <div className="team-icon">{member.icon}</div>
-                <h3 className="team-role">{member.role}</h3>
-                <p className="team-description">{member.description}</p>
+              <div key={idx} className={styles['team-card']}>
+                <div className={styles['team-icon']}>{member.icon}</div>
+                <h3 className={styles['team-role']}>{member.role}</h3>
+                <p className={styles['team-description']}>{member.description}</p>
               </div>
             ))}
           </div>
         </section>
 
         {/* Contact CTA */}
-        <section className="about-cta">
-          <div className="cta-content">
-            <h2 className="cta-title">Ready for Your Adventure?</h2>
-            <p className="cta-description">
+        <section className={styles['about-cta']}>
+          <div className={styles['cta-content']}>
+            <h2 className={styles['cta-title']}>Ready for Your Adventure?</h2>
+            <p className={styles['cta-description']}>
               Join thousands of travelers who trust Eternal Expeditions for their dream vacations.
             </p>
-            <p className="cta-contact">
+            <p className={styles['cta-contact']}>
               Questions? Contact us at <strong>abhishek.kushwaha.it@gmail.com</strong>
             </p>
           </div>

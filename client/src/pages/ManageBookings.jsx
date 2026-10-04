@@ -16,7 +16,7 @@ import {
   useConfirmDialog,
 } from '../core-components';
 import { BookingCard } from '../components';
-import './ManageBookings.css';
+import styles from './ManageBookings.module.css';
 
 export default function ManageBookings() {
   const { data: bookings = [], isLoading, error } = useAllBookings();
@@ -210,12 +210,18 @@ export default function ManageBookings() {
   );
 
   if (isLoading) {
-    return <LoadingState message="Loading bookings..." minHeight="60vh" />;
+    return (
+      <LoadingState
+        message="Loading bookings..."
+        minHeight="60vh"
+        className={styles['manage-bookings-root']}
+      />
+    );
   }
 
   if (error) {
     return (
-      <main className="main">
+      <main className={`main ${styles['manage-bookings-root']}`}>
         <ErrorState
           title="Failed to Load Bookings"
           message={error?.message || 'An error occurred while loading bookings.'}
@@ -227,23 +233,23 @@ export default function ManageBookings() {
   }
 
   return (
-    <main className="main">
-      <div className="page__container">
-        <div className="manage-bookings__header">
-          <h2 className="page__title">📅 Manage Bookings ({bookings.length})</h2>
+    <main className={`main ${styles['manage-bookings-root']}`}>
+      <div className={styles['page__container']}>
+        <div className={styles['manage-bookings__header']}>
+          <h2 className={styles['page__title']}>📅 Manage Bookings ({bookings.length})</h2>
           <Button variant="primary" onClick={() => handleOpenForm()}>
             + Create Booking
           </Button>
         </div>
 
-        <div className="manage-bookings__filters">
-          <div className="filters__grid">
-            <div className="form__group">
-              <label className="form__label">Sort By</label>
+        <div className={styles['manage-bookings__filters']}>
+          <div className={styles['filters__grid']}>
+            <div className={styles['form__group']}>
+              <label className={styles['form__label']}>Sort By</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="form__select"
+                className={styles['form__select']}
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -252,25 +258,25 @@ export default function ManageBookings() {
               </select>
             </div>
 
-            <div className="form__group">
-              <label className="form__label">Search User</label>
+            <div className={styles['form__group']}>
+              <label className={styles['form__label']}>Search User</label>
               <input
                 type="text"
                 value={searchUser}
                 onChange={(e) => setSearchUser(e.target.value)}
                 placeholder="User name..."
-                className="form__input"
+                className={styles['form__input']}
               />
             </div>
           </div>
         </div>
 
         {filteredBookings.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state__text">No bookings match your filters</p>
+          <div className={styles['empty-state']}>
+            <p className={styles['empty-state__text']}>No bookings match your filters</p>
           </div>
         ) : (
-          <div className="bookings-grid">
+          <div className={styles['bookings-grid']}>
             {filteredBookings.map((booking) => (
               <BookingCard
                 key={booking._id}
@@ -288,28 +294,28 @@ export default function ManageBookings() {
 
       {/* Create/Edit Booking Form Modal */}
       {showForm && (
-        <div className="form-modal-overlay">
-          <div className="form-modal">
-            <div className="form-modal__header">
+        <div className={styles['form-modal-overlay']}>
+          <div className={styles['form-modal']}>
+            <div className={styles['form-modal__header']}>
               <h3>{editingBooking ? 'Edit Booking' : 'Create New Booking'}</h3>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleCloseForm}
-                className="form-modal__close"
+                className={styles['form-modal__close']}
               >
                 ✕
               </Button>
             </div>
 
-            <form onSubmit={handleSubmitForm} className="form-modal__body">
-              <div className="form__group">
-                <label className="form__label">Select Tour *</label>
+            <form onSubmit={handleSubmitForm} className={styles['form-modal__body']}>
+              <div className={styles['form__group']}>
+                <label className={styles['form__label']}>Select Tour *</label>
                 <select
                   name="tour"
                   value={formData.tour}
                   onChange={handleFormChange}
-                  className="form__select"
+                  className={styles['form__select']}
                   disabled={editingBooking}
                 >
                   <option value="">Choose a tour...</option>
@@ -321,13 +327,13 @@ export default function ManageBookings() {
                 </select>
               </div>
 
-              <div className="form__group">
-                <label className="form__label">Select User *</label>
+              <div className={styles['form__group']}>
+                <label className={styles['form__label']}>Select User *</label>
                 <select
                   name="user"
                   value={formData.user}
                   onChange={handleFormChange}
-                  className="form__select"
+                  className={styles['form__select']}
                   disabled={editingBooking}
                 >
                   <option value="">Choose a user...</option>
@@ -339,27 +345,27 @@ export default function ManageBookings() {
                 </select>
               </div>
 
-              <div className="form__group">
-                <label className="form__label">Price *</label>
+              <div className={styles['form__group']}>
+                <label className={styles['form__label']}>Price *</label>
                 <input
                   type="number"
                   name="price"
                   value={formData.price}
                   onChange={handleFormChange}
-                  className="form__input"
+                  className={styles['form__input']}
                   placeholder="Enter booking price"
                   step="0.01"
                   min="0"
                 />
               </div>
 
-              <div className="form__group">
-                <label className="form__label">Payment Method</label>
+              <div className={styles['form__group']}>
+                <label className={styles['form__label']}>Payment Method</label>
                 <select
                   name="paymentMethod"
                   value={formData.paymentMethod}
                   onChange={handleFormChange}
-                  className="form__select"
+                  className={styles['form__select']}
                 >
                   <option value="card">Card</option>
                   <option value="bank_transfer">Bank Transfer</option>
@@ -368,13 +374,13 @@ export default function ManageBookings() {
                 </select>
               </div>
 
-              <div className="form__group">
-                <label className="form__label">Payment Status</label>
+              <div className={styles['form__group']}>
+                <label className={styles['form__label']}>Payment Status</label>
                 <select
                   name="paymentStatus"
                   value={formData.paymentStatus}
                   onChange={handleFormChange}
-                  className="form__select"
+                  className={styles['form__select']}
                 >
                   <option value="pending">Pending</option>
 
@@ -384,7 +390,7 @@ export default function ManageBookings() {
                 </select>
               </div>
 
-              <div className="form-modal__footer">
+              <div className={styles['form-modal__footer']}>
                 <Button type="button" variant="secondary" onClick={handleCloseForm}>
                   Cancel
                 </Button>

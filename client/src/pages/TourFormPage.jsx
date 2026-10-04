@@ -10,7 +10,7 @@ import {
 } from '../utils/tourValidation';
 import { BACKEND_URL } from '../utils/api';
 import { useToasts } from '../store/hooks';
-import './TourFormPage.css';
+import styles from './TourFormPage.module.css';
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -22,9 +22,9 @@ function ValidationAlert({ errors }) {
   }
 
   return (
-    <div className="form__validation-alert">
+    <div className={styles['form__validation-alert']}>
       <strong>⚠️ Please fix the following errors:</strong>
-      <ul className="form__error-list">
+      <ul className={styles['form__error-list']}>
         {Object.entries(errors).map(([field, error]) => error && <li key={field}>{error}</li>)}
       </ul>
     </div>
@@ -45,9 +45,9 @@ function DifficultySelector({
         {label}
         {required && <span className="form-group__required">*</span>}
       </label>
-      <div className="difficulty-selector">
+      <div className={styles['difficulty-selector']}>
         {Object.entries(DIFFICULTY_CONFIG).map(([key, config]) => (
-          <label key={key} className="difficulty-option">
+          <label key={key} className={styles['difficulty-option']}>
             <input
               type="radio"
               id={`difficulty-${key}`}
@@ -55,9 +55,9 @@ function DifficultySelector({
               value={key}
               checked={value === key}
               onChange={onChange}
-              className="difficulty-option__input"
+              className={styles['difficulty-option__input']}
             />
-            <span className="difficulty-option__label" style={{ borderColor: config.color }}>
+            <span className={styles['difficulty-option__label']} style={{ borderColor: config.color }}>
               {config.label}
             </span>
           </label>
@@ -70,13 +70,13 @@ function DifficultySelector({
 
 function BasicInfoSection({ formData, touched, errors, onBasicChange, onBlur }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">📋 Basic Information</h3>
-        <p className="form-section__description">Enter core tour details</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>📋 Basic Information</h3>
+        <p className={styles['form-section__description']}>Enter core tour details</p>
       </div>
 
-      <div className="form-grid form-grid--3col">
+      <div className={`${styles['form-grid']} ${styles['form-grid--3col']}`}>
         <FormGroup
           name="name"
           label="Tour Name"
@@ -129,13 +129,13 @@ function BasicInfoSection({ formData, touched, errors, onBasicChange, onBlur }) 
 
 function PricingSection({ formData, touched, errors, calculatedDiscount, onBasicChange, onBlur }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">💰 Pricing</h3>
-        <p className="form-section__description">Set tour pricing and discounts</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>💰 Pricing</h3>
+        <p className={styles['form-section__description']}>Set tour pricing and discounts</p>
       </div>
 
-      <div className="form-grid form-grid--3col">
+      <div className={`${styles['form-grid']} ${styles['form-grid--3col']}`}>
         <FormGroup
           name="price"
           label="Price per person ($)"
@@ -177,16 +177,16 @@ function PricingSection({ formData, touched, errors, calculatedDiscount, onBasic
         />
       </div>
 
-      <div className="pricing-display">
-        <div className="pricing-display__item">
-          <span className="pricing-display__label">Original Price:</span>
-          <span className="pricing-display__value">
+      <div className={styles['pricing-display']}>
+        <div className={styles['pricing-display__item']}>
+          <span className={styles['pricing-display__label']}>Original Price:</span>
+          <span className={styles['pricing-display__value']}>
             ${parseFloat(formData.price || 0).toFixed(2)}
           </span>
         </div>
-        <div className="pricing-display__item">
-          <span className="pricing-display__label">Discounted Price:</span>
-          <span className="pricing-display__value">${calculatedDiscount.toFixed(2)}</span>
+        <div className={styles['pricing-display__item']}>
+          <span className={styles['pricing-display__label']}>Discounted Price:</span>
+          <span className={styles['pricing-display__value']}>${calculatedDiscount.toFixed(2)}</span>
         </div>
       </div>
     </section>
@@ -195,10 +195,10 @@ function PricingSection({ formData, touched, errors, calculatedDiscount, onBasic
 
 function DescriptionSection({ formData, touched, errors, onBasicChange, onBlur }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">📝 Description</h3>
-        <p className="form-section__description">Provide tour details and highlights</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>📝 Description</h3>
+        <p className={styles['form-section__description']}>Provide tour details and highlights</p>
       </div>
 
       <FormGroup
@@ -247,25 +247,25 @@ function ImagesSection({
   const canAddMore = totalImages < MAX_IMAGES;
 
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">🖼️ Images</h3>
-        <p className="form-section__description">
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>🖼️ Images</h3>
+        <p className={styles['form-section__description']}>
           Upload cover and tour images (max 4 total images)
         </p>
       </div>
 
-      <div className="images-grid">
+      <div className={styles['images-grid']}>
         {/* Cover Image */}
-        <div className="image-section">
+        <div className={styles['image-section']}>
           <label className="form-group__label form-group__label--required">Cover Image</label>
-          <div className="image-upload">
+          <div className={styles['image-upload']}>
             {imagePreviews.cover ? (
-              <div className="image-preview image-preview--removable">
+              <div className={`${styles['image-preview']} ${styles['image-preview--removable']}`}>
                 <Image src={imagePreviews.cover} alt="Cover preview" />
                 <Button
                   type="button"
-                  className="image-preview__remove"
+                  className={styles['image-preview__remove']}
                   onClick={onRemoveCover}
                   variant="danger"
                   size="sm"
@@ -282,10 +282,10 @@ function ImagesSection({
               name="imageCover"
               onChange={onImageChange}
               accept="image/*"
-              className="image-upload__input"
+              className={styles['image-upload__input']}
               id="imageCover"
             />
-            <label htmlFor="imageCover" className="image-upload__label">
+            <label htmlFor="imageCover" className={styles['image-upload__label']}>
               {imagePreviews.cover ? '✓ Change Cover' : '📁 Upload Cover Image'}
             </label>
           </div>
@@ -295,7 +295,7 @@ function ImagesSection({
         </div>
 
         {/* Additional Images */}
-        <div className="image-section">
+        <div className={styles['image-section']}>
           <label className="form-group__label">Additional Images</label>
           {/* Only show hint when upload is possible */}
           {canAddMore && (
@@ -304,7 +304,7 @@ function ImagesSection({
               {remainingSlots !== 1 ? 's' : ''} ({additionalImages.length}/3 additional)
             </p>
           )}
-          <div className="image-upload">
+          <div className={styles['image-upload']}>
             {canAddMore ? (
               <>
                 <input
@@ -313,10 +313,10 @@ function ImagesSection({
                   onChange={onImageChange}
                   accept="image/*"
                   multiple
-                  className="image-upload__input"
+                  className={styles['image-upload__input']}
                   id="images"
                 />
-                <label htmlFor="images" className="image-upload__label">
+                <label htmlFor="images" className={styles['image-upload__label']}>
                   {additionalImages.length > 0
                     ? `+ Add More Images (${additionalImages.length}/3 additional)`
                     : '📁 Upload Tour Images'}
@@ -340,13 +340,16 @@ function ImagesSection({
 
           {/* Show previews below upload button */}
           {additionalImages.length > 0 && (
-            <div className="image-preview-grid">
+            <div className={styles['image-preview-grid']}>
               {additionalImages.map((image) => (
-                <div key={image.id} className="image-preview image-preview--removable">
+                <div
+                  key={image.id}
+                  className={`${styles['image-preview']} ${styles['image-preview--removable']}`}
+                >
                   <Image src={image.preview} alt={`Tour image`} />
                   <Button
                     type="button"
-                    className="image-preview__remove"
+                    className={styles['image-preview__remove']}
                     onClick={() => onRemoveImage(image.id)}
                     variant="danger"
                     size="sm"
@@ -366,13 +369,13 @@ function ImagesSection({
 
 function StartLocationSection({ formData, onLocationChange, onCoordinateChange }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">📍 Start Location</h3>
-        <p className="form-section__description">Set the tour starting point</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>📍 Start Location</h3>
+        <p className={styles['form-section__description']}>Set the tour starting point</p>
       </div>
 
-      <div className="form-grid form-grid--2col">
+      <div className={`${styles['form-grid']} ${styles['form-grid--2col']}`}>
         <FormGroup
           name="startLocation-address"
           label="Address"
@@ -392,7 +395,7 @@ function StartLocationSection({ formData, onLocationChange, onCoordinateChange }
         />
       </div>
 
-      <div className="form-grid form-grid--2col">
+      <div className={`${styles['form-grid']} ${styles['form-grid--2col']}`}>
         <FormGroup
           name="startLocation-latitude"
           label="Latitude"
@@ -419,10 +422,10 @@ function StartLocationSection({ formData, onLocationChange, onCoordinateChange }
 
 function StartDatesSection({ startDatesInput, onStartDatesChange, formData }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">📅 Start Dates</h3>
-        <p className="form-section__description">Add tour available dates</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>📅 Start Dates</h3>
+        <p className={styles['form-section__description']}>Add tour available dates</p>
       </div>
 
       <div className="form-group">
@@ -438,9 +441,9 @@ function StartDatesSection({ startDatesInput, onStartDatesChange, formData }) {
       </div>
 
       {formData.startDates.length > 0 && (
-        <div className="date-badges">
+        <div className={styles['date-badges']}>
           {formData.startDates.map((date, idx) => (
-            <span key={idx} className="date-badge">
+            <span key={idx} className={styles['date-badge']}>
               📅{' '}
               {new Date(date).toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -461,24 +464,24 @@ function GuidesSection({ guides, selectedGuides, onGuideToggle }) {
   }
 
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">👨‍🏫 Assign Guides</h3>
-        <p className="form-section__description">Select tour guides</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>👨‍🏫 Assign Guides</h3>
+        <p className={styles['form-section__description']}>Select tour guides</p>
       </div>
 
-      <div className="guides-selector">
+      <div className={styles['guides-selector']}>
         {guides.map((guide) => (
-          <label key={guide._id} className="guide-option">
+          <label key={guide._id} className={styles['guide-option']}>
             <input
               type="checkbox"
               checked={selectedGuides.includes(guide._id)}
               onChange={() => onGuideToggle(guide._id)}
-              className="guide-option__input"
+              className={styles['guide-option__input']}
             />
-            <span className="guide-option__label">
+            <span className={styles['guide-option__label']}>
               {guide.name}
-              <span className="guide-option__role">{guide.role}</span>
+              <span className={styles['guide-option__role']}>{guide.role}</span>
             </span>
           </label>
         ))}
@@ -489,10 +492,10 @@ function GuidesSection({ guides, selectedGuides, onGuideToggle }) {
 
 function OptionsSection({ formData, onBasicChange }) {
   return (
-    <section className="form-section">
-      <div className="form-section__header">
-        <h3 className="form-section__title">⚙️ Options</h3>
-        <p className="form-section__description">Additional tour settings</p>
+    <section className={styles['form-section']}>
+      <div className={styles['form-section__header']}>
+        <h3 className={styles['form-section__title']}>⚙️ Options</h3>
+        <p className={styles['form-section__description']}>Additional tour settings</p>
       </div>
 
       <label className="form-group__checkbox-label">
@@ -503,7 +506,7 @@ function OptionsSection({ formData, onBasicChange }) {
           onChange={onBasicChange}
           className="form-group__checkbox"
         />
-        <span className="checkbox-text">🔒 Secret Tour (hidden from public listings)</span>
+        <span className={styles['checkbox-text']}>🔒 Secret Tour (hidden from public listings)</span>
       </label>
     </section>
   );
@@ -1017,21 +1020,21 @@ export default function TourFormPage() {
   }
 
   return (
-    <main className="main tour-form-page">
+    <main className={`main ${styles['tour-form-page']}`}>
       {/* PAGE HEADER */}
-      <section className="form-page-header">
-        <div className="form-page-header__content">
-          <h1 className="form-page-header__title">
+      <section className={styles['form-page-header']}>
+        <div className={styles['form-page-header__content']}>
+          <h1 className={styles['form-page-header__title']}>
             {isNewTour ? '✚ Create New Tour' : '✎ Edit Tour'}
           </h1>
-          <p className="form-page-header__description">
+          <p className={styles['form-page-header__description']}>
             {isNewTour ? 'Add a new tour to your collection' : 'Update tour information'}
           </p>
           <Button
             variant="secondary"
             size="md"
             onClick={() => navigate('/manage/tours')}
-            className="form-page-header__back"
+            className={styles['form-page-header__back']}
           >
             ← Back to Tours
           </Button>
@@ -1039,13 +1042,13 @@ export default function TourFormPage() {
       </section>
 
       {/* MAIN CONTENT */}
-      <div className="form-page-content">
-        <div className="form-page-container">
+      <div className={styles['form-page-content']}>
+        <div className={styles['form-page-container']}>
           {/* VALIDATION ALERT */}
           <ValidationAlert errors={errors} />
 
           {/* FORM */}
-          <form className="tour-form" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
             {/* Basic Info */}
             <BasicInfoSection
               formData={formData}
@@ -1115,7 +1118,7 @@ export default function TourFormPage() {
             <OptionsSection formData={formData} onBasicChange={handleBasicChange} />
 
             {/* FORM ACTIONS */}
-            <div className="form-actions">
+            <div className={styles['form-actions']}>
               <Button type="submit" variant="primary" size="lg" disabled={isSaving}>
                 {isNewTour ? '✚ Create Tour' : '💾 Update Tour'}
               </Button>

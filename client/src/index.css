@@ -24,6 +24,7 @@
   /* Short aliases for convenience */
   --text-white: #fff;
   --text-gray: #777;
+  --text-secondary: var(--color-text-secondary);
   --text-tertiary: #bbb;
   --bg-white: #fff;
   --bg-light: #fcfcfc;
@@ -145,6 +146,31 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-secondary);
   min-height: 100vh;
+}
+
+.main {
+  background-color: var(--color-secondary);
+  padding: 8rem 6rem;
+  flex: 1;
+  position: relative;
+}
+
+@media only screen and (max-width: 768px) {
+  .main {
+    padding: 3rem 1.5rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .main {
+    padding: 2rem 1rem;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .main {
+    padding: 1.5rem 1rem;
+  }
 }
 
 /* ====================================

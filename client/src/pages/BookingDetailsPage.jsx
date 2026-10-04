@@ -4,7 +4,7 @@ import { Button, Card, Image, ErrorState, LoadingState } from '../core-component
 import { useBooking } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
 import { IMAGE_URL } from '../utils/api';
-import './BookingDetailsPage.css';
+import styles from './BookingDetailsPage.module.css';
 
 /**
  * BookingDetailsPage
@@ -44,26 +44,28 @@ export default function BookingDetailsPage() {
 
   return (
     <main className="main">
-      <div className="booking-details-page">
-        <div className="booking-details-container">
+      <div className={styles['booking-details-page']}>
+        <div className={styles['booking-details-container']}>
           {/* Page Header */}
-          <div className="booking-details-header">
-            <h1 className="booking-details-header__title">Booking Details</h1>
+          <div className={styles['booking-details-header']}>
+            <h1 className={styles['booking-details-header__title']}>Booking Details</h1>
             <span
-              className={`booking-status booking-status--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`}
+              className={`${styles['booking-status']} ${styles[`booking-status--${booking.paymentStatus === 'succeeded' ? 'confirmed' : 'pending'}`]}`}
             >
               {booking.paymentStatus === 'succeeded' ? '✓ Paid' : 'Awaiting Payment'}
             </span>
           </div>
 
           {/* Main Content Grid */}
-          <div className="booking-details-content">
+          <div className={styles['booking-details-content']}>
             {/* Tour Information Card */}
-            <Card className="booking-details-card booking-details-card--tour">
-              <div className="booking-card-header">
-                <h2 className="booking-card-title">
+            <Card
+              className={`${styles['booking-details-card']} ${styles['booking-details-card--tour']}`}
+            >
+              <div className={styles['booking-card-header']}>
+                <h2 className={styles['booking-card-title']}>
                   <svg
-                    className="booking-card-icon"
+                    className={styles['booking-card-icon']}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -73,27 +75,27 @@ export default function BookingDetailsPage() {
                   Tour Information
                 </h2>
               </div>
-              <div className="booking-card-content">
+              <div className={styles['booking-card-content']}>
                 {/* Tour Image - Small, inside card */}
                 {booking.tour?.imageCover && (
-                  <div className="tour-image-small">
+                  <div className={styles['tour-image-small']}>
                     <Image
                       src={`${IMAGE_URL}/tours/${booking.tour.imageCover}`}
                       alt={booking.tour.name}
-                      className="tour-image-small__img"
+                      className={styles['tour-image-small__img']}
                       loading="lazy"
                     />
                   </div>
                 )}
 
-                <div className="booking-info-grid">
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Tour Name</span>
-                    <span className="booking-info-value">{booking.tour?.name}</span>
+                <div className={styles['booking-info-grid']}>
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Tour Name</span>
+                    <span className={styles['booking-info-value']}>{booking.tour?.name}</span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Start Date</span>
-                    <span className="booking-info-value">
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Start Date</span>
+                    <span className={styles['booking-info-value']}>
                       {new Date(booking.tour?.startDates?.[0]).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -101,14 +103,16 @@ export default function BookingDetailsPage() {
                       })}
                     </span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Duration</span>
-                    <span className="booking-info-value">{booking.tour?.duration} days</span>
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Duration</span>
+                    <span className={styles['booking-info-value']}>
+                      {booking.tour?.duration} days
+                    </span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Difficulty</span>
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Difficulty</span>
                     <span
-                      className={`booking-difficulty booking-difficulty--${booking.tour?.difficulty?.toLowerCase()}`}
+                      className={`${styles['booking-difficulty']} ${styles[`booking-difficulty--${booking.tour?.difficulty?.toLowerCase()}`] ?? ''}`}
                     >
                       {booking.tour?.difficulty}
                     </span>
@@ -118,11 +122,11 @@ export default function BookingDetailsPage() {
             </Card>
 
             {/* Booking Information Card */}
-            <Card className="booking-details-card">
-              <div className="booking-card-header">
-                <h2 className="booking-card-title">
+            <Card className={styles['booking-details-card']}>
+              <div className={styles['booking-card-header']}>
+                <h2 className={styles['booking-card-title']}>
                   <svg
-                    className="booking-card-icon"
+                    className={styles['booking-card-icon']}
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -132,27 +136,33 @@ export default function BookingDetailsPage() {
                   Booking Information
                 </h2>
               </div>
-              <div className="booking-card-content">
-                <div className="booking-info-grid">
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Booking ID</span>
-                    <span className="booking-info-value booking-info-value--monospace">
+              <div className={styles['booking-card-content']}>
+                <div className={styles['booking-info-grid']}>
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Booking ID</span>
+                    <span
+                      className={`${styles['booking-info-value']} ${styles['booking-info-value--monospace']}`}
+                    >
                       {booking._id}
                     </span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Participants</span>
-                    <span className="booking-info-value">{booking.participants || 1}</span>
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Participants</span>
+                    <span className={styles['booking-info-value']}>
+                      {booking.participants || 1}
+                    </span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Total Price</span>
-                    <span className="booking-info-value booking-info-value--price">
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Total Price</span>
+                    <span
+                      className={`${styles['booking-info-value']} ${styles['booking-info-value--price']}`}
+                    >
                       ${booking.price}
                     </span>
                   </div>
-                  <div className="booking-info-item">
-                    <span className="booking-info-label">Booked On</span>
-                    <span className="booking-info-value">
+                  <div className={styles['booking-info-item']}>
+                    <span className={styles['booking-info-label']}>Booked On</span>
+                    <span className={styles['booking-info-value']}>
                       {new Date(booking.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -168,12 +178,12 @@ export default function BookingDetailsPage() {
           </div>
 
           {/* Action Footer */}
-          <div className="booking-details-footer">
+          <div className={styles['booking-details-footer']}>
             <Button
               variant="primary"
               size="md"
               onClick={() => navigate('/my-tour-bookings')}
-              className="booking-details-footer__button"
+              className={styles['booking-details-footer__button']}
             >
               ← Back to Bookings
             </Button>

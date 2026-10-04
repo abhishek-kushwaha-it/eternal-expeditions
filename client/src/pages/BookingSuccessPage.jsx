@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { Button, Card, ErrorState, LoadingState } from '../core-components';
+import { Button, ErrorState, LoadingState } from '../core-components';
 import { useToasts } from '../store/hooks';
 import { useAuth } from '../hooks/useAuth';
 import api from '../utils/api';
-import './BookingSuccessPage.css';
+import styles from './BookingSuccessPage.module.css';
 
 /**
  * BookingSuccessPage
@@ -41,9 +41,11 @@ const formatDate = (date) =>
 const renderDetailRow = (label, value, valueClass = '', isWarning = false) => {
   if (!value) return null;
   return (
-    <div className={`detail-row${isWarning ? ' detail-row--warning' : ''}`}>
-      <span className="detail-label">{label}</span>
-      <span className={`detail-value${valueClass ? ` ${valueClass}` : ''}`}>{value}</span>
+    <div className={`${styles['detail-row']} ${isWarning ? styles['detail-row--warning'] : ''}`}>
+      <span className={styles['detail-label']}>{label}</span>
+      <span className={`${styles['detail-value']}${valueClass ? ` ${valueClass}` : ''}`}>
+        {value}
+      </span>
     </div>
   );
 };
@@ -238,52 +240,56 @@ export default function BookingSuccessPage() {
 
   return (
     <main className="main">
-      <div className="success-page">
-        <div className="success-card">
+      <div className={styles['success-page']}>
+        <div className={styles['success-card']}>
           {/* Success Header */}
-          <div className="success-header">
-            <div className="success-checkmark">✓</div>
-            <h1 className="success-title">Payment Confirmed</h1>
-            <p className="success-subtitle">Your tour booking is reserved</p>
+          <div className={styles['success-header']}>
+            <div className={styles['success-checkmark']}>✓</div>
+            <h1 className={styles['success-title']}>Payment Confirmed</h1>
+            <p className={styles['success-subtitle']}>Your tour booking is reserved</p>
           </div>
 
           {/* Booking Details */}
-          <div className="booking-details">
+          <div className={styles['booking-details']}>
             {renderDetailRow('Tour', bookingData?.tourName)}
             {renderDetailRow(
               'Amount Paid',
               bookingData?.amount
                 ? `$${typeof bookingData.amount === 'number' ? bookingData.amount.toFixed(2) : bookingData.amount}`
                 : null,
-              'detail-amount'
+              styles['detail-amount']
             )}
-            {renderDetailRow('Payment Status', bookingData?.paymentStatus, 'detail-status')}
+            {renderDetailRow('Payment Status', bookingData?.paymentStatus, styles['detail-status'])}
             {renderDetailRow('Payment Method', bookingData?.paymentMethod)}
             {renderDetailRow('Booked On', bookingData?.date)}
             {renderDetailRow('Tour Starts', bookingData?.tourStartDate)}
-            {renderDetailRow('Session ID', bookingData?.sessionId, 'detail-code')}
+            {renderDetailRow('Session ID', bookingData?.sessionId, styles['detail-code'])}
             {bookingData?.failureReason &&
               renderDetailRow('Note', bookingData.failureReason, null, true)}
           </div>
 
           {/* Action Buttons */}
-          <div className="success-actions">
+          <div className={styles['success-actions']}>
             <Button
               variant="primary"
               onClick={() => navigate('/my-tour-bookings')}
-              className="action-btn"
+              className={styles['action-btn']}
             >
               View My Bookings
             </Button>
-            <Button variant="outline" onClick={() => navigate('/tours')} className="action-btn">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/tours')}
+              className={styles['action-btn']}
+            >
               Explore More Tours
             </Button>
           </div>
 
           {/* Info Footer */}
-          <p className="success-footer">
+          <p className={styles['success-footer']}>
             A confirmation email has been sent. Questions?{' '}
-            <a href="mailto:support@eternal-expeditions.com" className="footer-link">
+            <a href="mailto:support@eternal-expeditions.com" className={styles['footer-link']}>
               Contact support
             </a>
           </p>

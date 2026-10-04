@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import './FormGroup.css';
+import styles from './FormGroup.module.css';
 
 /**
  * FormGroup Component
@@ -29,11 +29,19 @@ const FormGroup = forwardRef(
     // Render select element if type is 'select'
     if (type === 'select') {
       return (
-        <div className="form-group">
+        <div className={styles['form-group']} data-form-group>
           {label && (
-            <label htmlFor={name} className="form-group__label">
+            <label
+              htmlFor={name}
+              className={styles['form-group__label']}
+              data-form-group-label
+            >
               {label}
-              {required && <span className="form-group__required">*</span>}
+              {required && (
+                <span className={styles['form-group__required']} data-form-group-required>
+                  *
+                </span>
+              )}
             </label>
           )}
           <select
@@ -44,7 +52,8 @@ const FormGroup = forwardRef(
             onChange={onChange}
             onBlur={onBlur}
             disabled={disabled}
-            className="form-group__select"
+            className={styles['form-group__select']}
+            data-form-group-control
             {...props}
           >
             <option value="">-- Select --</option>
@@ -54,8 +63,16 @@ const FormGroup = forwardRef(
               </option>
             ))}
           </select>
-          {error && <span className="form-group__error">{error}</span>}
-          {helperText && !error && <span className="form-group__helper">{helperText}</span>}
+          {error && (
+            <span className={styles['form-group__error']} data-form-group-error>
+              {error}
+            </span>
+          )}
+          {helperText && !error && (
+            <span className={styles['form-group__helper']} data-form-group-helper>
+              {helperText}
+            </span>
+          )}
         </div>
       );
     }
@@ -63,11 +80,19 @@ const FormGroup = forwardRef(
     // Render textarea element if type is 'textarea'
     if (type === 'textarea') {
       return (
-        <div className="form-group">
+        <div className={styles['form-group']} data-form-group>
           {label && (
-            <label htmlFor={name} className="form-group__label">
+            <label
+              htmlFor={name}
+              className={styles['form-group__label']}
+              data-form-group-label
+            >
               {label}
-              {required && <span className="form-group__required">*</span>}
+              {required && (
+                <span className={styles['form-group__required']} data-form-group-required>
+                  *
+                </span>
+              )}
             </label>
           )}
           <textarea
@@ -79,22 +104,39 @@ const FormGroup = forwardRef(
             onChange={onChange}
             onBlur={onBlur}
             disabled={disabled}
-            className="form-group__textarea"
+            className={styles['form-group__textarea']}
+            data-form-group-control
             {...props}
           />
-          {error && <span className="form-group__error">{error}</span>}
-          {helperText && !error && <span className="form-group__helper">{helperText}</span>}
+          {error && (
+            <span className={styles['form-group__error']} data-form-group-error>
+              {error}
+            </span>
+          )}
+          {helperText && !error && (
+            <span className={styles['form-group__helper']} data-form-group-helper>
+              {helperText}
+            </span>
+          )}
         </div>
       );
     }
 
     // Default: render input element
     return (
-      <div className="form-group">
+      <div className={styles['form-group']} data-form-group>
         {label && (
-          <label htmlFor={name} className="form-group__label">
+          <label
+            htmlFor={name}
+            className={styles['form-group__label']}
+            data-form-group-label
+          >
             {label}
-            {required && <span className="form-group__required">*</span>}
+            {required && (
+              <span className={styles['form-group__required']} data-form-group-required>
+                *
+              </span>
+            )}
           </label>
         )}
         <input
@@ -108,11 +150,20 @@ const FormGroup = forwardRef(
           onBlur={onBlur}
           disabled={disabled}
           pattern={pattern}
-          className="form-group__input"
+          className={styles['form-group__input']}
+          data-form-group-control
           {...props}
         />
-        {error && <span className="form-group__error">{error}</span>}
-        {helperText && !error && <span className="form-group__helper">{helperText}</span>}
+        {error && (
+          <span className={styles['form-group__error']} data-form-group-error>
+            {error}
+          </span>
+        )}
+        {helperText && !error && (
+          <span className={styles['form-group__helper']} data-form-group-helper>
+            {helperText}
+          </span>
+        )}
       </div>
     );
   }

@@ -8,7 +8,7 @@ import {
   useConfirmDialog,
 } from '../core-components';
 import { IMAGE_URL } from '../utils/api';
-import './TourTable.css';
+import styles from './TourTable.module.css';
 
 // Difficulty Badge Helper
 const DifficultyBadge = ({ difficulty }) => {
@@ -27,9 +27,9 @@ const DifficultyBadge = ({ difficulty }) => {
 
   const variant = getVariant(difficulty);
   return (
-    <span className={`status-badge status-badge--${variant}`}>
-      <span className="status-badge__icon"></span>
-      <span className="status-badge__text">{difficulty}</span>
+    <span className={`${styles['status-badge']} ${styles[`status-badge--${variant}`] ?? ''}`}>
+      <span className={styles['status-badge__icon']}></span>
+      <span className={styles['status-badge__text']}>{difficulty}</span>
     </span>
   );
 };
@@ -40,19 +40,21 @@ const ImageColumn = ({ tour }) => {
 
   if (imageError || !tour.imageCover) {
     return (
-      <td className="table__cell table__cell--image">
-        <div className="tour-thumbnail tour-thumbnail--placeholder">🖼️</div>
+      <td className={`${styles['table__cell']} ${styles['table__cell--image']}`}>
+        <div className={`${styles['tour-thumbnail']} ${styles['tour-thumbnail--placeholder']}`}>
+          🖼️
+        </div>
       </td>
     );
   }
 
   return (
-    <td className="table__cell table__cell--image">
+    <td className={`${styles['table__cell']} ${styles['table__cell--image']}`}>
       <Image
         src={`${IMAGE_URL}/tours/${tour.imageCover}`}
         alt={tour.name}
         onError={() => setImageError(true)}
-        className="tour-thumbnail"
+        className={styles['tour-thumbnail']}
       />
     </td>
   );
@@ -60,42 +62,42 @@ const ImageColumn = ({ tour }) => {
 
 // Name Column with Secret Badge
 const NameColumn = ({ tour }) => (
-  <td className="table__cell table__cell--name">
-    <div className="tour-name-cell">
-      <span className="tour-name-cell__name">{tour.name}</span>
-      {tour.secretTour && <span className="tour-name-cell__badge">🔒 Secret</span>}
+  <td className={`${styles['table__cell']} ${styles['table__cell--name']}`}>
+    <div className={styles['tour-name-cell']}>
+      <span className={styles['tour-name-cell__name']}>{tour.name}</span>
+      {tour.secretTour && <span className={styles['tour-name-cell__badge']}>🔒 Secret</span>}
     </div>
   </td>
 );
 
 // Rating Column Component
 const RatingColumn = ({ tour }) => (
-  <td className="table__cell">
-    <div className="rating-cell">
-      <span className="rating-cell__stars">⭐</span>
-      <span className="rating-cell__value">{tour.ratingsAverage || 'N/A'}</span>
-      <span className="rating-cell__count">({tour.ratingsQuantity || 0})</span>
+  <td className={styles['table__cell']}>
+    <div className={styles['rating-cell']}>
+      <span className={styles['rating-cell__stars']}>⭐</span>
+      <span className={styles['rating-cell__value']}>{tour.ratingsAverage || 'N/A'}</span>
+      <span className={styles['rating-cell__count']}>({tour.ratingsQuantity || 0})</span>
     </div>
   </td>
 );
 
 // Guides Column Component
 const GuidesColumn = ({ tour }) => (
-  <td className="table__cell table__cell--center">
-    <div className="guides-cell">
+  <td className={`${styles['table__cell']} ${styles['table__cell--center']}`}>
+    <div className={styles['guides-cell']}>
       {tour.guides && tour.guides.length > 0 ? (
-        <div className="guides-avatars">
+        <div className={styles['guides-avatars']}>
           {tour.guides.slice(0, 2).map((guide, idx) => (
-            <div key={idx} className="guides-avatars__item" title={guide.name}>
+            <div key={idx} className={styles['guides-avatars__item']} title={guide.name}>
               {guide.name?.charAt(0) || '?'}
             </div>
           ))}
           {tour.guides.length > 2 && (
-            <div className="guides-avatars__more">+{tour.guides.length - 2}</div>
+            <div className={styles['guides-avatars__more']}>+{tour.guides.length - 2}</div>
           )}
         </div>
       ) : (
-        <span className="guides-cell__empty">None</span>
+        <span className={styles['guides-cell__empty']}>None</span>
       )}
     </div>
   </td>
@@ -103,8 +105,10 @@ const GuidesColumn = ({ tour }) => (
 
 // Actions Column Component
 const ActionsColumn = ({ tour, onEdit, isDeleting, onDeleteClick }) => (
-  <td className="table__cell table__cell--center table__cell--actions">
-    <div className="actions-group">
+  <td
+    className={`${styles['table__cell']} ${styles['table__cell--center']} ${styles['table__cell--actions']}`}
+  >
+    <div className={styles['actions-group']}>
       <Button onClick={() => onEdit(tour)} variant="primary" size="sm" title="Edit tour">
         ✎ Edit
       </Button>
@@ -124,23 +128,23 @@ const ActionsColumn = ({ tour, onEdit, isDeleting, onDeleteClick }) => (
 
 // Tour Row Component
 const TourRow = ({ tour, onEdit, isDeleting, onDeleteClick }) => (
-  <tr className="table__row">
+  <tr className={styles['table__row']}>
     <ImageColumn tour={tour} />
     <NameColumn tour={tour} />
 
-    <td className="table__cell">
-      <span className="tour-info-cell">📅 {tour.duration} days</span>
+    <td className={styles['table__cell']}>
+      <span className={styles['tour-info-cell']}>📅 {tour.duration} days</span>
     </td>
 
-    <td className="table__cell">
-      <span className="tour-info-cell">👥 {tour.maxGroupSize}</span>
+    <td className={styles['table__cell']}>
+      <span className={styles['tour-info-cell']}>👥 {tour.maxGroupSize}</span>
     </td>
 
-    <td className="table__cell">
-      <span className="price-cell__price">${tour.price}</span>
+    <td className={styles['table__cell']}>
+      <span className={styles['price-cell__price']}>${tour.price}</span>
     </td>
 
-    <td className="table__cell">
+    <td className={styles['table__cell']}>
       <DifficultyBadge difficulty={tour.difficulty} />
     </td>
 
@@ -182,7 +186,7 @@ export default function TourTable({ tours, onEdit, onDelete, isDeleting }) {
 
   if (!tours || tours.length === 0) {
     return (
-      <Card className="tour-table">
+      <Card className={styles['tour-table']}>
         <ErrorState
           title="No tours found"
           message="Create your first tour to get started!"
@@ -195,20 +199,20 @@ export default function TourTable({ tours, onEdit, onDelete, isDeleting }) {
 
   return (
     <>
-      <Card className="tour-table">
-        <div className="table-container">
-          <table className="table">
-            <thead className="table__head">
+      <Card className={styles['tour-table']}>
+        <div className={styles['table-container']}>
+          <table className={styles.table}>
+            <thead className={styles['table__head']}>
               <tr>
-                <th className="table__header table__header--image">Image</th>
-                <th className="table__header">Name</th>
-                <th className="table__header">Duration</th>
-                <th className="table__header">Group Size</th>
-                <th className="table__header">Price</th>
-                <th className="table__header">Difficulty</th>
-                <th className="table__header">Rating</th>
-                <th className="table__header table__header--center">Guides</th>
-                <th className="table__header table__header--center">Actions</th>
+                <th className={`${styles['table__header']} ${styles['table__header--image']}`}>Image</th>
+                <th className={styles['table__header']}>Name</th>
+                <th className={styles['table__header']}>Duration</th>
+                <th className={styles['table__header']}>Group Size</th>
+                <th className={styles['table__header']}>Price</th>
+                <th className={styles['table__header']}>Difficulty</th>
+                <th className={styles['table__header']}>Rating</th>
+                <th className={`${styles['table__header']} ${styles['table__header--center']}`}>Guides</th>
+                <th className={`${styles['table__header']} ${styles['table__header--center']}`}>Actions</th>
               </tr>
             </thead>
             <tbody>

@@ -16,7 +16,7 @@ import {
 } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
 import { IMAGE_URL } from '../utils/api';
-import './AccountPage.css';
+import styles from './AccountPage.module.css';
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -196,11 +196,11 @@ export default function AccountPage() {
 
   return (
     <main className="main">
-      <div className="user-view">
+      <div className={styles['user-view']}>
         {/* Sidebar Navigation */}
-        <nav className="user-view__menu">
-          <ul className="side-nav">
-            <li className="side-nav--active">
+        <nav className={styles['user-view__menu']}>
+          <ul className={styles['side-nav']}>
+            <li className={styles['side-nav--active']}>
               <Link to="/me" className="nav-link">
                 <svg>
                   <use xlinkHref="/img/icons.svg#icon-settings"></use>
@@ -219,9 +219,9 @@ export default function AccountPage() {
 
             {/* Guide/Admin Management Routes */}
             {['admin', 'guide'].includes(user.role) && (
-              <div className="admin-nav">
-                <h5 className="admin-nav__heading">Management</h5>
-                <ul className="side-nav">
+              <div className={styles['admin-nav']}>
+                <h5 className={styles['admin-nav__heading']}>Management</h5>
+                <ul className={styles['side-nav']}>
                   <li>
                     <Link to="/manage/tours" className="nav-link">
                       <svg>
@@ -260,9 +260,9 @@ export default function AccountPage() {
 
             {/* Admin Only Routes */}
             {user.role === 'admin' && (
-              <div className="admin-nav">
-                <h5 className="admin-nav__heading">Admin Only</h5>
-                <ul className="side-nav">
+              <div className={styles['admin-nav']}>
+                <h5 className={styles['admin-nav__heading']}>Admin Only</h5>
+                <ul className={styles['side-nav']}>
                   <li>
                     <Link to="/admin/users" className="nav-link">
                       <svg>
@@ -278,9 +278,9 @@ export default function AccountPage() {
         </nav>
 
         {/* Main Content */}
-        <div className="user-view__content">
+        <div className={styles['user-view__content']}>
           {/* Settings Section */}
-          <div className="user-view__form-container">
+          <div className={styles['user-view__form-container']}>
             <h2 className="heading-secondary ma-bt-md">Your account settings</h2>
 
             <form className="form form-user-data" onSubmit={handleUpdateProfile}>
@@ -307,32 +307,32 @@ export default function AccountPage() {
               />
 
               {/* Photo Upload Section */}
-              <div className="photo-upload-section">
-                <div className="photo-upload-section__photo">
+              <div className={styles['photo-upload-section']}>
+                <div className={styles['photo-upload-section__photo']}>
                   <Image
                     src={formData.photoPreview || `${IMAGE_URL}/users/${user.photo}`}
                     alt="User photo"
-                    className="photo-upload-section__image"
+                    className={styles['photo-upload-section__image']}
                   />
                 </div>
-                <div className="photo-upload-section__controls">
+                <div className={styles['photo-upload-section__controls']}>
                   <input
                     ref={photoFileInputRef}
-                    className="photo-upload-section__input"
+                    className={styles['photo-upload-section__input']}
                     type="file"
                     accept="image/*"
                     id="photo"
                     onChange={handleFileChange}
                     disabled={updateMeMutation.isPending}
                   />
-                  <label htmlFor="photo" className="photo-upload-section__label">
+                  <label htmlFor="photo" className={styles['photo-upload-section__label']}>
                     {formData.photoPreview ? '✓ Photo selected' : '📷 Choose new photo'}
                   </label>
-                  <p className="photo-upload-section__info">JPG, PNG or GIF (Max. 5MB)</p>
+                  <p className={styles['photo-upload-section__info']}>JPG, PNG or GIF (Max. 5MB)</p>
                 </div>
               </div>
 
-              <div className="form__group right">
+              <div className={`${styles['form__group']} ${styles.right}`}>
                 <Button
                   type="submit"
                   variant="primary"
@@ -348,7 +348,7 @@ export default function AccountPage() {
           <div className="line">&nbsp;</div>
 
           {/* Password Change Section */}
-          <div className="user-view__form-container">
+          <div className={styles['user-view__form-container']}>
             <h2 className="heading-secondary ma-bt-md">Password change</h2>
 
             <form className="form form-user-password" onSubmit={handleUpdatePassword}>
@@ -391,7 +391,7 @@ export default function AccountPage() {
                 disabled={updatePasswordMutation.isPending}
               />
 
-              <div className="form__group right">
+              <div className={`${styles['form__group']} ${styles.right}`}>
                 <Button
                   type="submit"
                   variant="primary"
@@ -407,9 +407,11 @@ export default function AccountPage() {
           <div className="line">&nbsp;</div>
 
           {/* Account Management Section */}
-          <div className="user-view__form-container">
-            <h2 className="heading-secondary ma-bt-md danger-zone-title">⚠️ Account Management</h2>
-            <p className="danger-zone-description">
+          <div className={styles['user-view__form-container']}>
+            <h2 className={`heading-secondary ma-bt-md ${styles['danger-zone-title']}`}>
+              ⚠️ Account Management
+            </h2>
+            <p className={styles['danger-zone-description']}>
               Deactivating your account will mark it as inactive. Your reviews and bookings will be
               preserved, but you'll be removed as a tour guide. You can contact support to
               reactivate your account.

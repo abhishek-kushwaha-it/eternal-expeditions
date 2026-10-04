@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../core-components';
-import './NotFoundPage.css';
+import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
   return (
     <main className="main">
-      <div className="not-found-container">
-        <div className="not-found-content">
-          <h1 className="not-found-title">404</h1>
-          <h2 className="not-found-heading">Page Not Found</h2>
-          <p className="not-found-message">
+      <div className={styles['not-found-container']}>
+        <div className={styles['not-found-content']}>
+          <h1 className={styles['not-found-title']}>404</h1>
+          <h2 className={styles['not-found-heading']}>Page Not Found</h2>
+          <p className={styles['not-found-message']}>
             Oops! We couldn't find the page you're looking for. It might have been moved or deleted.
           </p>
 
-          <div className="not-found-illustration">
+          <div className={styles['not-found-illustration']}>
             <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
               <circle cx="100" cy="100" r="90" fill="none" stroke="#55c57a" strokeWidth="2" />
               <path
@@ -42,7 +42,7 @@ export default function NotFoundPage() {
             </svg>
           </div>
 
-          <div className="not-found-actions">
+          <div className={styles['not-found-actions']}>
             <Button as="a" href="/" variant="primary">
               Back to Home
             </Button>
@@ -51,7 +51,7 @@ export default function NotFoundPage() {
             </Button>
           </div>
 
-          <div className="not-found-suggestions">
+          <div className={styles['not-found-suggestions']}>
             <h3>What you can do:</h3>
             <ul>
               <li>

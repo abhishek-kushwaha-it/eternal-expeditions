@@ -1,12 +1,20 @@
 import { forwardRef } from 'react';
-import './Card.css';
+import styles from './Card.module.css';
 
 const Card = forwardRef(({ children, className = '', header, footer, ...props }, ref) => {
   return (
-    <div ref={ref} className={`card ${className}`.trim()} {...props}>
-      {header && <div className="card__header">{header}</div>}
-      <div className="card__content">{children}</div>
-      {footer && <div className="card__footer">{footer}</div>}
+    <div ref={ref} className={`${styles.card} ${className}`.trim()} data-card {...props}>
+      {header && (
+        <div className={styles['card__header']} data-card-part="header">
+          {header}
+        </div>
+      )}
+      <div className={styles['card__content']}>{children}</div>
+      {footer && (
+        <div className={styles['card__footer']} data-card-part="footer">
+          {footer}
+        </div>
+      )}
     </div>
   );
 });

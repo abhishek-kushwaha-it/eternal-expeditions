@@ -4,7 +4,7 @@ import { useAllToursAdmin, useDeleteTourMutation } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
 import { Button, LoadingState } from '../core-components';
 import TourTable from '../components/TourTable';
-import './ManageTours.css';
+import styles from './ManageTours.module.css';
 
 export default function ManageTours() {
   const navigate = useNavigate();
@@ -48,12 +48,12 @@ export default function ManageTours() {
 
   return (
     <main className="main">
-      <div className="page__container manage-tours-container">
+      <div className={`page__container ${styles['manage-tours-container']}`}>
         {/* Header */}
-        <div className="manage-tours__header">
-          <div className="manage-tours__title-section">
+        <div className={styles['manage-tours__header']}>
+          <div className={styles['manage-tours__title-section']}>
             <h1 className="page__title">🏔️ Manage Tours</h1>
-            <p className="manage-tours__subtitle">
+            <p className={styles['manage-tours__subtitle']}>
               {tours.length} {tours.length === 1 ? 'tour' : 'tours'} available
             </p>
           </div>
@@ -61,7 +61,7 @@ export default function ManageTours() {
             onClick={handleCreateTour}
             variant="success"
             size="lg"
-            className="manage-tours__create-btn"
+            className={styles['manage-tours__create-btn']}
           >
             + Create New Tour
           </Button>
@@ -69,20 +69,20 @@ export default function ManageTours() {
 
         {/* Statistics Cards */}
         {tours.length > 0 && (
-          <div className="manage-tours__stats">
-            <div className="stat-card">
-              <span className="stat-card__label">Total Tours</span>
-              <span className="stat-card__value">{tours.length}</span>
+          <div className={styles['manage-tours__stats']}>
+            <div className={styles['stat-card']}>
+              <span className={styles['stat-card__label']}>Total Tours</span>
+              <span className={styles['stat-card__value']}>{tours.length}</span>
             </div>
-            <div className="stat-card">
-              <span className="stat-card__label">Avg Price</span>
-              <span className="stat-card__value">
+            <div className={styles['stat-card']}>
+              <span className={styles['stat-card__label']}>Avg Price</span>
+              <span className={styles['stat-card__value']}>
                 ${(tours.reduce((sum, t) => sum + t.price, 0) / tours.length).toFixed(2)}
               </span>
             </div>
-            <div className="stat-card">
-              <span className="stat-card__label">Avg Rating</span>
-              <span className="stat-card__value">
+            <div className={styles['stat-card']}>
+              <span className={styles['stat-card__label']}>Avg Rating</span>
+              <span className={styles['stat-card__value']}>
                 {tours.length > 0
                   ? (
                       tours.reduce((sum, t) => sum + (t.ratingsAverage || 0), 0) / tours.length
@@ -90,15 +90,17 @@ export default function ManageTours() {
                   : 'N/A'}
               </span>
             </div>
-            <div className="stat-card">
-              <span className="stat-card__label">Secret Tours</span>
-              <span className="stat-card__value">{tours.filter((t) => t.secretTour).length}</span>
+            <div className={styles['stat-card']}>
+              <span className={styles['stat-card__label']}>Secret Tours</span>
+              <span className={styles['stat-card__value']}>
+                {tours.filter((t) => t.secretTour).length}
+              </span>
             </div>
           </div>
         )}
 
         {/* Tour Table */}
-        <div className="manage-tours__table-section">
+        <div className={styles['manage-tours__table-section']}>
           <TourTable
             tours={tours}
             onEdit={handleEditTour}

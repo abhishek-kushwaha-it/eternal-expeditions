@@ -10,7 +10,7 @@ import {
   useConfirmDialog,
 } from '../core-components';
 import { IMAGE_URL } from '../utils/api';
-import './ManageUsers.css';
+import styles from './ManageUsers.module.css';
 
 const USER_ROLES = ['user', 'admin', 'guide'];
 
@@ -31,9 +31,9 @@ const RoleBadge = ({ role }) => {
 
   const variant = getVariant(role);
   return (
-    <span className={`status-badge status-badge--${variant}`}>
-      <span className="status-badge__icon"></span>
-      <span className="status-badge__text">{role}</span>
+    <span className={`${styles['status-badge']} ${styles[`status-badge--${variant}`]}`}>
+      <span className={styles['status-badge__icon']}></span>
+      <span className={styles['status-badge__text']}>{role}</span>
     </span>
   );
 };
@@ -42,9 +42,9 @@ const ActiveBadge = ({ isActive }) => {
   const variant = isActive ? 'success' : 'warning';
   const text = isActive ? 'Active' : 'Inactive';
   return (
-    <span className={`status-badge status-badge--${variant}`}>
-      <span className="status-badge__icon"></span>
-      <span className="status-badge__text">{text}</span>
+    <span className={`${styles['status-badge']} ${styles[`status-badge--${variant}`]}`}>
+      <span className={styles['status-badge__icon']}></span>
+      <span className={styles['status-badge__text']}>{text}</span>
     </span>
   );
 };
@@ -136,19 +136,19 @@ export default function ManageUsers() {
   return (
     <main className="main">
       <div className="page__container">
-        <div className="manage-users__header">
+        <div className={styles['manage-users__header']}>
           <h2 className="page__title">👥 Manage Users ({users.length})</h2>
-          <p className="manage-users__info">Users are created through the sign-up process</p>
+          <p className={styles['manage-users__info']}>Users are created through the sign-up process</p>
         </div>
 
-        <div className="manage-users__filters">
-          <div className="filters__grid">
-            <div className="form__group">
-              <label className="form__label">Filter by Role</label>
+        <div className={styles['manage-users__filters']}>
+          <div className={styles['filters__grid']}>
+            <div className={styles['form__group']}>
+              <label className={styles['form__label']}>Filter by Role</label>
               <select
                 value={filterRole}
                 onChange={(e) => setFilterRole(e.target.value)}
-                className="form__select"
+                className={styles['form__select']}
               >
                 <option value="all">All Roles</option>
                 {USER_ROLES.map((role) => (
@@ -159,34 +159,36 @@ export default function ManageUsers() {
               </select>
             </div>
 
-            <div className="form__group">
-              <label className="form__label">Search by Name</label>
+            <div className={styles['form__group']}>
+              <label className={styles['form__label']}>Search by Name</label>
               <input
                 type="text"
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
                 placeholder="User name..."
-                className="form__input"
+                className={styles['form__input']}
               />
             </div>
           </div>
         </div>
 
         {filteredUsers.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state__text">No users match your filters</p>
+          <div className={styles['empty-state']}>
+            <p className={styles['empty-state__text']}>No users match your filters</p>
           </div>
         ) : (
-          <div className="table-container">
-            <table className="table">
-              <thead className="table__head">
+          <div className={styles['table-container']}>
+            <table className={styles.table}>
+              <thead className={styles['table__head']}>
                 <tr>
-                  <th className="table__header">Photo</th>
-                  <th className="table__header">Name</th>
-                  <th className="table__header">Email</th>
-                  <th className="table__header">Role</th>
-                  <th className="table__header">Status</th>
-                  <th className="table__header table__header--center">Actions</th>
+                  <th className={styles['table__header']}>Photo</th>
+                  <th className={styles['table__header']}>Name</th>
+                  <th className={styles['table__header']}>Email</th>
+                  <th className={styles['table__header']}>Role</th>
+                  <th className={styles['table__header']}>Status</th>
+                  <th className={`${styles['table__header']} ${styles['table__header--center']}`}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -194,23 +196,25 @@ export default function ManageUsers() {
                   const isEditing = editingId === user._id;
 
                   return (
-                    <tr key={user._id} className="table__row">
-                      <td className="table__cell">
+                    <tr key={user._id} className={styles['table__row']}>
+                      <td className={styles['table__cell']}>
                         <Image
                           src={`${IMAGE_URL}/users/${user.photo}`}
                           alt={user.name}
                           loading="lazy"
-                          className="user-avatar"
+                          className={styles['user-avatar']}
                         />
                       </td>
-                      <td className="table__cell table__cell--name">{user.name}</td>
-                      <td className="table__cell">{user.email}</td>
-                      <td className="table__cell">
+                      <td className={`${styles['table__cell']} ${styles['table__cell--name']}`}>
+                        {user.name}
+                      </td>
+                      <td className={styles['table__cell']}>{user.email}</td>
+                      <td className={styles['table__cell']}>
                         {isEditing ? (
                           <select
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value)}
-                            className="role-select"
+                            className={styles['role-select']}
                           >
                             {USER_ROLES.map((role) => (
                               <option key={role} value={role}>
@@ -222,11 +226,13 @@ export default function ManageUsers() {
                           <RoleBadge role={user.role} />
                         )}
                       </td>
-                      <td className="table__cell">
+                      <td className={styles['table__cell']}>
                         <ActiveBadge isActive={user.active !== false} />
                       </td>
-                      <td className="table__cell table__cell--center table__cell--actions">
-                        <div className="actions-group">
+                      <td
+                        className={`${styles['table__cell']} ${styles['table__cell--center']} ${styles['table__cell--actions']}`}
+                      >
+                        <div className={styles['actions-group']}>
                           {isEditing ? (
                             <>
                               <Button

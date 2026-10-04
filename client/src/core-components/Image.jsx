@@ -1,5 +1,4 @@
 import { forwardRef } from 'react';
-import './Image.css';
 
 const Image = forwardRef(
   (

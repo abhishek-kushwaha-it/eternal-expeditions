@@ -4,7 +4,7 @@ import { Button, FormGroup } from '../core-components';
 import { useSignupMutation } from '../hooks/useQueries';
 import { useAuth } from '../hooks/useAuth';
 import { useToasts } from '../store/hooks';
-import './SignUpPage.css';
+import styles from './AuthPages.module.css';
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -92,14 +92,14 @@ export default function SignUpPage() {
 
   return (
     <main className="main">
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
+      <div className={styles['auth-container']}>
+        <div className={styles['auth-card']}>
+          <div className={styles['auth-header']}>
             <h1 className="heading-primary">Create Account</h1>
-            <p className="auth-subtitle">Join thousands of adventurers</p>
+            <p className={styles['auth-subtitle']}>Join thousands of adventurers</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className={styles['auth-form']} onSubmit={handleSubmit}>
             <FormGroup
               type="text"
               name="name"
@@ -124,7 +124,7 @@ export default function SignUpPage() {
               required
             />
 
-            <div className="auth-form-row">
+            <div className={styles['auth-form-row']}>
               <FormGroup
                 type="password"
                 name="password"
@@ -150,15 +150,15 @@ export default function SignUpPage() {
               />
             </div>
 
-            <div className="auth-checkbox">
+            <div className={styles['auth-checkbox']}>
               <input type="checkbox" id="terms" required disabled={signupMutation.isPending} />
-              <label htmlFor="terms" className="auth-checkbox-label">
+              <label htmlFor="terms" className={styles['auth-checkbox-label']}>
                 I agree to the{' '}
-                <Link to="#" className="auth-checkbox-link">
+                <Link to="#" className={styles['auth-checkbox-link']}>
                   Terms & Conditions
                 </Link>{' '}
                 and{' '}
-                <Link to="#" className="auth-checkbox-link">
+                <Link to="#" className={styles['auth-checkbox-link']}>
                   Privacy Policy
                 </Link>
               </label>
@@ -176,9 +176,9 @@ export default function SignUpPage() {
             </Button>
           </form>
 
-          <div className="auth-footer">
+          <div className={styles['auth-footer']}>
             Already have an account?{' '}
-            <Link to="/login" className="auth-footer-link">
+            <Link to="/login" className={styles['auth-footer-link']}>
               Log in here
             </Link>
           </div>

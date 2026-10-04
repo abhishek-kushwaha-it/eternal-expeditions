@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Button } from '../core-components';
-import './ErrorBoundary.css';
+import styles from './ErrorBoundary.module.css';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -23,12 +23,12 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <main className="main error-boundary">
-          <div className="error-boundary__icon" aria-label="Error icon">
+        <main className={`main ${styles['error-boundary']}`}>
+          <div className={styles['error-boundary__icon']} aria-label="Error icon">
             ⚠️
           </div>
-          <h1 className="error-boundary__title">Something Went Wrong</h1>
-          <p className="error-boundary__message">
+          <h1 className={styles['error-boundary__title']}>Something Went Wrong</h1>
+          <p className={styles['error-boundary__message']}>
             {this.state.error?.message || 'An unexpected error occurred. Please try again.'}
           </p>
           <Button variant="primary" onClick={this.resetError} aria-label="Try again button">

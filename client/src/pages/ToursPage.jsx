@@ -4,7 +4,7 @@ import FilterPanel from '../components/FilterPanel';
 import { LoadingState, ErrorState, Button } from '../core-components';
 import { useTours, useToursWithin, useDistances } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
-import './ToursPage.css';
+import styles from './ToursPage.module.css';
 
 export default function ToursPage() {
   const { data: tours = [], isLoading, error } = useTours();
@@ -212,18 +212,19 @@ export default function ToursPage() {
 
   return (
     <main className="main">
-      <div className="tours-page">
-        <div className="tours-page__header">
+      <div className={styles['tours-page']}>
+        <div className={styles['tours-page__header']}>
           {/* LEFT SECTION - TITLE & SUBTITLE & FILTER */}
-          <div className="header__left">
-            <h1 className="tours-page__title">🌍 Explore All Tours</h1>
-            <p className="tours-page__subtitle">
+          <div className={styles['header__left']}>
+            <h1 className={styles['tours-page__title']}>🌍 Explore All Tours</h1>
+            <p className={styles['tours-page__subtitle']}>
               Discover our complete collection of amazing adventures
             </p>
 
             {/* FILTER PANEL - MOVED TO LEFT */}
             {!hasLocationSearch && (
               <FilterPanel
+                className={styles['filter-panel-fill']}
                 filters={filterOptions}
                 activeFilter={activeFilter}
                 onFilterChange={setActiveFilter}
@@ -239,16 +240,16 @@ export default function ToursPage() {
           </div>
 
           {/* RIGHT SECTION - LOCATION SEARCH FORM */}
-          <div className="header__right">
-            <h2 className="header__location-title">📍 Search via Location</h2>
+          <div className={styles['header__right']}>
+            <h2 className={styles['header__location-title']}>📍 Search via Location</h2>
 
             {/* SEARCH MODE TABS + ACTION BUTTONS */}
-            <div className="header__search-controls">
+            <div className={styles['header__search-controls']}>
               <Button
                 variant={searchMode === 'distances' ? 'primary' : 'outline'}
                 size="xs"
                 onClick={() => setSearchMode('distances')}
-                className="search-mode-tab"
+                className={styles['search-mode-tab']}
               >
                 📏 Distance
               </Button>
@@ -256,7 +257,7 @@ export default function ToursPage() {
                 variant={searchMode === 'within' ? 'primary' : 'outline'}
                 size="xs"
                 onClick={() => setSearchMode('within')}
-                className="search-mode-tab"
+                className={styles['search-mode-tab']}
               >
                 🎯 Radius
               </Button>
@@ -266,7 +267,7 @@ export default function ToursPage() {
                 variant="primary"
                 size="xs"
                 onClick={handleGetCurrentLocation}
-                className="action-btn"
+                className={styles['action-btn']}
               >
                 Fetch current location
               </Button>
@@ -276,7 +277,7 @@ export default function ToursPage() {
                 size="xs"
                 onClick={handleLocationSearch}
                 disabled={isSearchingLocation || isLoadingDistances}
-                className="action-btn"
+                className={styles['action-btn']}
               >
                 {isSearchingLocation || isLoadingDistances
                   ? 'Searching...'
@@ -289,12 +290,12 @@ export default function ToursPage() {
             {/* LOCATION SEARCH FORM */}
             <form
               onSubmit={handleLocationSearch}
-              className="tours-page__location-form location-search-form"
+              className={`${styles['tours-page__location-form']} ${styles['location-search-form']}`}
             >
-              <div className="location-form-grid">
+              <div className={styles['location-form-grid']}>
                 {searchMode === 'within' && (
-                  <div className="form-group">
-                    <label className="form-label">
+                  <div className={styles['form-group']}>
+                    <label className={styles['form-label']}>
                       Search Radius ({unit === 'mi' ? 'Miles' : 'Kilometers'})
                     </label>
                     <input
@@ -304,48 +305,48 @@ export default function ToursPage() {
                       min="1"
                       max="1000"
                       placeholder="e.g., 10"
-                      className="form-input"
+                      className={styles['form-input']}
                     />
-                    <small className="form-helper">How far to search from your location</small>
+                    <small className={styles['form-helper']}>How far to search from your location</small>
                   </div>
                 )}
 
-                <div className="form-group">
-                  <label className="form-label">Distance Unit</label>
+                <div className={styles['form-group']}>
+                  <label className={styles['form-label']}>Distance Unit</label>
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="form-input"
+                    className={styles['form-input']}
                   >
                     <option value="mi">Miles (mi)</option>
                     <option value="km">Kilometers (km)</option>
                   </select>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Latitude</label>
+                <div className={styles['form-group']}>
+                  <label className={styles['form-label']}>Latitude</label>
                   <input
                     type="number"
                     value={latitude}
                     onChange={(e) => setLatitude(e.target.value)}
                     placeholder="e.g., 40.7128 (New York)"
                     step="0.0001"
-                    className="form-input"
+                    className={styles['form-input']}
                   />
-                  <small className="form-helper">Vertical position (-90 to 90)</small>
+                  <small className={styles['form-helper']}>Vertical position (-90 to 90)</small>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Longitude</label>
+                <div className={styles['form-group']}>
+                  <label className={styles['form-label']}>Longitude</label>
                   <input
                     type="number"
                     value={longitude}
                     onChange={(e) => setLongitude(e.target.value)}
                     placeholder="e.g., -74.0060 (New York)"
                     step="0.0001"
-                    className="form-input"
+                    className={styles['form-input']}
                   />
-                  <small className="form-helper">Horizontal position (-180 to 180)</small>
+                  <small className={styles['form-helper']}>Horizontal position (-180 to 180)</small>
                 </div>
               </div>
             </form>
@@ -353,7 +354,7 @@ export default function ToursPage() {
         </div>
 
         {/* RESULTS SECTION */}
-        <div className="tours-page__content">
+        <div>
           {isLoadingResults ? (
             <LoadingState
               message={
@@ -367,9 +368,9 @@ export default function ToursPage() {
             />
           ) : filteredAndSortedTours.length > 0 ? (
             <>
-              <div className="card-container">
+              <div className={styles['card-container']}>
                 {filteredAndSortedTours.map((tour) => (
-                  <div key={tour._id || tour.id} className="tour-card-wrapper">
+                  <div key={tour._id || tour.id}>
                     <TourCard
                       tour={tour}
                       distance={
@@ -380,7 +381,7 @@ export default function ToursPage() {
                   </div>
                 ))}
               </div>
-              <p className="tours-page__count">
+              <p className={styles['tours-page__count']}>
                 {hasLocationSearch && searchMode === 'within'
                   ? `Found ${filteredAndSortedTours.length} tour(s) within ${distance} ${unit === 'mi' ? 'miles' : 'km'}`
                   : hasLocationSearch && searchMode === 'distances'
@@ -389,8 +390,8 @@ export default function ToursPage() {
               </p>
             </>
           ) : (
-            <div className="empty-state">
-              <p className="empty-state-text">
+            <div className={styles['empty-state']}>
+              <p className={styles['empty-state-text']}>
                 {hasLocationSearch
                   ? searchMode === 'within'
                     ? `No tours found within ${distance} ${unit === 'mi' ? 'miles' : 'km'}. Try increasing the search radius.`

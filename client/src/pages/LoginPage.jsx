@@ -4,7 +4,7 @@ import { Button, FormGroup } from '../core-components';
 import { useLoginMutation } from '../hooks/useQueries';
 import { useAuth } from '../hooks/useAuth';
 import { useToasts } from '../store/hooks';
-import './LoginPage.css';
+import styles from './AuthPages.module.css';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -54,15 +54,15 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="main">
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
+    <main className={`main ${styles['login-page-root']}`}>
+      <div className={styles['auth-container']}>
+        <div className={styles['auth-card']}>
+          <div className={styles['auth-header']}>
             <h1 className="heading-primary">Log In</h1>
-            <p className="auth-subtitle">Welcome back!</p>
+            <p className={styles['auth-subtitle']}>Welcome back!</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className={styles['auth-form']} onSubmit={handleSubmit}>
             <FormGroup
               type="email"
               name="email"
@@ -87,8 +87,8 @@ export default function LoginPage() {
               required
             />
 
-            <div className="auth-form-footer">
-              <Link to="/forgot-password" className="auth-form-footer">
+            <div className={styles['auth-form-footer']}>
+              <Link to="/forgot-password" className={styles['auth-form-footer']}>
                 Forgot password?
               </Link>
             </div>
@@ -104,9 +104,9 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="auth-footer">
+          <div className={styles['auth-footer']}>
             Don't have an account?{' '}
-            <Link to="/signup" className="auth-footer-link">
+            <Link to="/signup" className={styles['auth-footer-link']}>
               Sign up here
             </Link>
           </div>

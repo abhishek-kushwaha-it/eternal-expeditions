@@ -1,0 +1,227 @@
+.user-view {
+  background-color: #fff;
+  max-width: 120rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-3xl);
+  display: flex;
+}
+
+.user-view__menu {
+  flex: 32rem 0 0;
+  background: var(--gradient-primary);
+  padding: var(--spacing-3xl) 0;
+}
+
+.user-view__content {
+  flex: 1;
+  padding: var(--spacing-6xl) 0;
+}
+
+.user-view__form-container {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 8rem;
+}
+
+.side-nav {
+  list-style: none;
+}
+
+.side-nav li {
+  margin: 1rem 0;
+  border-left: 0 solid #fff;
+  transition: all var(--transition-base);
+}
+
+.side-nav--active,
+.side-nav li:hover {
+  border-left: 4px solid #fff !important;
+}
+
+.side-nav--active a {
+  transform: translateX(-3px);
+}
+
+.side-nav a:link,
+.side-nav a:visited {
+  padding: 1rem 4rem;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  font-weight: var(--font-weight-normal);
+  text-decoration: none;
+  transition: all var(--transition-base);
+}
+
+.side-nav a:hover,
+.side-nav a:active {
+  transform: translateX(3px);
+}
+
+.side-nav svg {
+  height: 1.9rem;
+  width: 1.9rem;
+  fill: var(--color-text-white);
+  margin-right: 2rem;
+}
+
+.admin-nav {
+  margin-top: 5.5rem;
+}
+
+.admin-nav__heading {
+  margin: 0 5rem 1.5rem 4rem;
+  padding-bottom: 3px;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: #f2f2f2;
+  border-bottom: 1px solid currentColor;
+}
+
+@media only screen and (max-width: 768px) {
+  .user-view {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .user-view__menu {
+    flex: auto;
+  }
+
+  .user-view__form-container {
+    padding: 0 2rem;
+  }
+}
+
+.photo-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  padding: 2rem 0;
+  margin: 2rem 0;
+  border-bottom: 1px solid #e8e8e8;
+  border-top: 1px solid #e8e8e8;
+}
+
+.photo-upload-section__photo {
+  flex-shrink: 0;
+  margin-left: 4rem;
+}
+
+.photo-upload-section__image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--color-primary);
+  box-shadow: 0 4px 16px rgba(85, 197, 122, 0.2);
+  display: block;
+}
+
+.photo-upload-section__controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.photo-upload-section__input {
+  display: none;
+}
+
+.photo-upload-section__label {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(85, 197, 122, 0.2);
+  max-width: 200px;
+}
+
+.photo-upload-section__label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(85, 197, 122, 0.3);
+}
+
+.photo-upload-section__label:active {
+  transform: translateY(0);
+}
+
+.photo-upload-section__info {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+  font-style: italic;
+}
+
+@media only screen and (max-width: 768px) {
+  .photo-upload-section {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .photo-upload-section__image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .photo-upload-section__label {
+    max-width: 100%;
+  }
+}
+
+.danger-zone-title {
+  color: #e74c3c;
+  margin-bottom: 0.8rem;
+}
+
+.danger-zone-description {
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.user-view__form-container:last-of-type {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-view__form-container:last-of-type button {
+  align-self: flex-end;
+  max-width: 250px;
+  padding: 12px 24px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+}
+
+.form__group.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form__group.right button {
+  min-width: 150px;
+  padding: 12px 24px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+}

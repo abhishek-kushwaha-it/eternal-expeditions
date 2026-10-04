@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Button, FormGroup, LoadingState } from '../core-components';
 import { useVerifyResetToken, useResetPasswordMutation } from '../hooks/useQueries';
 import { useToasts } from '../store/hooks';
-import './ResetPasswordPage.css';
+import styles from './AuthPages.module.css';
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
@@ -87,15 +87,15 @@ export default function ResetPasswordPage() {
   if (hasError || !tokenValid) {
     return (
       <main className="main">
-        <div className="auth-container">
-          <div className="auth-card error-card">
-            <div className="error-icon">✗</div>
-            <h2 className="error-title">Invalid Reset Link</h2>
-            <p className="error-message-content">
+        <div className={styles['auth-container']}>
+          <div className={styles['auth-card']}>
+            <div>✗</div>
+            <h2>Invalid Reset Link</h2>
+            <p>
               {verifyError?.response?.data?.message ||
                 'The password reset link is invalid or has expired. Please request a new one.'}
             </p>
-            <div className="error-actions">
+            <div>
               <Button
                 variant="primary"
                 size="md"
@@ -124,14 +124,14 @@ export default function ResetPasswordPage() {
   if (isSuccessful) {
     return (
       <main className="main">
-        <div className="auth-container">
-          <div className="auth-card success-card">
-            <div className="success-icon">✓</div>
-            <h2 className="success-title">Password Reset Successfully!</h2>
-            <p className="success-message">
+        <div className={styles['auth-container']}>
+          <div className={styles['auth-card']}>
+            <div>✓</div>
+            <h2>Password Reset Successfully!</h2>
+            <p>
               Your password has been updated. You can now log in with your new password.
             </p>
-            <div className="success-actions">
+            <div>
               <Button variant="primary" size="md" fullWidth onClick={() => navigate('/login')}>
                 Back to Login
               </Button>
@@ -145,14 +145,14 @@ export default function ResetPasswordPage() {
   // Form State - Reset password form
   return (
     <main className="main">
-      <div className="auth-container">
-        <div className="auth-card">
-          <div className="auth-header">
-            <h1 className="auth-header-title">Create New Password</h1>
-            <p className="auth-subtitle">Enter a strong password to secure your account</p>
+      <div className={styles['auth-container']}>
+        <div className={styles['auth-card']}>
+          <div className={styles['auth-header']}>
+            <h1>Create New Password</h1>
+            <p className={styles['auth-subtitle']}>Enter a strong password to secure your account</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form className={styles['auth-form']} onSubmit={handleSubmit}>
             <FormGroup
               type="password"
               name="password"
@@ -189,9 +189,9 @@ export default function ResetPasswordPage() {
             </Button>
           </form>
 
-          <div className="auth-footer">
+          <div className={styles['auth-footer']}>
             Changed your mind?{' '}
-            <Link to="/login" className="auth-footer-link">
+            <Link to="/login" className={styles['auth-footer-link']}>
               Go back to login
             </Link>
           </div>
