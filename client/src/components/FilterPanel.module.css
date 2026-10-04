@@ -16,11 +16,34 @@
   justify-content: flex-start;
 }
 
+.filter-panel__heading {
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #edf1ed;
+}
+
+.filter-panel__heading h2 {
+  margin: 0;
+  color: #26332b;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 .filter-panel__item {
   flex: 0 1 auto;
   min-width: 140px;
   max-width: 200px;
   position: relative;
+}
+
+.filter-panel__label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+  color: #56645b;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .filter-panel__input,
@@ -216,5 +239,90 @@
     font-size: 0.9rem;
     padding: 0.7rem 0.85rem;
     width: 100%;
+  }
+}
+
+.filter-panel.filter-panel--tours {
+  flex: none;
+  width: 100%;
+  padding: 1.1rem;
+  border: 1px solid #e7ece8;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(27, 47, 34, 0.09);
+  backdrop-filter: none;
+  animation: none;
+}
+
+.filter-panel--tours .filter-panel__container {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.filter-panel--tours .filter-panel__heading {
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.75rem;
+}
+
+.filter-panel--tours .filter-panel__item:first-child {
+  grid-column: 1 / -1;
+}
+
+.filter-panel--tours .filter-panel__item {
+  flex: initial;
+  min-width: 0;
+  max-width: none;
+}
+
+.filter-panel--tours .filter-panel__input,
+.filter-panel--tours .filter-panel__select {
+  min-height: 3.1rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #d8e2da;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.filter-panel--tours .filter-panel__select {
+  appearance: auto;
+}
+
+.filter-panel--tours .filter-panel__input::placeholder {
+  color: #718078;
+}
+
+.filter-panel--tours .filter-panel__input:focus,
+.filter-panel--tours .filter-panel__select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(85, 197, 122, 0.16);
+  transform: none;
+}
+
+.filter-panel--tours .filter-panel__input:hover,
+.filter-panel--tours .filter-panel__select:hover {
+  border-color: #aab9ae;
+  background: white;
+  box-shadow: none;
+}
+
+.filter-panel--tours .filter-panel__select--medium {
+  max-width: none;
+}
+
+@media (max-width: 1200px) {
+  .filter-panel.filter-panel--tours {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-panel--tours .filter-panel__container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filter-panel--tours .filter-panel__item:first-child {
+    grid-column: auto;
   }
 }

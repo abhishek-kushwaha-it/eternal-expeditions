@@ -79,7 +79,7 @@ export default function TourPage() {
   const descriptions = tour.description?.split('\n') || [];
 
   return (
-    <main className="main">
+    <main className={`main ${styles['tour-page']}`}>
       {/* SECTION HEADER */}
       <section className={styles['section-header']}>
         <div className={styles['header__hero']}>

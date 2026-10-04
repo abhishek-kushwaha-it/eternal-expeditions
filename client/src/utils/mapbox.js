@@ -11,6 +11,7 @@ export const displayMap = (mapContainer, locations) => {
     style: 'mapbox://styles/abhikush012/cmlg7uvv8006k01r3ckr5fop1',
     scrollZoom: false,
   });
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
   const bounds = new mapboxgl.LngLatBounds();
 

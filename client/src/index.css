@@ -6,17 +6,17 @@
   --color-primary: #55c57a;
   --color-primary-light: #7dd56f;
   --color-primary-dark: #28b487;
-  --color-secondary: #f7f7f7;
+  --color-secondary: #f4f7f2;
   --color-tertiary: #fff;
   --color-accent: #ff7730;
   --color-error: #eb4d4b;
-  --color-text-primary: #777;
-  --color-text-secondary: #999;
-  --color-text-light: #bbb;
+  --color-text-primary: #2f3d34;
+  --color-text-secondary: #6a786f;
+  --color-text-light: #9aa7a0;
   --color-text-white: #f7f7f7;
-  --color-border: #e0e0e0;
+  --color-border: #dfe8e1;
   --color-bg-light: #fcfcfc;
-  --color-bg-dark: #444;
+  --color-bg-dark: #1d2a24;
   --color-success: #20bf6b;
   --color-danger: #eb4d4b;
   --color-warning: #ffb400;
@@ -40,16 +40,16 @@
 
   /* Spacing */
   --spacing-xs: 0.5rem;
-  --spacing-sm: 1rem;
-  --spacing-md: 1.5rem;
-  --spacing-lg: 2rem;
-  --spacing-xl: 2.5rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-  --spacing-4xl: 5rem;
-  --spacing-5xl: 6rem;
-  --spacing-6xl: 7rem;
-  --spacing-7xl: 8rem;
+  --spacing-sm: 0.9rem;
+  --spacing-md: 1.3rem;
+  --spacing-lg: 1.8rem;
+  --spacing-xl: 2.2rem;
+  --spacing-2xl: 2.8rem;
+  --spacing-3xl: 3.6rem;
+  --spacing-4xl: 4.8rem;
+  --spacing-5xl: 5.8rem;
+  --spacing-6xl: 6.8rem;
+  --spacing-7xl: 7.8rem;
 
   /* Typography */
   --font-family: 'Lato', sans-serif;
@@ -78,17 +78,17 @@
   --line-height-relaxed: 1.8;
 
   /* Shadows */
-  --shadow-sm: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 2rem 4rem rgba(0, 0, 0, 0.25);
-  --shadow-2xl: 0 3rem 8rem 0.5rem rgba(0, 0, 0, 0.15);
-  --shadow-3xl: 0 2.5rem 8rem 2rem rgba(0, 0, 0, 0.07);
+  --shadow-sm: 0 0.6rem 1.4rem rgba(34, 52, 39, 0.08);
+  --shadow-md: 0 1.2rem 3rem rgba(23, 52, 39, 0.1);
+  --shadow-lg: 0 1.8rem 4rem rgba(20, 38, 31, 0.12);
+  --shadow-xl: 0 2rem 4rem rgba(20, 38, 31, 0.18);
+  --shadow-2xl: 0 3rem 8rem 0.5rem rgba(20, 38, 31, 0.12);
+  --shadow-3xl: 0 2.5rem 8rem 2rem rgba(20, 38, 31, 0.06);
 
   /* Border Radius */
-  --radius-sm: 3px;
-  --radius-md: 4px;
-  --radius-lg: 5px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-xl: 2rem;
   --radius-full: 50%;
   --radius-pill: 10rem;
@@ -150,9 +150,12 @@ body {
 
 .main {
   background-color: var(--color-secondary);
-  padding: 8rem 6rem;
+  padding: 4rem clamp(1.2rem, 2vw, 3rem);
   flex: 1;
   position: relative;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
 }
 
 @media only screen and (max-width: 768px) {
@@ -177,6 +180,15 @@ body {
    CUSTOM SCROLLBAR STYLING
    Beautiful scrollbar for Webkit browsers (Chrome, Safari, Edge)
    ==================================== */
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 /* Track styles */
 ::-webkit-scrollbar {
   width: 12px;

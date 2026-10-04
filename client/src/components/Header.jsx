@@ -63,6 +63,7 @@ export default function Header() {
 
       {/* CENTER SECTION: Navigation Menu */}
       <nav
+        id="primary-navigation"
         className={`${styles['header__nav']} ${mobileMenuOpen ? styles['header__nav--active'] : ''}`}
       >
         <Link to="/" className={styles['nav__link']}>
@@ -87,6 +88,8 @@ export default function Header() {
           className={styles['header__menu-toggle']}
           onClick={toggleMobileMenu}
           aria-label="Toggle mobile menu"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="primary-navigation"
         >
           <span></span>
           <span></span>
@@ -133,56 +136,6 @@ export default function Header() {
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <nav>
-          <Link
-            to="/"
-            className={styles['nav__link']}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            to="/tours"
-            className={styles['nav__link']}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Tours
-          </Link>
-          <Link
-            to="/monthly-plan"
-            className={styles['nav__link']}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Monthly Plan
-          </Link>
-          <Link
-            to="/contact"
-            className={styles['nav__link']}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Contact
-          </Link>
-          {!isAuthenticated && (
-            <>
-              <Link
-                to="/login"
-                className={styles['nav__link']}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Log in
-              </Link>
-              <Link
-                to="/signup"
-                className={styles['nav__link']}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sign up
-              </Link>
-            </>
-          )}
-        </nav>
-      )}
     </header>
   );
 }
