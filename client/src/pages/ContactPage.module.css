@@ -11,7 +11,7 @@
   align-items: start;
   justify-content: center;
   width: 100%;
-  max-width: 1400px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
 }
 
@@ -47,7 +47,7 @@
   display: flex;
   gap: 1rem;
   padding: 1rem 1.2rem;
-  margin: 1.4rem 20rem 0 1.2rem;
+  margin: 0;
   background: rgba(255, 255, 255, 0.7);
   border-left: 3px solid #55c57a;
   border-radius: 8px;
@@ -192,9 +192,11 @@
 .social-item {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   padding: 0.6rem 1.2rem;
+  width: 100%;
+  min-height: 4.4rem;
   background: linear-gradient(135deg, #55c57a, #28b487);
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -202,6 +204,15 @@
   box-shadow: 0 2px 8px rgba(85, 197, 122, 0.2);
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.social-item a {
+  min-width: 0;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .social-item:hover {
@@ -270,7 +281,7 @@
   }
 
   .social-item {
-    width: 44px;
-    height: 44px;
+    width: 100%;
+    min-height: 4.4rem;
   }
 }

@@ -14,13 +14,20 @@ export const displayMap = (mapContainer, locations) => {
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
   const bounds = new mapboxgl.LngLatBounds();
+  const compactMap = mapContainer.clientWidth <= 768;
+  let activePopup = null;
 
   locations.forEach((loc) => {
-    // Create marker
     const el = document.createElement('div');
     el.className = 'marker';
+    const popup = new mapboxgl.Popup({
+      offset: [0, -35],
+      closeButton: true,
+      closeOnClick: !compactMap,
+    })
+      .setLngLat(loc.coordinates)
+      .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`);
 
-    // Add marker
     new mapboxgl.Marker({
       element: el,
       anchor: 'bottom',
@@ -28,26 +35,39 @@ export const displayMap = (mapContainer, locations) => {
       .setLngLat(loc.coordinates)
       .addTo(map);
 
-    // Add popup
-    new mapboxgl.Popup({
-      offset: [0, -35],
-      closeButton: true,
-      closeOnClick: false,
-    })
-      .setLngLat(loc.coordinates)
-      .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`)
-      .addTo(map);
+    if (compactMap) {
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.setAttribute('aria-label', `Show details for day ${loc.day}: ${loc.description}`);
 
-    // Extend map bounds to include current location
+      const openPopup = () => {
+        activePopup?.remove();
+        activePopup = popup.addTo(map);
+      };
+
+      el.addEventListener('click', openPopup);
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openPopup();
+        }
+      });
+    } else {
+      popup.addTo(map);
+    }
+
     bounds.extend(loc.coordinates);
   });
 
+  const verticalPadding = Math.min(150, Math.floor(mapContainer.clientHeight * 0.15));
+  const horizontalPadding = Math.min(100, Math.floor(mapContainer.clientWidth * 0.1));
+
   map.fitBounds(bounds, {
     padding: {
-      top: 200,
-      bottom: 150,
-      left: 100,
-      right: 100,
+      top: verticalPadding,
+      bottom: verticalPadding,
+      left: horizontalPadding,
+      right: horizontalPadding,
     },
     duration: 1200,
   });

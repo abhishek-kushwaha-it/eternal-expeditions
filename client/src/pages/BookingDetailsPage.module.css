@@ -17,7 +17,7 @@
 }
 
 .booking-details-container {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
 }
 

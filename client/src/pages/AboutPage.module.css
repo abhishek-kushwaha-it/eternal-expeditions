@@ -5,7 +5,7 @@
 }
 
 .about-hero {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto var(--spacing-3xl);
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   border-radius: var(--radius-lg);
@@ -36,7 +36,7 @@
 }
 
 .about-section {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto var(--spacing-3xl);
   animation: slideUp 0.6s ease-out both;
 }
@@ -59,7 +59,7 @@
 }
 
 .about-stats {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto var(--spacing-3xl);
   animation: slideUp 0.6s ease-out 0.2s both;
 }
@@ -182,13 +182,13 @@
 }
 
 .about-cta {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
   animation: slideUp 0.6s ease-out 0.4s both;
 }
 
 .cta-content {
-  max-width: 1200px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   border-radius: var(--radius-lg);

@@ -111,7 +111,7 @@
 }
 
 .card-container {
-  max-width: 1400px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));

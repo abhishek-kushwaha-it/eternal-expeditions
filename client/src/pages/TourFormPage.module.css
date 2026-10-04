@@ -11,7 +11,7 @@
 }
 
 .form-page-header__content {
-  max-width: 1600px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .form-page-content {
-  max-width: 1600px;
+  max-width: var(--page-content-max);
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
   margin-bottom: var(--spacing-3xl);
