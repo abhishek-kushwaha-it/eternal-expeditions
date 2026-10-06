@@ -60,12 +60,11 @@ const ImageColumn = ({ tour }) => {
   );
 };
 
-// Name Column with Secret Badge
+// Name Column
 const NameColumn = ({ tour }) => (
   <td className={`${styles['table__cell']} ${styles['table__cell--name']}`}>
     <div className={styles['tour-name-cell']}>
       <span className={styles['tour-name-cell__name']}>{tour.name}</span>
-      {tour.secretTour && <span className={styles['tour-name-cell__badge']}>🔒 Secret</span>}
     </div>
   </td>
 );

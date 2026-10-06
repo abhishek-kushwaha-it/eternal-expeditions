@@ -112,7 +112,7 @@ export default function ToursPage() {
       return;
     }
 
-    if (lat < -180 || lng > 180) {
+    if (lng < -180 || lng > 180) {
       addToast('Longitude must be between -180 and 180', 'error');
       return;
     }
@@ -167,9 +167,9 @@ export default function ToursPage() {
         case 'price-desc':
           return b.price - a.price;
         case 'duration-asc':
-          return a.durationDays - b.durationDays;
+          return a.duration - b.duration;
         case 'duration-desc':
-          return b.durationDays - a.durationDays;
+          return b.duration - a.duration;
         case 'rating-asc':
           return (a.ratingsAverage || 0) - (b.ratingsAverage || 0);
         case 'rating-desc':

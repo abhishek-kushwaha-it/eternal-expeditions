@@ -39,8 +39,8 @@ export default function TourStatsPage() {
   const totalTours = stats.reduce((sum, item) => sum + item.numTours, 0);
   const totalRatings = stats.reduce((sum, item) => sum + item.numRatings, 0);
   const overallAvgRating =
-    stats.length > 0
-      ? (stats.reduce((sum, item) => sum + item.avgRating * item.numTours, 0) / totalTours).toFixed(
+    totalRatings > 0
+      ? (stats.reduce((sum, item) => sum + item.avgRating * item.numRatings, 0) / totalRatings).toFixed(
           1
         )
       : '0.0';

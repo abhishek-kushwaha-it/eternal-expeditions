@@ -90,12 +90,6 @@ export default function ManageTours() {
                   : 'N/A'}
               </span>
             </div>
-            <div className={styles['stat-card']}>
-              <span className={styles['stat-card__label']}>Secret Tours</span>
-              <span className={styles['stat-card__value']}>
-                {tours.filter((t) => t.secretTour).length}
-              </span>
-            </div>
           </div>
         )}
 

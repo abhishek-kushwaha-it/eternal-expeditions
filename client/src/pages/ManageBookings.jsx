@@ -386,7 +386,7 @@ export default function ManageBookings() {
 
                   <option value="succeeded">Succeeded</option>
                   <option value="failed">Failed</option>
-                  <option value="canceled">Canceled</option>
+                  <option value="cancelled">Canceled</option>
                 </select>
               </div>
 

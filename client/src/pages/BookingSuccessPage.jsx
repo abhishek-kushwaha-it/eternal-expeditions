@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { Button, ErrorState, LoadingState } from '../core-components';
@@ -22,9 +22,11 @@ const handlePaymentStatus = (paymentStatus, failureReason, setStatus, addToast) 
   } else if (paymentStatus === 'failed') {
     setStatus('error');
     addToast(`❌ Payment failed: ${failureReason || 'Please try again'}`, 'error');
+  } else if (paymentStatus === 'cancelled') {
+    setStatus('cancelled');
+    addToast('Payment was cancelled.', 'warning');
   } else {
-    setStatus('success');
-    addToast('Payment received! Your booking is being processed.', 'success');
+    setStatus('pending');
   }
 };
 
@@ -57,7 +59,7 @@ export default function BookingSuccessPage() {
   const { user } = useAuth();
   const [status, setStatus] = useState('loading');
   const [bookingData, setBookingData] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
 
   const sessionId = searchParams.get('session_id');
   const isCancelled = searchParams.get('cancelled') === 'true';
@@ -66,6 +68,15 @@ export default function BookingSuccessPage() {
   useEffect(() => {
     let isMounted = true;
     let hasRun = false;
+    let pollTimer = null;
+    let pollAttempts = 0;
+
+    const stopPolling = () => {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    };
 
     const setupPaymentState = () => {
       if (!isMounted || hasRun) return;
@@ -99,6 +110,10 @@ export default function BookingSuccessPage() {
         if (booking) {
           // Booking found - update display and handle status
           updateBookingDisplay(booking);
+          if (booking.paymentStatus === 'pending') {
+            setupWebsocket();
+            startPolling();
+          }
         } else if (isDev) {
           // Dev mode: booking should exist
           setStatus('error');
@@ -113,6 +128,7 @@ export default function BookingSuccessPage() {
           setStatus('pending');
           addToast('Payment received! Your booking is being processed via webhook.', 'info');
           setupWebsocket();
+          startPolling();
         }
       } catch (err) {
         if (!isMounted) return;
@@ -146,6 +162,7 @@ export default function BookingSuccessPage() {
       }
 
       const newSocket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000', {
+        withCredentials: true,
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
@@ -153,8 +170,7 @@ export default function BookingSuccessPage() {
       });
 
       newSocket.on('connect', () => {
-        console.log('[WebSocket] Connected (production mode), registering user:', user._id);
-        newSocket.emit('registerUser', user._id);
+        console.log('[WebSocket] Connected (production mode)');
       });
 
       // Listen for booking status changes
@@ -170,6 +186,7 @@ export default function BookingSuccessPage() {
 
           // Reuse payment status handler for consistency
           handlePaymentStatus(data.paymentStatus, data.failureReason, setStatus, addToast);
+          if (data.paymentStatus !== 'pending') stopPolling();
         }
       });
 
@@ -181,17 +198,45 @@ export default function BookingSuccessPage() {
         console.error('[WebSocket] Error:', error);
       });
 
-      setSocket(newSocket);
+      socketRef.current = newSocket;
       return newSocket;
+    };
+
+    const startPolling = () => {
+      if (pollTimer) return;
+
+      pollAttempts = 0;
+      pollTimer = setInterval(async () => {
+        pollAttempts += 1;
+
+        try {
+          const response = await api.get('/bookings/my-bookings');
+          const bookings = response.data.data.bookings;
+          const booking = bookings.find((item) => item.sessionId === sessionId);
+
+          if (booking && booking.paymentStatus !== 'pending') {
+            stopPolling();
+            updateBookingDisplay(booking);
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking payment status:', error);
+        }
+
+        if (pollAttempts >= 24) {
+          stopPolling();
+          if (isMounted) setStatus('verification-timeout');
+        }
+      }, 5000);
     };
 
     setupPaymentState();
 
     return () => {
       isMounted = false;
-      if (socket) {
-        socket.disconnect();
-      }
+      stopPolling();
+      socketRef.current?.disconnect();
+      socketRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, isCancelled, user?._id]);
@@ -207,6 +252,20 @@ export default function BookingSuccessPage() {
         minHeight="100vh"
         showSpinner
       />
+    );
+  }
+
+  if (status === 'verification-timeout') {
+    return (
+      <main className="main">
+        <ErrorState
+          title="Payment Is Still Processing"
+          message="We could not verify the booking yet. Check your bookings for the latest status."
+          emoji="⏳"
+          actionLabel="View My Bookings"
+          onAction={() => navigate('/my-tour-bookings')}
+        />
+      </main>
     );
   }
 

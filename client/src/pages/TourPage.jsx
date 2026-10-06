@@ -20,9 +20,10 @@ export default function TourPage() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   useEffect(() => {
-    if (tour && mapContainer.current) {
-      displayMap(mapContainer.current, tour.locations);
-    }
+    if (!tour || !mapContainer.current) return undefined;
+
+    const map = displayMap(mapContainer.current, tour.locations);
+    return () => map?.remove();
   }, [tour]);
 
   const handleBookTour = () => {
@@ -106,7 +107,9 @@ export default function TourPage() {
               <svg className={styles['heading-box__icon']}>
                 <use xlinkHref="/img/icons.svg#icon-map-pin"></use>
               </svg>
-              <span className={styles['heading-box__text']}>{tour.startLocation.description}</span>
+              <span className={styles['heading-box__text']}>
+                {tour.startLocation?.description || 'Location to be announced'}
+              </span>
             </div>
           </div>
         </div>

@@ -64,7 +64,6 @@ server/
 │   ├── fileUtils.js
 │   ├── objectUtils.js
 │   ├── socket.js
-│   ├── stripeSetup.js
 │   └── uploadUtils.js
 │
 ├── public/                   # Static files served by Express

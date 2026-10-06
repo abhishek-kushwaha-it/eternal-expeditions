@@ -109,10 +109,25 @@ exports.restrictTo =
   };
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
+  if (!config.emailEnabled) {
+    return next(
+      new AppError(
+        'Password reset email delivery is currently unavailable.',
+        503
+      )
+    );
+  }
+
+  const genericResponse = {
+    status: 'success',
+    message:
+      'If an account exists for that email, reset instructions will be sent.',
+  };
+
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError('There is no user with email address.', 404));
+    return res.status(200).json(genericResponse);
   }
 
   // 2) Generate the random reset token
@@ -124,19 +139,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     const resetURL = `${config.frontendUrl}/reset-password/${resetToken}`;
     await new Email(user, resetURL).sendPasswordReset();
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Token sent to email!',
-    });
+    res.status(200).json(genericResponse);
   } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
-    return next(
-      new AppError('There was an error sending the email. Try again later!'),
-      500
-    );
+    console.error('Password reset email delivery failed:', err.message);
+    return res.status(200).json(genericResponse);
   }
 });
 

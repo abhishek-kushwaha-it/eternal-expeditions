@@ -19,10 +19,13 @@ exports.validateBooking = catchAsync(async (req, res, next) => {
   const booking = await Booking.findOne({
     user: req.user.id,
     tour: tourId,
+    paymentStatus: 'succeeded',
   });
 
   if (!booking) {
-    return next(new AppError('You can only review tours you have booked', 403));
+    return next(
+      new AppError('You can only review tours with a successful payment', 403)
+    );
   }
 
   next();
@@ -67,5 +70,29 @@ exports.getMyReviews = catchAsync(async (req, res, next) => {
 });
 
 exports.createReview = factory.createOne(Review);
-exports.updateReview = factory.updateOne(Review);
+
+exports.updateReview = catchAsync(async (req, res, next) => {
+  const updateData = {};
+  if (req.body.rating !== undefined) updateData.rating = req.body.rating;
+  if (req.body.review !== undefined) updateData.review = req.body.review;
+
+  if (Object.keys(updateData).length === 0) {
+    return next(new AppError('No review fields were provided.', 400));
+  }
+
+  const review = await Review.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!review) {
+    return next(new AppError('Review not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { data: review },
+  });
+});
+
 exports.deleteReview = factory.deleteOne(Review);

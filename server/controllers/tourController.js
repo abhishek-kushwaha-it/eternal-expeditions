@@ -1,6 +1,7 @@
 const sharp = require('sharp');
 const path = require('path');
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const Tour = require('../models/tourModel');
 const Review = require('../models/reviewModel');
@@ -12,6 +13,7 @@ const AppError = require('../utils/appError');
 const config = require('../utils/config');
 const { createImageUploader } = require('../utils/uploadUtils');
 const { safeUnlink, deleteFiles } = require('../utils/fileUtils');
+const { filterObject } = require('../utils/objectUtils');
 
 const upload = createImageUploader({
   allowedTypes: config.allowedImageTypes.split(','),
@@ -63,22 +65,42 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
       .resize(2000, 1333)
       .toFormat('jpeg')
       .jpeg({ quality: 90 })
-      .toFile(`public/img/tours/${req.body.imageCover}`);
+      .toFile(path.join(__dirname, '../public/img/tours', req.body.imageCover));
   }
 
   // 2) Images
-  if (req.files.images || req.body.imagesToKeep) {
-    // Case 1: New images uploaded - delete old, add new
+  if (req.files.images || req.body.imagesToKeep !== undefined) {
     if (req.files.images) {
-      // Delete old additional images if updating
-      if (oldTour && oldTour.images && Array.isArray(oldTour.images)) {
-        const oldImagePaths = oldTour.images.map((imageName) =>
-          path.join(__dirname, '../public/img/tours', imageName)
-        );
-        await deleteFiles(oldImagePaths);
+      const oldImageNames = Array.isArray(oldTour?.images)
+        ? oldTour.images
+        : [];
+      let requestedImagesToKeep = oldImageNames;
+
+      if (typeof req.body.imagesToKeep === 'string') {
+        try {
+          const parsedImagesToKeep = JSON.parse(req.body.imagesToKeep);
+          if (!Array.isArray(parsedImagesToKeep)) {
+            return next(new AppError('imagesToKeep must be an array.', 400));
+          }
+          requestedImagesToKeep = parsedImagesToKeep;
+        } catch {
+          return next(new AppError('imagesToKeep must be valid JSON.', 400));
+        }
       }
 
-      req.body.images = [];
+      const imagesToKeep = oldImageNames.filter((imageName) =>
+        requestedImagesToKeep.includes(imageName)
+      );
+      const imagesToDelete = oldImageNames.filter(
+        (imageName) => !imagesToKeep.includes(imageName)
+      );
+      await deleteFiles(
+        imagesToDelete.map((imageName) =>
+          path.join(__dirname, '../public/img/tours', imageName)
+        )
+      );
+
+      req.body.images = [...imagesToKeep];
 
       await Promise.all(
         req.files.images.map(async (file, i) => {
@@ -88,42 +110,35 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
             .resize(2000, 1333)
             .toFormat('jpeg')
             .jpeg({ quality: 90 })
-            .toFile(`public/img/tours/${filename}`);
+            .toFile(path.join(__dirname, '../public/img/tours', filename));
 
           req.body.images.push(filename);
         })
       );
-    }
-    // Case 2: No new images but imagesToKeep provided - user removed images
-    // Delete only the images not in the keep list
-    else if (
-      req.body.imagesToKeep &&
-      typeof req.body.imagesToKeep === 'string'
-    ) {
+    } else if (typeof req.body.imagesToKeep === 'string') {
       try {
-        const imagesToKeep = JSON.parse(req.body.imagesToKeep);
-        if (
-          Array.isArray(imagesToKeep) &&
-          oldTour &&
-          oldTour.images &&
-          Array.isArray(oldTour.images)
-        ) {
-          // Find images to delete
-          const imagesToDelete = oldTour.images.filter(
-            (img) => !imagesToKeep.includes(img)
-          );
-
-          // Delete removed images from filesystem
-          const imagesToDeletePaths = imagesToDelete.map((imageName) =>
-            path.join(__dirname, '../public/img/tours', imageName)
-          );
-          await deleteFiles(imagesToDeletePaths);
-
-          // Update images array to keep only the specified ones
-          req.body.images = imagesToKeep;
+        const requestedImagesToKeep = JSON.parse(req.body.imagesToKeep);
+        if (!Array.isArray(requestedImagesToKeep)) {
+          return next(new AppError('imagesToKeep must be an array.', 400));
         }
-      } catch (err) {
-        // If parsing fails, don't modify images
+
+        const oldImageNames = Array.isArray(oldTour?.images)
+          ? oldTour.images
+          : [];
+        const imagesToKeep = oldImageNames.filter((imageName) =>
+          requestedImagesToKeep.includes(imageName)
+        );
+        const imagesToDelete = oldImageNames.filter(
+          (imageName) => !imagesToKeep.includes(imageName)
+        );
+        await deleteFiles(
+          imagesToDelete.map((imageName) =>
+            path.join(__dirname, '../public/img/tours', imageName)
+          )
+        );
+        req.body.images = imagesToKeep;
+      } catch {
+        return next(new AppError('imagesToKeep must be valid JSON.', 400));
       }
     }
   }
@@ -164,51 +179,68 @@ exports.dataSanitization = catchAsync(async (req, res, next) => {
     req.body.ratingsQuantity = parseInt(req.body.ratingsQuantity, 10);
   }
 
-  // Boolean field - convert string to boolean (handle both string and falsy values)
-  if (
-    req.body.secretTour !== undefined &&
-    req.body.secretTour !== null &&
-    typeof req.body.secretTour === 'string'
-  ) {
-    req.body.secretTour = req.body.secretTour === 'true';
-  } else if (
-    req.body.secretTour !== undefined &&
-    req.body.secretTour !== null &&
-    typeof req.body.secretTour === 'boolean'
-  ) {
-    // Already a boolean, leave as is
-    req.body.secretTour = Boolean(req.body.secretTour);
-  }
-
   // Parse startLocation from JSON string to object
   if (req.body.startLocation && typeof req.body.startLocation === 'string') {
     try {
       req.body.startLocation = JSON.parse(req.body.startLocation);
-    } catch (e) {
-      // startLocation parsing failed, continue with original value
+    } catch {
+      return next(new AppError('Start location must be valid JSON.', 400));
     }
   }
 
-  // Convert startLocation coordinates to numbers (longitude, latitude)
-  if (req.body.startLocation && req.body.startLocation.coordinates) {
-    req.body.startLocation.coordinates = req.body.startLocation.coordinates.map(
-      (coord) => {
-        // Skip empty coordinates
-        if (coord === '' || coord === null || coord === undefined) {
-          return 0;
-        }
-        const num = parseFloat(coord);
-        return Number.isNaN(num) ? 0 : num;
-      }
-    );
+  if (req.method === 'POST' && !req.body.startLocation) {
+    return next(new AppError('A complete start location is required.', 400));
+  }
 
-    // If coordinates are [0, 0], remove startLocation to prevent validation issues
+  if (req.body.startLocation) {
+    const { coordinates } = req.body.startLocation;
     if (
-      req.body.startLocation.coordinates[0] === 0 &&
-      req.body.startLocation.coordinates[1] === 0
+      !Array.isArray(coordinates) ||
+      coordinates.length !== 2 ||
+      coordinates.some(
+        (coordinate) =>
+          coordinate === '' || coordinate === null || coordinate === undefined
+      )
     ) {
-      delete req.body.startLocation;
+      return next(
+        new AppError(
+          'Start location coordinates must be [longitude, latitude].',
+          400
+        )
+      );
     }
+
+    const [longitude, latitude] = coordinates.map(Number);
+    if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+      return next(
+        new AppError('Start location coordinates must be valid numbers.', 400)
+      );
+    }
+    if (
+      longitude < -180 ||
+      longitude > 180 ||
+      latitude < -90 ||
+      latitude > 90
+    ) {
+      return next(
+        new AppError('Start location coordinates are out of range.', 400)
+      );
+    }
+
+    const address = req.body.startLocation.address?.trim();
+    const description = req.body.startLocation.description?.trim();
+    if (!address || !description) {
+      return next(
+        new AppError(
+          'Start location address and description are required.',
+          400
+        )
+      );
+    }
+
+    req.body.startLocation.coordinates = [longitude, latitude];
+    req.body.startLocation.address = address;
+    req.body.startLocation.description = description;
   }
 
   // Parse locations from JSON string to array
@@ -306,23 +338,35 @@ exports.dataSanitization = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.aliasTopTours = (req, res, next) => {
-  req.query.limit = '5';
-  req.query.sort = '-ratingsAverage,price';
-  // req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
-  next();
-};
-
-// Get all tours for public listing (excludes secret tours)
+// Get all tours for public listing
 exports.getAllTours = factory.getAll(Tour);
 
-// Get all tours for admin management (includes secret tours)
+exports.getTopCheapTours = catchAsync(async (req, res) => {
+  const tours = await Tour.aggregate([
+    {
+      $addFields: {
+        discountedPrice: {
+          $subtract: ['$price', { $ifNull: ['$priceDiscount', 0] }],
+        },
+        id: { $toString: '$_id' },
+      },
+    },
+    { $sort: { discountedPrice: 1, ratingsAverage: -1 } },
+    { $limit: 5 },
+    { $project: { discountedPrice: 0 } },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: { data: tours },
+  });
+});
+
+// Get all tours for admin management
 exports.getAllToursAdmin = catchAsync(async (req, res, next) => {
   // Build query with APIFeatures
-  const features = new APIFeatures(
-    Tour.find().setOptions({ includeSecretTours: true }),
-    req.query
-  )
+  const features = new APIFeatures(Tour.find(), req.query)
     .filter()
     .sort()
     .limitFields()
@@ -340,67 +384,55 @@ exports.getAllToursAdmin = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
+exports.createTour = factory.createOne(Tour);
 
-// Protected getTour for authenticated admins/guides - includes secret tours
-exports.getProtectedTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id)
-    .setOptions({ includeSecretTours: true })
-    .populate({ path: 'reviews' });
+exports.updateTour = catchAsync(async (req, res, next) => {
+  const tour = await Tour.findById(req.params.id);
 
   if (!tour) {
     return next(new AppError('No document found with that ID', 404));
   }
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      data: tour,
-    },
-  });
-});
-exports.createTour = factory.createOne(Tour);
-
-// Custom updateTour with priceDiscount validation
-exports.updateTour = catchAsync(async (req, res, next) => {
-  // Get the current tour directly from collection to bypass middleware filter
-  const tourDoc = await Tour.collection.findOne({
-    _id: new mongoose.Types.ObjectId(req.params.id),
-  });
-
-  if (!tourDoc) {
-    return next(new AppError('No document found with that ID', 404));
-  }
-
-  // Convert to Tour instance for validation
-  const tour = new Tour(tourDoc);
-
-  // If priceDiscount is being updated, validate it against price
-  if (req.body.priceDiscount !== undefined) {
-    const price = req.body.price || tour.price; // Use new price if provided, otherwise current price
-    const discount = req.body.priceDiscount;
-
-    if (discount >= price) {
-      return next(
-        new AppError('Discount price should be below regular price', 400)
-      );
-    }
-  }
-
-  // Proceed with update using collection to bypass middleware
-  await Tour.collection.updateOne(
-    { _id: new mongoose.Types.ObjectId(req.params.id) },
-    { $set: req.body }
+  const updateData = filterObject(
+    req.body,
+    'name',
+    'duration',
+    'maxGroupSize',
+    'difficulty',
+    'price',
+    'priceDiscount',
+    'summary',
+    'description',
+    'imageCover',
+    'images',
+    'startDates',
+    'startLocation',
+    'locations',
+    'guides'
   );
 
-  // Fetch the updated document directly from collection to ensure we get all fields including secretTour
-  const updatedDoc = await Tour.collection.findOne({
-    _id: new mongoose.Types.ObjectId(req.params.id),
+  if (updateData.name !== undefined) {
+    updateData.slug = slugify(updateData.name, { lower: true });
+  }
+
+  const nextPrice = updateData.price ?? tour.price;
+  const nextDiscount = updateData.priceDiscount ?? tour.priceDiscount;
+  if (nextDiscount >= nextPrice) {
+    return next(
+      new AppError('Discount price should be below regular price', 400)
+    );
+  }
+
+  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, updateData, {
+    new: true,
+    runValidators: true,
+    context: 'query',
   });
 
   res.status(200).json({
     status: 'success',
     data: {
-      data: updatedDoc,
+      data: updatedTour,
     },
   });
 });
@@ -461,7 +493,6 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
 
     // Commit transaction
     await session.commitTransaction();
-    // console.log(`✅ Tour ${req.params.id} deleted with all associated data`); // Helpful for development
 
     res.status(204).json({
       status: 'success',
@@ -470,7 +501,6 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   } catch (err) {
     // Rollback transaction on any error
     await session.abortTransaction();
-    // console.error(`❌ Tour deletion failed: ${err.message}`); // Helpful for development
     throw err;
   } finally {
     session.endSession();
@@ -621,6 +651,13 @@ exports.getDistances = catchAsync(async (req, res, next) => {
         400
       )
     );
+  }
+
+  if (latitude < -90 || latitude > 90) {
+    return next(new AppError('Latitude must be between -90 and 90', 400));
+  }
+  if (longitude < -180 || longitude > 180) {
+    return next(new AppError('Longitude must be between -180 and 180', 400));
   }
 
   const distances = await Tour.aggregate([

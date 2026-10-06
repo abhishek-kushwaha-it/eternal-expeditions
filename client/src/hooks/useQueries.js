@@ -33,7 +33,7 @@ export const useTours = () => {
   });
 };
 
-// Get all tours for admin (including secret tours)
+// Get all tours for admin
 export const useAllToursAdmin = () => {
   return useQuery({
     queryKey: ['allToursAdmin'],
@@ -600,7 +600,7 @@ export const useDeleteUserMutation = () => {
 export const useGuides = () => {
   return useQuery({
     queryKey: ['guides'],
-    queryFn: () => api.get('/users?role=guide').then((res) => res.data.data.data),
+    queryFn: () => api.get('/users/guides').then((res) => res.data.data.data),
     staleTime: 1000 * 60 * 15, // 15 minutes
     retry: 2,
   });
@@ -610,13 +610,7 @@ export const useGuides = () => {
 export const useAdminAndGuides = () => {
   return useQuery({
     queryKey: ['adminAndGuides'],
-    queryFn: async () => {
-      const [guidesRes, adminsRes] = await Promise.all([
-        api.get('/users?role=guide'),
-        api.get('/users?role=admin'),
-      ]);
-      return [...(guidesRes.data.data.data || []), ...(adminsRes.data.data.data || [])];
-    },
+    queryFn: () => api.get('/users/assignable-guides').then((res) => res.data.data.data || []),
     staleTime: 1000 * 60 * 15,
     retry: 2,
   });

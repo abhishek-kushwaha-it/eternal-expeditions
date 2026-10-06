@@ -155,8 +155,8 @@ export default function AccountPage() {
         await openPasswordErrorDialog({
           title: '❌ Wrong Current Password',
           message: errorMessage,
-          confirmLabel: 'Try Again',
-          cancelLabel: null,
+          confirmText: 'Try Again',
+          cancelText: 'Close',
         });
       } else {
         addToast(errorMessage, 'error');
@@ -169,9 +169,9 @@ export default function AccountPage() {
       title: '⚠️ Deactivate Account?',
       message:
         "Your account will be marked as inactive. Your reviews and bookings will be preserved, but you won't appear as a guide. You can contact support to reactivate.",
-      confirmLabel: 'Deactivate',
-      cancelLabel: 'Cancel',
-      isDanger: true,
+      confirmText: 'Deactivate',
+      cancelText: 'Cancel',
+      isDangerous: true,
     });
 
     if (confirmed) {

@@ -13,9 +13,7 @@ const router = express.Router();
 // Nested reviews route - use this after admin route
 router.use('/:tourId/reviews', reviewRouter);
 
-router
-  .route('/top-5-cheap')
-  .get(tourController.aliasTopTours, tourController.getAllTours);
+router.route('/top-5-cheap').get(tourController.getTopCheapTours);
 
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
@@ -46,15 +44,6 @@ router
     tourController.resizeTourImages,
     tourController.dataSanitization,
     tourController.createTour
-  );
-
-// Protected route to get a specific tour (for admins/guides to view secret tours when editing)
-router
-  .route('/protected/:id')
-  .get(
-    authController.protect,
-    authController.restrictTo('admin', 'guide'),
-    tourController.getProtectedTour
   );
 
 router

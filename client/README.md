@@ -27,7 +27,6 @@ npm run dev
 - Redux Toolkit + React Redux
 - @tanstack/react-query
 - Axios
-- Stripe React SDK (`@stripe/react-stripe-js`)
 - socket.io-client
 - Mapbox GL
 - ESLint and Prettier
@@ -81,7 +80,6 @@ client/
 ## 💳 Stripe Integration
 
 - Payment flow uses Stripe Checkout
-- The frontend uses `@stripe/react-stripe-js` for Stripe-specific components and hooks
 - A complete booking lifecycle is supported through the backend webhook and socket events
 
 ## 🌐 Environment Variables
@@ -90,7 +88,6 @@ Set local variables in `.env.local` or Vite environment files:
 
 - `VITE_API_URL` — backend API URL, e.g. `http://localhost:3000/api/v1`
 - `VITE_BACKEND_URL` — backend base URL, e.g. `http://localhost:3000`
-- `VITE_STRIPE_PUBLIC_KEY` — Stripe publishable key
 
 ## 📌 Key Files
 

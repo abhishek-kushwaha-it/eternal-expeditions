@@ -107,7 +107,9 @@ function TourCard({ tour, distance, unit = 'mi' }) {
       {/* Location */}
       <div className={styles['tour-card__location']}>
         <span className={styles['location-icon']}>📌</span>
-        <span className={styles['location-text']}>{tour.startLocation.description}</span>
+        <span className={styles['location-text']}>
+          {tour.startLocation?.description || 'Location to be announced'}
+        </span>
       </div>
 
       {distance !== undefined && distance !== null && (

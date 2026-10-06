@@ -1,7 +1,9 @@
 const socketIO = require('socket.io');
+const jwt = require('jsonwebtoken');
+const config = require('./config');
+const User = require('../models/userModel');
 
 let io;
-const userSockets = new Map(); // Map userId -> socketId
 
 exports.initializeSocket = (server) => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -16,21 +18,33 @@ exports.initializeSocket = (server) => {
     transports: ['websocket', 'polling'],
   });
 
-  io.on('connection', (socket) => {
-    // Register user when they connect
-    socket.on('registerUser', (userId) => {
-      userSockets.set(userId, socket.id);
-      socket.userId = userId;
-      socket.join(`user-${userId}`); // Join room specific to user
-      console.log(`[Socket] User ${userId} registered`);
-    });
+  io.use(async (socket, next) => {
+    try {
+      const cookieHeader = socket.handshake.headers.cookie || '';
+      const jwtCookie = cookieHeader
+        .split(';')
+        .map((cookie) => cookie.trim())
+        .find((cookie) => cookie.startsWith('jwt='));
 
-    // Cleanup on disconnect
-    socket.on('disconnect', () => {
-      if (socket.userId) {
-        userSockets.delete(socket.userId);
+      if (!jwtCookie) return next(new Error('Unauthorized'));
+
+      const token = decodeURIComponent(jwtCookie.slice(4));
+      const decoded = jwt.verify(token, config.jwtSecret);
+      const user = await User.findById(decoded.id);
+
+      if (!user || user.changedPasswordAfter(decoded.iat)) {
+        return next(new Error('Unauthorized'));
       }
-    });
+
+      socket.data.userId = user._id.toString();
+      return next();
+    } catch {
+      return next(new Error('Unauthorized'));
+    }
+  });
+
+  io.on('connection', (socket) => {
+    socket.join(`user-${socket.data.userId}`);
 
     socket.on('error', (error) => {
       console.error('[Socket] Error:', error);
@@ -68,6 +82,3 @@ exports.emitBookingStatusChange = (userId, bookingData) => {
 
   io.to(`user-${userId}`).emit('bookingStatusChanged', eventData);
 };
-
-exports.getIO = () => io;
-exports.getUserSockets = () => userSockets;

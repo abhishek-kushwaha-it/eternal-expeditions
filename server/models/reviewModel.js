@@ -45,15 +45,6 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
-// Post-find middleware to filter out reviews from inactive users (after population)
-reviewSchema.post(/^find/, (docs, next) => {
-  if (Array.isArray(docs)) {
-    // Filter out reviews from inactive users
-    docs = docs.filter((doc) => !doc.user || doc.user.active !== false);
-  }
-  next();
-});
-
 reviewSchema.statics.calcAverageRatings = async function (tourId) {
   const stats = await this.aggregate([
     {
@@ -67,8 +58,6 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  // console.log(stats);
-
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsQuantity: stats[0].nRating,
@@ -91,7 +80,6 @@ reviewSchema.post('save', function () {
 // findByIdAndDelete
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   this.r = await this.findOne();
-  // console.log(this.r);
   next();
 });
 

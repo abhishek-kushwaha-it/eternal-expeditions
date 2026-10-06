@@ -15,6 +15,7 @@ const ERRORS = {
   discount_invalid: 'Discount must be a valid number',
   discount_exceeded: 'Discount price should be below regular price',
   imageCover_required: 'A tour must have a cover image',
+  startLocation_required: 'A tour must have a complete start location',
   startLocation_invalid: 'Start location coordinates must be [longitude, latitude]',
   startLocation_coords_invalid: 'Coordinates must be valid numbers',
   startDates_invalid: 'All start dates must be valid dates',
@@ -99,19 +100,26 @@ export const validateTourData = (data, isNewTour = false) => {
   }
 
   // Location validations
-  if (data.startLocation?.coordinates) {
-    const coords = data.startLocation.coordinates;
-    if (!Array.isArray(coords) || coords.length !== 2) {
+  const coordinates = data.startLocation?.coordinates;
+  if (
+    !data.startLocation?.address?.trim() ||
+    !data.startLocation?.description?.trim() ||
+    !Array.isArray(coordinates) ||
+    coordinates.length !== 2 ||
+    coordinates.some((coordinate) => coordinate === '' || coordinate === null || coordinate === undefined)
+  ) {
+    errors.startLocation = ERRORS.startLocation_required;
+  } else {
+    const [longitude, latitude] = coordinates.map(Number);
+    if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+      errors.startLocation = ERRORS.startLocation_coords_invalid;
+    } else if (
+      longitude < -180 ||
+      longitude > 180 ||
+      latitude < -90 ||
+      latitude > 90
+    ) {
       errors.startLocation = ERRORS.startLocation_invalid;
-    } else {
-      // Check if at least one coordinate has a value
-      const hasValues = coords.some((c) => c !== '' && c !== null && c !== undefined);
-      if (hasValues) {
-        // If one or both have values, verify they're both valid numbers
-        if (isNaN(parseFloat(coords[0])) || isNaN(parseFloat(coords[1]))) {
-          errors.startLocation = ERRORS.startLocation_coords_invalid;
-        }
-      }
     }
   }
 
@@ -174,11 +182,6 @@ export const prepareTourData = (formData, originalData = null, existingCoverImag
   if (changedFields.includes('priceDiscount')) {
     const absoluteDiscount = calculateAbsoluteDiscount(formData, originalData);
     data.append('priceDiscount', absoluteDiscount.toString());
-  }
-
-  // Boolean
-  if (changedFields.includes('secretTour') && formData.secretTour !== undefined) {
-    data.append('secretTour', String(formData.secretTour).toLowerCase() === 'true');
   }
 
   // Location and images
@@ -277,11 +280,21 @@ const appendLocations = (data, formData, changedFields) => {
 
 export const parseStartDates = (dateString) => {
   if (!dateString?.trim()) return [];
-  return dateString
+  const dates = dateString
     .split(',')
     .map((d) => d.trim())
-    .filter((d) => d && isValidDate(d))
-    .map((d) => new Date(d).toISOString().split('T')[0]);
+    .filter(Boolean);
+  const hasInvalidDate = dates.some((dateString) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) return true;
+    const date = new Date(`${dateString}T00:00:00.000Z`);
+    return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== dateString;
+  });
+
+  if (hasInvalidDate) {
+    throw new Error('Enter valid start dates in YYYY-MM-DD format.');
+  }
+
+  return dates;
 };
 
 export const formatStartDates = (dates) => {

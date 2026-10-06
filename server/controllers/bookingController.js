@@ -134,6 +134,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         error.message
       );
       console.error('[Webhook] Stack:', error.stack);
+      throw error;
     }
   }
 
@@ -160,6 +161,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         '[Webhook] Error handling charge succeeded:',
         error.message
       );
+      throw error;
     }
   }
 
@@ -184,6 +186,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
       }
     } catch (error) {
       console.error('[Webhook] Error handling charge failed:', error.message);
+      throw error;
     }
   }
 
@@ -210,6 +213,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         '[Webhook] Error handling async payment failed:',
         error.message
       );
+      throw error;
     }
   }
 
@@ -234,6 +238,7 @@ exports.handleStripeWebhook = catchAsync(async (req, res) => {
         '[Webhook] Error handling async payment succeeded:',
         error.message
       );
+      throw error;
     }
   }
 
@@ -272,6 +277,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     return next(new AppError('Tour not found', 404));
   }
 
+  const unitAmount = Math.round((tour.price - (tour.priceDiscount || 0)) * 100);
   const frontendUrl =
     config.frontendUrl || `${req.protocol}://${req.get('host')}`;
 
@@ -291,7 +297,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       {
         price_data: {
           currency: 'usd',
-          unit_amount: tour.price * 100,
+          unit_amount: unitAmount,
           product_data: {
             name: `${tour.name} Tour`,
             description: tour.summary,
@@ -315,7 +321,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           createManualBookingData({
             tour: req.params.tourId,
             user: req.user._id,
-            price: tour.price,
+            price: unitAmount / 100,
             paymentMethod: 'card',
             paymentStatus: 'succeeded',
             sessionId: session.id,

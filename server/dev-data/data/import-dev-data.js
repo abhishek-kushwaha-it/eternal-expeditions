@@ -1,61 +1,71 @@
 const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Tour = require('../../models/tourModel');
 const Review = require('../../models/reviewModel');
 const User = require('../../models/userModel');
+const Booking = require('../../models/bookingModel');
 
-dotenv.config({ path: './config.env' });
-
-const DB = process.env.DATABASE.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
-
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('DB connection successful!'));
+const envFile =
+  process.env.NODE_ENV === 'production'
+    ? '.env.production'
+    : '.env.development';
+dotenv.config({ path: path.resolve(__dirname, '..', '..', envFile) });
 
 // READ JSON FILE
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
-const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
-const reviews = JSON.parse(
-  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
-);
+const readData = (fileName) =>
+  JSON.parse(fs.readFileSync(path.join(__dirname, fileName), 'utf8'));
 
-// IMPORT DATA INTO DB
+const tours = readData('tours.json');
+const users = readData('users.json');
+const reviews = readData('reviews.json');
+
 const importData = async () => {
-  try {
-    await Tour.create(tours);
-    await User.create(users, { validateBeforeSave: false });
-    await Review.create(reviews);
-    console.log('Data successfully loaded!');
-  } catch (err) {
-    console.log(err);
-  }
-  process.exit();
+  await Tour.create(tours);
+  const normalizedUsers = users.map((user) => ({
+    ...user,
+    role: user.role === 'lead-guide' ? 'guide' : user.role,
+  }));
+
+  // Seed passwords are already bcrypt hashes, so bypass the save hashing hook.
+  await User.collection.insertMany(normalizedUsers);
+  await Review.create(reviews);
+  console.log('Data successfully loaded!');
 };
 
-// DELETE ALL DATA FROM DB: node import-dev-data.js --delete
 const deleteData = async () => {
-  try {
-    await Tour.deleteMany();
-    await User.deleteMany();
-    await Review.deleteMany();
-    console.log('Data successfully deleted!');
-  } catch (err) {
-    console.log(err);
-  }
-  process.exit();
+  await Booking.deleteMany();
+  await Review.deleteMany();
+  await Tour.deleteMany();
+  await User.deleteMany();
+  console.log('Data successfully deleted!');
 };
 
-if (process.argv[2] === '--import') {
-  importData();
-} else if (process.argv[2] === '--delete') {
-  deleteData();
-}
+const run = async () => {
+  try {
+    const { DATABASE, DATABASE_PASSWORD } = process.env;
+    if (!DATABASE || !DATABASE_PASSWORD) {
+      throw new Error(
+        `DATABASE and DATABASE_PASSWORD are required in ${envFile}`
+      );
+    }
+
+    await mongoose.connect(DATABASE.replace('<PASSWORD>', DATABASE_PASSWORD));
+
+    if (process.argv[2] === '--import') {
+      await importData();
+    } else if (process.argv[2] === '--delete') {
+      await deleteData();
+    } else {
+      throw new Error('Usage: node import-dev-data.js --import|--delete');
+    }
+  } catch (error) {
+    console.error('Dev data operation failed:', error);
+    process.exitCode = 1;
+  } finally {
+    await mongoose.disconnect();
+  }
+};
+
+run();

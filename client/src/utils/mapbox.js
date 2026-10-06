@@ -20,13 +20,15 @@ export const displayMap = (mapContainer, locations) => {
   locations.forEach((loc) => {
     const el = document.createElement('div');
     el.className = 'marker';
+    const popupContent = document.createElement('p');
+    popupContent.textContent = `Day ${loc.day}: ${loc.description}`;
     const popup = new mapboxgl.Popup({
       offset: [0, -35],
       closeButton: true,
       closeOnClick: !compactMap,
     })
       .setLngLat(loc.coordinates)
-      .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`);
+      .setDOMContent(popupContent);
 
     new mapboxgl.Marker({
       element: el,

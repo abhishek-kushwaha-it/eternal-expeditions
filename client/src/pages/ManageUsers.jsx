@@ -99,9 +99,9 @@ export default function ManageUsers() {
       const confirmed = await openDeleteDialog({
         title: 'Delete User?',
         message: 'This action cannot be undone. All user data will be permanently deleted.',
-        confirmLabel: 'Delete',
-        cancelLabel: 'Cancel',
-        isDanger: true,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        isDangerous: true,
       });
 
       if (confirmed) {

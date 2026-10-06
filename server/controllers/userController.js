@@ -13,15 +13,6 @@ const { filterObject } = require('../utils/objectUtils');
 const { safeUnlink } = require('../utils/fileUtils');
 const { createImageUploader } = require('../utils/uploadUtils');
 
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, 'public/img/users');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   }
-// });
 const upload = createImageUploader({
   allowedTypes: config.allowedImageTypes.split(','),
   maxFileSize: config.maxFileSize,
@@ -51,7 +42,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
     .resize(500, 500)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
+    .toFile(path.join(__dirname, '../public/img/users', req.file.filename));
 
   next();
 });
@@ -101,12 +92,10 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   // 1) If user is a guide, remove them from the guides array in all tours
   if (user.role === 'guide') {
     await Tour.updateMany({ guides: userId }, { $pull: { guides: userId } });
-    // console.log(`✅ Removed guide ${userId} from all tours`); // Helpful for development
   }
 
   // 2) Mark user as inactive (soft delete)
   await User.findByIdAndUpdate(userId, { active: false });
-  // console.log(`✅ Marked user ${userId} as inactive`); // Helpful for development
 
   res.status(204).json({
     status: 'success',
@@ -124,8 +113,67 @@ exports.createUser = (req, res) => {
 exports.getUser = factory.getOne(User);
 exports.getAllUsers = factory.getAll(User);
 
-// Do NOT update passwords with this!
-exports.updateUser = factory.updateOne(User);
+exports.getGuides = catchAsync(async (req, res) => {
+  const guides = await User.find({ role: 'guide' }).select('_id name role');
+
+  res.status(200).json({
+    status: 'success',
+    results: guides.length,
+    data: { data: guides },
+  });
+});
+
+exports.getAssignableGuides = catchAsync(async (req, res) => {
+  const guides = await User.find({ role: { $in: ['guide', 'admin'] } }).select(
+    '_id name role'
+  );
+
+  res.status(200).json({
+    status: 'success',
+    results: guides.length,
+    data: { data: guides },
+  });
+});
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'User passwords must be changed through the password flow.',
+        400
+      )
+    );
+  }
+
+  const filteredBody = filterObject(
+    req.body,
+    'name',
+    'email',
+    'role',
+    'active'
+  );
+  if (Object.keys(filteredBody).length === 0) {
+    return next(new AppError('No supported user fields were provided.', 400));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError('No document found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { data: updatedUser },
+  });
+});
 
 // Custom deleteUser handler with cascade delete for reviews, bookings, and guide removal
 exports.deleteUser = catchAsync(async (req, res, next) => {
@@ -143,11 +191,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   try {
     // 2) Delete all reviews created by this user
     await Review.deleteMany({ user: req.params.id }, { session });
-    // console.log(`✅ Deleted all reviews by user ${req.params.id}`); // Helpful for development
 
     // 3) Delete all bookings created by this user
     await Booking.deleteMany({ user: req.params.id }, { session });
-    // console.log(`✅ Deleted all bookings by user ${req.params.id}`); // Helpful for development
 
     // 4) If user is a guide, remove them from the guides array in all tours
     if (user.role === 'guide') {
@@ -156,12 +202,10 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
         { $pull: { guides: req.params.id } },
         { session }
       );
-      // console.log(`✅ Removed guide ${req.params.id} from all tours`); // Helpful for development
     }
 
     // 5) Delete the user document
     await User.findByIdAndDelete(req.params.id, { session });
-    // console.log(`✅ Deleted user ${req.params.id}`); // Helpful for development
 
     // Commit transaction
     await session.commitTransaction();

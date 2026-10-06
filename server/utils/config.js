@@ -34,11 +34,6 @@ const requiredEnvVars = [
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'JWT_COOKIE_EXPIRES_IN',
-  'EMAIL_FROM',
-  'EMAIL_HOST',
-  'EMAIL_PORT',
-  'SENDGRID_USERNAME',
-  'SENDGRID_PASSWORD',
   'STRIPE_SECRET_KEY',
   'STRIPE_WEBHOOK_SECRET',
   'MAX_FILE_SIZE',
@@ -49,6 +44,16 @@ const requiredEnvVars = [
   'COOKIE_HTTP_ONLY',
   'COOKIE_SAME_SITE',
 ];
+
+if (process.env.EMAIL_ENABLED === 'true') {
+  requiredEnvVars.push(
+    'EMAIL_FROM',
+    'EMAIL_HOST',
+    'EMAIL_PORT',
+    'SENDGRID_USERNAME',
+    'SENDGRID_PASSWORD'
+  );
+}
 
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 

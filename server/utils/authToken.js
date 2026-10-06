@@ -37,4 +37,4 @@ const sendBackgroundEmail = (emailPromise, description = 'email') => {
   });
 };
 
-module.exports = { signToken, createSendToken, sendBackgroundEmail };
+module.exports = { createSendToken, sendBackgroundEmail };

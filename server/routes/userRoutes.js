@@ -18,6 +18,16 @@ router.use(authController.protect);
 // Protected routes - Authentication required
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
+router.get(
+  '/guides',
+  authController.restrictTo('admin', 'guide'),
+  userController.getGuides
+);
+router.get(
+  '/assignable-guides',
+  authController.restrictTo('admin', 'guide'),
+  userController.getAssignableGuides
+);
 router.patch(
   '/updateMe',
   userController.uploadUserPhoto,
@@ -28,12 +38,12 @@ router.delete('/deleteMe', userController.deleteMe);
 
 router
   .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+  .get(authController.restrictTo('admin'), userController.getAllUsers)
+  .post(authController.restrictTo('admin'), userController.createUser);
 
 router
   .route('/:id')
-  .get(userController.getUser)
+  .get(authController.restrictTo('admin'), userController.getUser)
   .patch(authController.restrictTo('admin'), userController.updateUser)
   .delete(authController.restrictTo('admin'), userController.deleteUser);
 

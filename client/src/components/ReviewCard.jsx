@@ -7,6 +7,8 @@ function ReviewCard({ review, isOwnReview, canManage, onEdit, onDelete, isLoadin
   const [isEditing, setIsEditing] = useState(false);
   const [editRating, setEditRating] = useState(review.rating);
   const [editReview, setEditReview] = useState(review.review);
+  const reviewerName = review.user?.name || 'Former traveler';
+  const reviewerPhoto = review.user?.photo || 'default.jpg';
   const cardClassName = `${styles['review-card']} ${isEditing ? styles['review-card--editing'] : ''} ${compact ? styles['review-card--compact'] : ''}`.trim();
 
   const renderStars = () => {
@@ -50,7 +52,7 @@ function ReviewCard({ review, isOwnReview, canManage, onEdit, onDelete, isLoadin
       <Card className={cardClassName}>
         <div className={styles['review-card__edit-header']}>
           <h3 className={styles['review-card__edit-title']}>Edit Review</h3>
-          <p className={styles['review-card__edit-subtitle']}>User: {review.user?.name}</p>
+          <p className={styles['review-card__edit-subtitle']}>User: {reviewerName}</p>
         </div>
 
         <div className={styles['review-card__edit-content']}>
@@ -103,13 +105,13 @@ function ReviewCard({ review, isOwnReview, canManage, onEdit, onDelete, isLoadin
       <div className={styles['review-card__header']}>
         <div className={styles['review-card__author-info']}>
           <Image
-            src={`${IMAGE_URL}/users/${review.user.photo}`}
-            alt={review.user.name}
+            src={`${IMAGE_URL}/users/${reviewerPhoto}`}
+            alt={reviewerName}
             className={styles['review-card__avatar']}
           />
           <div className={styles['review-card__author-meta']}>
             <div className={styles['review-card__author']}>
-              {review.user.name}
+              {reviewerName}
               {isOwnReview && (
                 <span
                   className={`${styles['review-card__badge']} ${styles['review-card__badge--own']}`}

@@ -490,28 +490,6 @@ function GuidesSection({ guides, selectedGuides, onGuideToggle }) {
   );
 }
 
-function OptionsSection({ formData, onBasicChange }) {
-  return (
-    <section className={styles['form-section']}>
-      <div className={styles['form-section__header']}>
-        <h3 className={styles['form-section__title']}>⚙️ Options</h3>
-        <p className={styles['form-section__description']}>Additional tour settings</p>
-      </div>
-
-      <label className="form-group__checkbox-label">
-        <input
-          type="checkbox"
-          name="secretTour"
-          checked={formData.secretTour}
-          onChange={onBasicChange}
-          className="form-group__checkbox"
-        />
-        <span className={styles['checkbox-text']}>🔒 Secret Tour (hidden from public listings)</span>
-      </label>
-    </section>
-  );
-}
-
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -537,7 +515,7 @@ const INITIAL_STATE = {
   difficulty: 'easy',
   price: '',
   priceDiscount: '',
-  discountType: 'fixed', // Local UI only - for showing % vs $ label, never sent to backend
+  discountType: 'amount', // Local UI only - for showing % vs $ label, never sent to backend
   summary: '',
   description: '',
   imageCover: null,
@@ -550,7 +528,6 @@ const INITIAL_STATE = {
     description: '',
   },
   guides: [],
-  secretTour: false,
 };
 
 export default function TourFormPage() {
@@ -583,8 +560,7 @@ export default function TourFormPage() {
 
     const loadTourData = async () => {
       try {
-        // Use protected endpoint to allow viewing secret tours for authenticated users
-        const response = await fetch(`${BACKEND_URL}/api/v1/tours/protected/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/api/v1/tours/${id}`, {
           credentials: 'include', // Include cookies for authentication
           headers: {
             'Content-Type': 'application/json',
@@ -606,7 +582,7 @@ export default function TourFormPage() {
             difficulty: tourData.difficulty || 'easy',
             price: tourData.price ?? '',
             priceDiscount: tourData.priceDiscount ?? '',
-            discountType: 'fixed', // Local UI only
+            discountType: 'amount', // Local UI only
             summary: tourData.summary || '',
             description: tourData.description || '',
             imageCover: null,
@@ -619,7 +595,6 @@ export default function TourFormPage() {
               description: tourData.startLocation?.description || '',
             },
             guides: tourData.guides?.map((g) => g._id || g) || [],
-            secretTour: tourData.secretTour || false,
           });
           setStartDatesInput(formatStartDates(tourData.startDates));
           if (tourData.imageCover) {
@@ -690,8 +665,17 @@ export default function TourFormPage() {
     try {
       const parsedDates = parseStartDates(input);
       setFormData((prev) => ({ ...prev, startDates: parsedDates }));
+      setErrors((prev) => {
+        const remainingErrors = { ...prev };
+        delete remainingErrors.startDates;
+        return remainingErrors;
+      });
     } catch {
       setFormData((prev) => ({ ...prev, startDates: [] }));
+      setErrors((prev) => ({
+        ...prev,
+        startDates: 'Enter valid start dates in YYYY-MM-DD format.',
+      }));
     }
   };
 
@@ -856,6 +840,14 @@ export default function TourFormPage() {
 
     // Validate form data - use 'id' to determine if it's a new tour (id doesn't exist in params)
     const newErrors = validateTourData(formData, !id);
+    try {
+      parseStartDates(startDatesInput);
+    } catch {
+      newErrors.startDates = 'Enter valid start dates in YYYY-MM-DD format.';
+    }
+    if (id && !formData.imageCover && !imagePreviews.cover) {
+      newErrors.imageCover = 'Upload a replacement cover image before saving.';
+    }
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       addToast('Please fix all errors before submitting', 'error');
@@ -892,16 +884,13 @@ export default function TourFormPage() {
             const price = parseFloat(formData.price) || parseFloat(tour.price);
             finalDiscount = (price * finalDiscount) / 100;
           }
-          if (finalDiscount) formDataToSend.append('priceDiscount', finalDiscount);
+          formDataToSend.append('priceDiscount', finalDiscount);
         }
         if (formData.summary !== tour.summary) {
           formDataToSend.append('summary', formData.summary || '');
         }
         if (formData.description !== tour.description) {
           formDataToSend.append('description', formData.description || '');
-        }
-        if (formData.secretTour !== tour.secretTour) {
-          formDataToSend.append('secretTour', formData.secretTour || false);
         }
 
         // Check if coordinates changed
@@ -954,10 +943,7 @@ export default function TourFormPage() {
 
           // Send list of images to keep (so backend can delete the rest)
           // This serves as a reference but backend still primarily relies on uploaded files
-          if (existingImageNames.length > 0 || newImageFiles.length === 0) {
-            // If keeping some existing images or removing all, send the list
-            formDataToSend.append('imagesToKeep', JSON.stringify(existingImageNames));
-          }
+          formDataToSend.append('imagesToKeep', JSON.stringify(existingImageNames));
         }
 
         await updateTourMutation.mutateAsync({
@@ -986,7 +972,6 @@ export default function TourFormPage() {
 
         formDataToSend.append('summary', formData.summary || '');
         formDataToSend.append('description', formData.description || '');
-        formDataToSend.append('secretTour', formData.secretTour || false);
 
         if (formData.imageCover && formData.imageCover instanceof File) {
           formDataToSend.append('imageCover', formData.imageCover);

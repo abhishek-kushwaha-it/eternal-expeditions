@@ -64,12 +64,8 @@ const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in an hour!',
-  skip: (req) => req.path === '/api/v1/bookings/webhook/stripe',
-  keyGenerator: (req) => {
-    // Extract IP without port (Azure sends format: IP:PORT)
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
-    return ip.split(':').pop(); // Get last part (handles IPv4 and IPv6)
-  },
+  skip: (req) =>
+    req.originalUrl.split('?')[0] === '/api/v1/bookings/webhook/stripe',
 });
 app.use('/api', limiter);
 
@@ -113,13 +109,6 @@ app.use(
 );
 
 app.use(compression());
-
-// Test middleware
-app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  // console.log(req.cookies);
-  next();
-});
 
 // 3) ROUTES - API only (React handles views)
 app.use('/api/v1/tours', tourRouter);

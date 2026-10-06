@@ -122,7 +122,6 @@ The backend uses `.env.development` and `.env.production` files. The server conf
 - `@reduxjs/toolkit`, `react-redux` for state management
 - `axios` for API calls
 - `socket.io-client` for live booking updates
-- `@stripe/react-stripe-js` for Stripe payment UI
 - `mapbox-gl` for map rendering
 
 ## 🧠 Backend Details

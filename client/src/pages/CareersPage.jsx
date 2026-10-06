@@ -100,10 +100,10 @@ export default function CareersPage() {
   ];
 
   const stats = [
-    { number: '500+', label: 'Team Members' },
-    { number: '50+', label: 'Countries' },
+    { number: '10+', label: 'Team Members' },
+    { number: '5+', label: 'Countries' },
     { number: '95%', label: 'Employee Satisfaction' },
-    { number: '10yr+', label: 'Avg Tenure' },
+    { number: '3+ years', label: 'Avg Tenure' },
   ];
 
   return (

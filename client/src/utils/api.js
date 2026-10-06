@@ -8,9 +8,6 @@ const API_BASE_URL = apiUrl;
 export const BACKEND_URL = backendUrl;
 export const IMAGE_URL = `${BACKEND_URL}/img`;
 
-// Stripe public key from environment
-export const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY || '';
-
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,

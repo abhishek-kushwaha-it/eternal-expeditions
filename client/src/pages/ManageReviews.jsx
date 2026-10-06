@@ -110,9 +110,9 @@ export default function ManageReviews() {
       openDeleteDialog({
         title: 'Delete Review?',
         message: 'Once deleted, the review cannot be recovered.',
-        confirmLabel: 'Delete',
-        cancelLabel: 'Cancel',
-        isDanger: true,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        isDangerous: true,
       }).then((confirmed) => {
         if (confirmed) {
           deleteReviewMutation.mutate(

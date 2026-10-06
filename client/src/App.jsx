@@ -1,13 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
-import { Elements } from '@stripe/react-stripe-js';
-import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
 import RoleBasedRoute from './components/RoleBasedRoute';
-import { getStripe } from './utils/stripe';
 
 // Public Pages
 import HomePage from './pages/HomePage';
@@ -42,25 +39,9 @@ import TourStatsPage from './pages/TourStatsPage';
 import ManageUsers from './pages/ManageUsers';
 
 function App() {
-  const [stripe, setStripe] = useState(null);
-
-  useEffect(() => {
-    const initStripe = async () => {
-      try {
-        const stripeInstance = await getStripe();
-        setStripe(stripeInstance);
-      } catch (error) {
-        console.error('Failed to initialize Stripe:', error);
-      }
-    };
-
-    initStripe();
-  }, []);
-
   return (
     <ErrorBoundary>
-      <Elements stripe={stripe || null}>
-        <Router>
+      <Router>
           <Toast />
           <Header />
           <Routes>
@@ -222,8 +203,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <Footer />
-        </Router>
-      </Elements>
+      </Router>
     </ErrorBoundary>
   );
 }

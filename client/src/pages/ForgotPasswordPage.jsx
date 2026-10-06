@@ -35,8 +35,14 @@ export default function ForgotPasswordPage() {
       setEmailError('Valid email is required');
       return;
     }
-    await forgotPasswordMutation.mutateAsync({ email });
-    setIsSubmitted(true);
+    try {
+      await forgotPasswordMutation.mutateAsync({ email });
+      setIsSubmitted(true);
+    } catch (error) {
+      setEmailError(
+        error.response?.data?.message || 'Unable to send the reset link. Please try again.'
+      );
+    }
   };
 
   // Loading state while sending reset link
@@ -51,9 +57,7 @@ export default function ForgotPasswordPage() {
           <div className={styles['auth-card']}>
             <div>✓</div>
             <h2>Check Your Email</h2>
-            <p>
-              Reset link sent to <strong>{email}</strong>
-            </p>
+            <p>If an account exists for that email, reset instructions will be sent.</p>
             <p>
               Click the link in your email to reset your password. Check your spam folder if you
               don't see it.
