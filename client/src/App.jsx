@@ -1,49 +1,51 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import Toast from './components/Toast';
 import RoleBasedRoute from './components/RoleBasedRoute';
+import { LoadingState } from './core-components';
 
 // Public Pages
-import HomePage from './pages/HomePage';
-import ToursPage from './pages/ToursPage';
-import TopCheapToursPage from './pages/TopCheapToursPage';
-import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
-import TourPage from './pages/TourPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import AboutPage from './pages/AboutPage';
-import CareersPage from './pages/CareersPage';
-import ContactPage from './pages/ContactPage';
-import BecomeGuidePage from './pages/BecomeGuidePage';
-import NotFoundPage from './pages/NotFoundPage';
-import GuideMonthlyPlanPage from './pages/GuideMonthlyPlanPage';
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ToursPage = lazy(() => import('./pages/ToursPage'));
+const TopCheapToursPage = lazy(() => import('./pages/TopCheapToursPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignUpPage = lazy(() => import('./pages/SignUpPage'));
+const TourPage = lazy(() => import('./pages/TourPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const CareersPage = lazy(() => import('./pages/CareersPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const BecomeGuidePage = lazy(() => import('./pages/BecomeGuidePage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const GuideMonthlyPlanPage = lazy(() => import('./pages/GuideMonthlyPlanPage'));
 
 // User Pages
-import AccountPage from './pages/AccountPage';
-import BookingListPage from './pages/BookingListPage';
-import BookingDetailsPage from './pages/BookingDetailsPage';
-import BookingSuccessPage from './pages/BookingSuccessPage';
+const AccountPage = lazy(() => import('./pages/AccountPage'));
+const BookingListPage = lazy(() => import('./pages/BookingListPage'));
+const BookingDetailsPage = lazy(() => import('./pages/BookingDetailsPage'));
+const BookingSuccessPage = lazy(() => import('./pages/BookingSuccessPage'));
 
 // Guide/Admin Pages
-import ManageReviews from './pages/ManageReviews';
-import ManageBookings from './pages/ManageBookings';
-import ManageTours from './pages/ManageTours';
-import TourFormPage from './pages/TourFormPage';
-import TourStatsPage from './pages/TourStatsPage';
+const ManageReviews = lazy(() => import('./pages/ManageReviews'));
+const ManageBookings = lazy(() => import('./pages/ManageBookings'));
+const ManageTours = lazy(() => import('./pages/ManageTours'));
+const TourFormPage = lazy(() => import('./pages/TourFormPage'));
+const TourStatsPage = lazy(() => import('./pages/TourStatsPage'));
 
 // Admin Pages
-import ManageUsers from './pages/ManageUsers';
+const ManageUsers = lazy(() => import('./pages/ManageUsers'));
 
 function App() {
   return (
     <ErrorBoundary>
       <Router>
-          <Toast />
-          <Header />
+        <Toast />
+        <Header />
+        <Suspense fallback={<LoadingState message="Loading page..." minHeight="60vh" />}>
           <Routes>
             {/* ============================================
               PUBLIC ROUTES
@@ -202,7 +204,8 @@ function App() {
             {/* Catch-all 404 */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-          <Footer />
+        </Suspense>
+        <Footer />
       </Router>
     </ErrorBoundary>
   );

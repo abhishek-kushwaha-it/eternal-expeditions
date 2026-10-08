@@ -1,4 +1,3 @@
-const sharp = require('sharp');
 const path = require('path');
 const mongoose = require('mongoose');
 const User = require('../models/userModel');
@@ -10,8 +9,9 @@ const AppError = require('../utils/appError');
 const config = require('../utils/config');
 const factory = require('./handlerFactory');
 const { filterObject } = require('../utils/objectUtils');
-const { safeUnlink } = require('../utils/fileUtils');
+const { safeUnlink, resolveChildPath } = require('../utils/fileUtils');
 const { createImageUploader } = require('../utils/uploadUtils');
+const { resizeAndSaveJpeg } = require('../utils/imageUtils');
 
 const upload = createImageUploader({
   allowedTypes: config.allowedImageTypes.split(','),
@@ -25,24 +25,19 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   // Get old user if updating, to delete old photo
   const oldUser = await User.findById(req.user.id);
-
-  // Delete old profile photo if it exists
-  if (oldUser && oldUser.photo && oldUser.photo !== 'default.jpg') {
-    const oldPhotoPath = path.join(
-      __dirname,
-      '../public/img/users',
-      oldUser.photo
-    );
-    await safeUnlink(oldPhotoPath);
-  }
+  req.oldUserPhoto = oldUser?.photo;
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
-  await sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(path.join(__dirname, '../public/img/users', req.file.filename));
+  await resizeAndSaveJpeg(
+    req.file.buffer,
+    resolveChildPath(
+      path.join(__dirname, '../public/img/users'),
+      req.file.filename
+    ),
+    500,
+    500
+  );
 
   next();
 });
@@ -73,6 +68,23 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
+  if (!updatedUser) {
+    return next(new AppError('User not found', 404));
+  }
+
+  if (
+    req.oldUserPhoto &&
+    req.oldUserPhoto !== 'default.jpg' &&
+    req.oldUserPhoto !== updatedUser.photo
+  ) {
+    await safeUnlink(
+      resolveChildPath(
+        path.join(__dirname, '../public/img/users'),
+        req.oldUserPhoto
+      )
+    );
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -102,13 +114,6 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not defined! Please use /signup instead',
-  });
-};
 
 exports.getUser = factory.getOne(User);
 exports.getAllUsers = factory.getAll(User);
@@ -190,7 +195,18 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
   try {
     // 2) Delete all reviews created by this user
+    const reviews = await Review.find({ user: req.params.id })
+      .select('tour')
+      .session(session);
+    const affectedTourIds = [
+      ...new Set(reviews.map((review) => review.tour.toString())),
+    ];
     await Review.deleteMany({ user: req.params.id }, { session });
+    await Promise.all(
+      affectedTourIds.map((tourId) =>
+        Review.calcAverageRatings(tourId, session)
+      )
+    );
 
     // 3) Delete all bookings created by this user
     await Booking.deleteMany({ user: req.params.id }, { session });
@@ -209,21 +225,6 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
     // Commit transaction
     await session.commitTransaction();
-
-    // 6) Delete user's profile photo from filesystem (after transaction is safely committed)
-    if (user.photo && user.photo !== 'default.jpg') {
-      const userPhotoPath = path.join(
-        __dirname,
-        '../public/img/users',
-        user.photo
-      );
-      await safeUnlink(userPhotoPath);
-    }
-
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    });
   } catch (err) {
     // Rollback transaction on any error
     await session.abortTransaction();
@@ -234,4 +235,15 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   } finally {
     session.endSession();
   }
+
+  if (user.photo && user.photo !== 'default.jpg') {
+    await safeUnlink(
+      resolveChildPath(path.join(__dirname, '../public/img/users'), user.photo)
+    );
+  }
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
 });

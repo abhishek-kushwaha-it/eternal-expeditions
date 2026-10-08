@@ -38,6 +38,8 @@ server/
 │   ├── errorController.js
 │   ├── handlerFactory.js
 │   ├── reviewController.js
+│   ├── stripeWebhookController.js
+│   ├── tourAnalyticsController.js
 │   ├── tourController.js
 │   └── userController.js
 │
@@ -53,6 +55,10 @@ server/
 │   ├── tourRoutes.js
 │   └── userRoutes.js
 │
+├── middleware/               # Request parsing and image processing
+│   ├── tourDataMiddleware.js
+│   └── tourImageMiddleware.js
+│
 ├── utils/                    # Helpers and services
 │   ├── apiFeatures.js
 │   ├── appError.js
@@ -62,6 +68,7 @@ server/
 │   ├── config.js
 │   ├── email.js
 │   ├── fileUtils.js
+│   ├── imageUtils.js
 │   ├── objectUtils.js
 │   ├── socket.js
 │   └── uploadUtils.js
@@ -90,6 +97,8 @@ The backend loads `.env.development` or `.env.production` depending on `NODE_ENV
 - `SENDGRID_PASSWORD`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `GEMINI_API_KEY` (optional; enables the Eternal AI Assistant)
+- `GEMINI_MODEL` (optional; defaults to `gemini-3.8-flash`)
 - `MAX_FILE_SIZE`
 - `ALLOWED_IMAGE_TYPES`
 - `LOG_LEVEL`
@@ -97,6 +106,10 @@ The backend loads `.env.development` or `.env.production` depending on `NODE_ENV
 - `COOKIE_SECURE`
 - `COOKIE_HTTP_ONLY`
 - `COOKIE_SAME_SITE`
+
+To enable the assistant locally, add `GEMINI_API_KEY=your-key` to
+`server/.env.development` and restart the backend. Keep the key out of frontend
+environment files and source control. `GEMINI_MODEL` is optional.
 
 ## 📦 Key Dependencies
 
@@ -164,6 +177,14 @@ The backend loads `.env.development` or `.env.production` depending on `NODE_ENV
 - `GET /api/v1/bookings/checkout-session/:tourId`
 - `POST /api/v1/bookings/webhook/stripe`
 
+### Eternal AI Assistant
+
+- `POST /api/v1/eternal-ai-assistant/chat` — available to visitors and signed-in accounts for public tour questions; only authenticated `user` accounts are offered private booking lookups.
+- The assistant uses Gemini function calling with public tour search and read-only booking tools. Booking tools are scoped to the authenticated user and cannot create, change, cancel, or pay for bookings. Guides and admins only receive public tour search.
+- Booking filters include upcoming trips, payment status, and a calendar month (`YYYY-MM`).
+- The browser keeps conversation history only in the current tab and sends the latest turns to the server with each prompt. The server does not persist chat history.
+- Prompts and recent turns are sent to Gemini. Booking records are provided to Gemini only when the assistant calls a booking lookup tool. Configure `GEMINI_API_KEY` in server environment settings; do not expose it to the frontend. Keep free-tier demonstrations strictly synthetic; do not send real personal or confidential booking data to Gemini's unpaid tier.
+
 ## 💳 Stripe Integration
 
 - The backend handles Stripe Checkout creation and webhook validation.
@@ -206,7 +227,6 @@ The booking model includes fields for real-time tracking and Stripe metadata:
 
 - The server package is configured for both development and production via `NODE_ENV`.
 - Use the root workspace README for overall repository instructions and links to the frontend and backend docs.
-
 
 ### Middleware Stack
 

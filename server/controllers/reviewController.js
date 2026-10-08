@@ -5,9 +5,8 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.setTourUserIds = (req, res, next) => {
-  // Allow nested routes
-  if (!req.body.tour) req.body.tour = req.params.tourId;
-  if (!req.body.user) req.body.user = req.user.id;
+  req.body.tour = req.params.tourId || req.body.tour;
+  req.body.user = req.user.id;
   next();
 };
 
@@ -43,7 +42,7 @@ exports.validateReviewOwnership = catchAsync(async (req, res, next) => {
   if (
     req.user.role !== 'admin' &&
     req.user.role !== 'guide' &&
-    review.user._id.toString() !== req.user.id
+    review.user?._id?.toString() !== req.user.id
   ) {
     return next(
       new AppError('You do not have permission to perform this action', 403)

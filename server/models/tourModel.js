@@ -16,10 +16,12 @@ const tourSchema = new mongoose.Schema(
     duration: {
       type: Number,
       required: [true, 'A tour must have a duration'],
+      min: [1, 'Tour duration must be at least one day'],
     },
     maxGroupSize: {
       type: Number,
       required: [true, 'A tour must have a group size'],
+      min: [1, 'A tour must allow at least one participant'],
     },
     difficulty: {
       type: String,
@@ -39,14 +41,17 @@ const tourSchema = new mongoose.Schema(
     ratingsQuantity: {
       type: Number,
       default: 0,
+      min: [0, 'Ratings quantity cannot be negative'],
     },
     price: {
       type: Number,
       required: [true, 'A tour must have a price'],
+      min: [0.5, 'Tour price must be at least $0.50'],
     },
     priceDiscount: {
       type: Number,
       default: 0,
+      min: [0, 'Discount cannot be negative'],
       validate: {
         validator: function (val) {
           // Only validate during creation (.save()), not during updates

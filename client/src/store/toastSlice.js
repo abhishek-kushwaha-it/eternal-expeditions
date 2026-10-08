@@ -13,13 +13,6 @@ const toastSlice = createSlice({
       prepare: (message, type = 'success', duration = 3000) => {
         const id = Date.now() + Math.random();
 
-        // Auto-dismiss toast after duration
-        if (duration > 0) {
-          setTimeout(() => {
-            // This will be handled by a listener in the store
-          }, duration);
-        }
-
         return {
           payload: {
             id,

@@ -14,6 +14,7 @@ const bookingSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: [true, 'Booking must have a price.'],
+    min: [0.5, 'Booking price must be at least $0.50.'],
   },
   createdAt: {
     type: Date,

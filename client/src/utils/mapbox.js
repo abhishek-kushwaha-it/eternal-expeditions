@@ -1,7 +1,8 @@
-import mapboxgl from 'mapbox-gl';
-
-export const displayMap = (mapContainer, locations) => {
+export const displayMap = async (mapContainer, locations) => {
   if (!mapContainer || !locations || locations.length === 0) return;
+
+  const { default: mapboxgl } = await import('mapbox-gl');
+  if (!mapContainer.isConnected) return;
 
   mapboxgl.accessToken =
     'pk.eyJ1IjoiYWJoaWt1c2gwMTIiLCJhIjoiY21sZzZmYXN6MDk3ZzNmc2g0dWZuNnQ5ayJ9.Hd8iNrXwfpwuzYJaIySeeg';

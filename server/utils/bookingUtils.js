@@ -30,17 +30,7 @@ const createManualBookingData = ({
   };
 };
 
-const isStripeEventSupported = (eventType) =>
-  [
-    'checkout.session.completed',
-    'charge.succeeded',
-    'charge.failed',
-    'checkout.session.async_payment_failed',
-    'checkout.session.async_payment_succeeded',
-  ].includes(eventType);
-
 module.exports = {
   mapStripePaymentStatus,
   createManualBookingData,
-  isStripeEventSupported,
 };

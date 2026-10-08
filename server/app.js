@@ -12,11 +12,12 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const bookingController = require('./controllers/bookingController');
+const stripeWebhookController = require('./controllers/stripeWebhookController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
+const eternalAIAssistantRouter = require('./routes/eternalAIAssistantRoutes');
 
 const app = express();
 const config = require('./utils/config');
@@ -41,11 +42,17 @@ app.use(
 );
 
 // 1) GLOBAL MIDDLEWARES
-// Serving static files
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Set security HTTP headers
 app.use(helmet());
+
+// Profile and tour images are loaded by a separate frontend origin in production.
+app.use('/img', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Trust proxy for Azure App Services
 // Azure sends X-Forwarded-For header, so we need to trust the proxy
@@ -73,8 +80,8 @@ app.use('/api', limiter);
 app.post(
   '/api/v1/bookings/webhook/stripe',
   express.raw({ type: 'application/json' }),
-  bookingController.verifyStripeWebhook,
-  bookingController.handleStripeWebhook
+  stripeWebhookController.verifyStripeWebhook,
+  stripeWebhookController.handleStripeWebhook
 );
 
 // Body parser, reading data from body into req.body
@@ -115,6 +122,7 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
+app.use('/api/v1/eternal-ai-assistant', eternalAIAssistantRouter);
 
 // For any other route, return 404 (React SPA will handle its own routing)
 app.all('*', (req, res, next) => {

@@ -79,7 +79,8 @@ export default function ManageReviews() {
         }
         if (searchTour) {
           const searchLower = searchTour.toLowerCase();
-          const matchesTourId = r.tour?.includes(searchLower);
+          const tourId = String(r.tour?._id || r.tour || '').toLowerCase();
+          const matchesTourId = tourId.includes(searchLower);
           const matchesUserName = r.user?.name?.toLowerCase().includes(searchLower);
           const matchesUserId = r.user?._id?.includes(searchTour);
           if (!matchesTourId && !matchesUserName && !matchesUserId) {

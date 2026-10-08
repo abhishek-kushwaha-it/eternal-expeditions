@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
       refetchOnReconnect: 'stale', // Only refetch stale queries when reconnecting
     },
     mutations: {
-      retry: 1,
+      retry: 0,
     },
   },
 });

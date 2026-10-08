@@ -96,11 +96,16 @@ export default function BookingDetailsPage() {
                   <div className={styles['booking-info-item']}>
                     <span className={styles['booking-info-label']}>Start Date</span>
                     <span className={styles['booking-info-value']}>
-                      {new Date(booking.tour?.startDates?.[0]).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                      {booking.tour?.startDates?.[0]
+                        ? new Date(booking.tour.startDates[0]).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            }
+                          )
+                        : 'Not scheduled'}
                     </span>
                   </div>
                   <div className={styles['booking-info-item']}>

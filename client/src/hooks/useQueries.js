@@ -12,11 +12,16 @@ const invalidateBookingQueries = (queryClient) => {
 const invalidateTourQueries = (queryClient) => {
   queryClient.invalidateQueries({ queryKey: ['tours'] });
   queryClient.invalidateQueries({ queryKey: ['allToursAdmin'] });
+  queryClient.invalidateQueries({ queryKey: ['topCheapTours'] });
+  queryClient.invalidateQueries({ queryKey: ['tourStats'] });
+  queryClient.invalidateQueries({ queryKey: ['monthlyPlan'] });
 };
 
 const invalidateReviewQueries = (queryClient, tourId = null) => {
   queryClient.invalidateQueries({ queryKey: ['myReviews'] });
   queryClient.invalidateQueries({ queryKey: ['allReviews'] });
+  queryClient.invalidateQueries({ queryKey: ['topCheapTours'] });
+  queryClient.invalidateQueries({ queryKey: ['tourStats'] });
   if (tourId) {
     queryClient.invalidateQueries({ queryKey: ['tour', tourId] });
   }
@@ -94,13 +99,20 @@ export const useToursWithin = (distance, lat, lng, unit = 'mi') => {
   return useQuery({
     queryKey: ['toursWithin', distance, lat, lng, unit],
     queryFn: async () => {
-      if (!distance || !lat || !lng || distance === null || lat === null || lng === null) {
+      if (
+        distance === null ||
+        distance === undefined ||
+        lat === null ||
+        lat === undefined ||
+        lng === null ||
+        lng === undefined
+      ) {
         throw new Error('Distance, latitude, and longitude are required');
       }
 
-      const dist = parseFloat(distance);
-      const latitude = parseFloat(lat);
-      const longitude = parseFloat(lng);
+      const dist = Number(distance);
+      const latitude = Number(lat);
+      const longitude = Number(lng);
 
       if (isNaN(dist) || isNaN(latitude) || isNaN(longitude)) {
         throw new Error('Invalid distance or coordinate values');
@@ -122,7 +134,13 @@ export const useToursWithin = (distance, lat, lng, unit = 'mi') => {
     staleTime: 1000 * 60 * 20, // 20 minutes (increased from 10)
     gcTime: 1000 * 60 * 60,
     retry: 1,
-    enabled: !!(distance && lat && lng && distance !== null && lat !== null && lng !== null),
+    enabled:
+      distance !== null &&
+      distance !== undefined &&
+      lat !== null &&
+      lat !== undefined &&
+      lng !== null &&
+      lng !== undefined,
   });
 };
 
@@ -131,12 +149,17 @@ export const useDistances = (lat, lng, unit = 'mi') => {
   return useQuery({
     queryKey: ['distances', lat, lng, unit],
     queryFn: async () => {
-      if (!lat || !lng || lat === null || lng === null) {
+      if (
+        lat === null ||
+        lat === undefined ||
+        lng === null ||
+        lng === undefined
+      ) {
         throw new Error('Latitude and longitude are required');
       }
 
-      const latitude = parseFloat(lat);
-      const longitude = parseFloat(lng);
+      const latitude = Number(lat);
+      const longitude = Number(lng);
 
       if (isNaN(latitude) || isNaN(longitude)) {
         throw new Error('Invalid latitude or longitude values');
@@ -156,7 +179,11 @@ export const useDistances = (lat, lng, unit = 'mi') => {
     staleTime: 1000 * 60 * 20, // 20 minutes (increased from 10)
     gcTime: 1000 * 60 * 60,
     retry: 1,
-    enabled: !!(lat && lng && lat !== null && lng !== null),
+    enabled:
+      lat !== null &&
+      lat !== undefined &&
+      lng !== null &&
+      lng !== undefined,
   });
 };
 
@@ -182,7 +209,10 @@ export const useUpdateTourMutation = () => {
   return useMutation({
     mutationFn: ({ tourId, data }) => api.patch(`/tours/${tourId}`, data),
     onSuccess: (response, variables) => {
-      queryClient.setQueryData(['tour', variables.tourId], response.data.data);
+      queryClient.setQueryData(
+        ['tour', variables.tourId],
+        response.data.data.data
+      );
       invalidateTourQueries(queryClient);
     },
   });
@@ -197,6 +227,8 @@ export const useDeleteTourMutation = () => {
     onSuccess: (response, tourId) => {
       queryClient.removeQueries({ queryKey: ['tour', tourId] });
       invalidateTourQueries(queryClient);
+      invalidateBookingQueries(queryClient);
+      invalidateReviewQueries(queryClient);
     },
   });
 };
@@ -456,8 +488,11 @@ export const useUpdateBookingMutation = () => {
 
   return useMutation({
     mutationFn: ({ bookingId, data }) => api.patch(`/bookings/${bookingId}`, data),
-    onSuccess: () => {
+    onSuccess: (response, variables) => {
       invalidateBookingQueries(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: ['booking', variables.bookingId],
+      });
     },
   });
 };
@@ -480,13 +515,10 @@ export const useCreateReviewMutation = () => {
 
   return useMutation({
     mutationFn: ({ tour, rating, review }) => api.post('/reviews', { tour, rating, review }),
-    onSuccess: (response) => {
-      let tourId = null;
-      try {
-        tourId = response.data?.data?.tour?._id || response.data?.data?.tour;
-      } catch {
-        // Silently ignore - tourId extraction is not critical
-      }
+    onSuccess: (response, variables) => {
+      const tour =
+        response.data?.data?.data?.tour || variables.tour;
+      const tourId = tour?._id || tour;
       invalidateReviewQueries(queryClient, tourId);
     },
   });
@@ -500,12 +532,8 @@ export const useUpdateReviewMutation = () => {
     mutationFn: ({ reviewId, rating, review }) =>
       api.patch(`/reviews/${reviewId}`, { rating, review }),
     onSuccess: (response, variables) => {
-      let tourId = null;
-      try {
-        tourId = response.data?.data?.tour?._id || response.data?.data?.tour || variables.tourId;
-      } catch {
-        // Silently ignore
-      }
+      const tour = response.data?.data?.data?.tour || variables.tourId;
+      const tourId = tour?._id || tour;
       invalidateReviewQueries(queryClient, tourId);
     },
   });
@@ -518,12 +546,8 @@ export const useDeleteReviewMutation = () => {
   return useMutation({
     mutationFn: ({ reviewId }) => api.delete(`/reviews/${reviewId}`),
     onSuccess: (response, variables) => {
-      let tourId = null;
-      try {
-        tourId = response.data?.data?.tour?._id || response.data?.data?.tour || variables.tourId;
-      } catch {
-        // Silently ignore
-      }
+      const tour = response.data?.data?.data?.tour || variables.tourId;
+      const tourId = tour?._id || tour;
       invalidateReviewQueries(queryClient, tourId);
     },
   });
@@ -557,18 +581,6 @@ export const useAllUsers = () => {
 export const useGetUserMutation = () => {
   return useMutation({
     mutationFn: (userId) => api.get(`/users/${userId}`),
-  });
-};
-
-// Admin: Create user
-export const useCreateUserMutation = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (userData) => api.post('/users', userData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allUsers'] });
-    },
   });
 };
 

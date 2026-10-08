@@ -5,8 +5,8 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const API_BASE_URL = apiUrl;
-export const BACKEND_URL = backendUrl;
-export const IMAGE_URL = `${BACKEND_URL}/img`;
+export const BACKEND_URL = backendUrl?.replace(/\/+$/, '');
+export const IMAGE_URL = BACKEND_URL ? `${BACKEND_URL}/img` : '/img';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

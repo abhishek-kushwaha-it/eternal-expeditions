@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { Button } from '.';
+import Button from './Button';
 import styles from './ConfirmDialog.module.css';
 
 /**

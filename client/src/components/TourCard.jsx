@@ -17,11 +17,13 @@ const getDiscountPercentage = (price, discount) => {
 };
 
 function TourCard({ tour, distance, unit = 'mi' }) {
-  const startDate = new Date(tour.startDates[0]).toLocaleString('en-us', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const startDate = tour.startDates?.[0]
+    ? new Date(tour.startDates[0]).toLocaleString('en-us', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : 'Dates to be announced';
 
   const cardHeader = (
     <div className={styles['tour-card__image-wrapper']}>

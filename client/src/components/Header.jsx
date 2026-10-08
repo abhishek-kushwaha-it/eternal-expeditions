@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, lazy, useCallback, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Image, Button } from '../core-components';
 import { useAuth } from '../hooks/useAuth';
@@ -7,17 +7,22 @@ import { useToasts } from '../store/hooks';
 import { IMAGE_URL } from '../utils/api';
 import styles from './Header.module.css';
 
+const EternalAIAssistant = lazy(() => import('./EternalAIAssistant'));
+
 export default function Header() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading } = useAuth();
   const logoutMutation = useLogoutMutation();
   const { addToast } = useToasts();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const closeAssistant = useCallback(() => setAssistantOpen(false), []);
 
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
       navigate('/');
+      setAssistantOpen(false);
       addToast('Logged out successfully!', 'success');
       setMobileMenuOpen(false);
     } catch {
@@ -25,27 +30,28 @@ export default function Header() {
     }
   };
 
+  const assistantButton = (
+    <Button
+      type="button"
+      variant="primary"
+      size="sm"
+      className={styles['assistant-toggle']}
+      onClick={() => setAssistantOpen((isOpen) => !isOpen)}
+      aria-expanded={assistantOpen}
+      aria-controls="eternal-ai-assistant"
+      aria-label={assistantOpen ? 'Close Eternal AI Assistant' : 'Open Eternal AI Assistant'}
+      title="Eternal AI Assistant"
+    >
+      <span className={styles['assistant-toggle__sparkle']} aria-hidden="true">
+        ✦
+      </span>
+      AI Assistant
+    </Button>
+  );
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-
-  if (loading) {
-    return (
-      <header className={styles.header}>
-        <div className={styles['header__left']}>
-          <div className={styles['header__logo']}>
-            <Image
-              src="/img/logo-header.png"
-              alt="Eternal-Expeditions Logo"
-              className={styles['logo-image']}
-            />
-            <span className={styles['logo-text']}>Eternal-Expeditions</span>
-          </div>
-        </div>
-        <span className={styles['loading-text']}>Loading...</span>
-      </header>
-    );
-  }
 
   return (
     <header className={styles.header}>
@@ -97,8 +103,14 @@ export default function Header() {
         </Button>
 
         <div className={styles['header__auth']}>
-          {isAuthenticated && user ? (
+          {loading ? (
+            <div className={styles['auth-links']}>
+              <span className={styles['loading-text']}>Loading...</span>
+              {assistantButton}
+            </div>
+          ) : isAuthenticated && user ? (
             <div className={styles['user-section']}>
+              {assistantButton}
               <Link to="/me" className={styles['user-profile']}>
                 <Image
                   src={`${IMAGE_URL}/users/${user.photo}?t=${user.updatedAt}`}
@@ -119,10 +131,8 @@ export default function Header() {
             </div>
           ) : (
             <div className={styles['auth-links']}>
-              <Link
-                to="/login"
-                className={`${styles['nav__link']} ${styles['nav__link--login']}`}
-              >
+              {assistantButton}
+              <Link to="/login" className={`${styles['nav__link']} ${styles['nav__link--login']}`}>
                 Log in
               </Link>
               <Link
@@ -136,6 +146,14 @@ export default function Header() {
         </div>
       </div>
 
+      <Suspense fallback={null}>
+        <EternalAIAssistant
+          open={assistantOpen}
+          onClose={closeAssistant}
+          userRole={isAuthenticated ? user?.role : null}
+          memoryKey={isAuthenticated ? user?.id || user?._id : 'public'}
+        />
+      </Suspense>
     </header>
   );
 }

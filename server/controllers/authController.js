@@ -8,6 +8,15 @@ const Email = require('../utils/email');
 const { createSendToken, sendBackgroundEmail } = require('../utils/authToken');
 const config = require('../utils/config');
 
+const findUserByValidResetToken = (token) => {
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  return User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -151,17 +160,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyResetToken = catchAsync(async (req, res, next) => {
-  // 1) Hash the token from params
-  const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
-
-  // 2) Find user with valid reset token and check expiration
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
+  const user = await findUserByValidResetToken(req.params.token);
 
   // 3) If token is invalid or expired
   if (!user) {
@@ -183,18 +182,8 @@ exports.verifyResetToken = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  // 1) Get user based on the token
-  const hashedToken = crypto
-    .createHash('sha256')
-    .update(req.params.token)
-    .digest('hex');
+  const user = await findUserByValidResetToken(req.params.token);
 
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-
-  // 2) If token has not expired, and there is user, set the new password
   if (!user) {
     return next(new AppError('Token is invalid or has expired', 400));
   }
@@ -204,8 +193,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  // 3) Update changedPasswordAt property for the user
-  // 4) Log the user in, send JWT
   createSendToken(user, 200, res);
 });
 

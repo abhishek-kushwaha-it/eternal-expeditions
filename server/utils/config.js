@@ -91,6 +91,10 @@ const config = {
   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
 
+  // Eternal AI Assistant. Optional so the server can run while unconfigured.
+  geminiApiKey: process.env.GEMINI_API_KEY,
+  geminiModel: process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+
   // File Upload Config
   maxFileSize: process.env.MAX_FILE_SIZE,
   allowedImageTypes: process.env.ALLOWED_IMAGE_TYPES,

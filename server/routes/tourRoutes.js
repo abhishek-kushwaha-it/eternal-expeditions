@@ -1,7 +1,10 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
+const tourAnalyticsController = require('../controllers/tourAnalyticsController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
+const tourImageMiddleware = require('../middleware/tourImageMiddleware');
+const tourDataMiddleware = require('../middleware/tourDataMiddleware');
 
 const router = express.Router();
 
@@ -13,25 +16,27 @@ const router = express.Router();
 // Nested reviews route - use this after admin route
 router.use('/:tourId/reviews', reviewRouter);
 
-router.route('/top-5-cheap').get(tourController.getTopCheapTours);
+router.route('/top-5-cheap').get(tourAnalyticsController.getTopCheapTours);
 
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router.route('/monthly-plan/:year').get(tourAnalyticsController.getMonthlyPlan);
 
 router
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
-  .get(tourController.getToursWithin);
+  .get(tourAnalyticsController.getToursWithin);
 
 // /tours-within?distance=233&center=-40,45&unit=mi
 // /tours-within/233/center/-40,45/unit/mi
 
-router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+router
+  .route('/distances/:latlng/unit/:unit')
+  .get(tourAnalyticsController.getDistances);
 
 router
   .route('/tour-stats')
   .get(
     authController.protect,
     authController.restrictTo('admin', 'guide'),
-    tourController.getTourStats
+    tourAnalyticsController.getTourStats
   );
 
 router
@@ -40,9 +45,9 @@ router
   .post(
     authController.protect,
     authController.restrictTo('admin', 'guide'),
-    tourController.uploadTourImages,
-    tourController.resizeTourImages,
-    tourController.dataSanitization,
+    tourImageMiddleware.uploadTourImages,
+    tourImageMiddleware.resizeTourImages,
+    tourDataMiddleware.dataSanitization,
     tourController.createTour
   );
 
@@ -52,9 +57,9 @@ router
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'guide'),
-    tourController.uploadTourImages,
-    tourController.resizeTourImages,
-    tourController.dataSanitization,
+    tourImageMiddleware.uploadTourImages,
+    tourImageMiddleware.resizeTourImages,
+    tourDataMiddleware.dataSanitization,
     tourController.updateTour
   )
   .delete(

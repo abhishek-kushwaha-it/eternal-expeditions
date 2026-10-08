@@ -263,9 +263,7 @@ const appendImageData = (data, formData, changedFields, existingCoverImage) => {
 const appendArrayFields = (data, formData, changedFields, fields) => {
   fields.forEach((field) => {
     if (changedFields.includes(field) && Array.isArray(formData[field])) {
-      formData[field].forEach((item) => {
-        if (item) data.append(field, item);
-      });
+      data.append(field, JSON.stringify(formData[field]));
     }
   });
 };
@@ -273,9 +271,7 @@ const appendArrayFields = (data, formData, changedFields, fields) => {
 // Helper: Append location array as JSON
 const appendLocations = (data, formData, changedFields) => {
   if (!changedFields.includes('locations') || !Array.isArray(formData.locations)) return;
-  if (formData.locations.length > 0) {
-    data.append('locations', JSON.stringify(formData.locations));
-  }
+  data.append('locations', JSON.stringify(formData.locations));
 };
 
 export const parseStartDates = (dateString) => {

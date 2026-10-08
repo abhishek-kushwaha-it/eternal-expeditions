@@ -22,8 +22,25 @@ export default function TourPage() {
   useEffect(() => {
     if (!tour || !mapContainer.current) return undefined;
 
-    const map = displayMap(mapContainer.current, tour.locations);
-    return () => map?.remove();
+    let isMounted = true;
+    let map;
+
+    displayMap(mapContainer.current, tour.locations)
+      .then((loadedMap) => {
+        if (!isMounted) {
+          loadedMap?.remove();
+          return;
+        }
+        map = loadedMap;
+      })
+      .catch((error) => {
+        console.error('Unable to load tour map:', error);
+      });
+
+    return () => {
+      isMounted = false;
+      map?.remove();
+    };
   }, [tour]);
 
   const handleBookTour = () => {
@@ -70,10 +87,12 @@ export default function TourPage() {
     );
   }
 
-  const startDate = new Date(tour.startDates[0]).toLocaleString('en-us', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const startDate = tour.startDates?.[0]
+    ? new Date(tour.startDates[0]).toLocaleString('en-us', {
+        month: 'long',
+        year: 'numeric',
+      })
+    : 'Dates to be announced';
 
   const guides = tour.guides || [];
   const reviews = tour.reviews || [];

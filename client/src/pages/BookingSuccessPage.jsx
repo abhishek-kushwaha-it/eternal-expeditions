@@ -148,7 +148,9 @@ export default function BookingSuccessPage() {
         paymentStatus: booking.paymentStatus,
         paymentMethod: booking.paymentMethod,
         failureReason: booking.failureReason,
-        tourStartDate: formatDate(booking.tour?.startDates?.[0]),
+        tourStartDate: booking.tour?.startDates?.[0]
+          ? formatDate(booking.tour.startDates[0])
+          : 'Not scheduled',
       });
 
       // Handle payment status
