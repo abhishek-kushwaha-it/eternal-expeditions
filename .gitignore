@@ -23,6 +23,10 @@ client/dist/
 .parcel-cache/
 .next/
 out/
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
 
 # Package lock files
 package-lock.json
